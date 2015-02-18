@@ -17,7 +17,7 @@ NOTE: It may take some time for Eclipse to populate the results. Locate "Eclipse
 4. Once you have opened the Git perspective, a new tab on the left will appear with the database icon. Open it. The tab labeled "Git Repositories" should now be popped open. Select the option labeled "Clone a Git Repository". 
 URI: https://github.com/MesaLabs1/MesaTraining.git
 A few fields will fill in automatically. 
-Now, for Authentication, enter the login information for this repository. 
+Now, for Authentication, enter the login information for your GitHub account, provided you've been added as a collaborator. 
 Optional: Check "Store in Secure store". Hit Next.
 
 
