@@ -30,5 +30,6 @@ This repository contains the primary Java-based frontends for the web applets th
 
 
 How to Add/Remove/Update the Repo with your work
+
 1. All modifications you make can be applied by right clicking the "MesaTraining" entry in Git, and hitting "Commit", and then after posting a commit message, selecting "Commit and Push". This will sync the project with the upstream.
 1a. If you get an error saying "Non-fast forward" you have most likely pushed an empty commit.
