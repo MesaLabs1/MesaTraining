@@ -28,6 +28,7 @@ Optional: Check "Store in Secure store". Hit Next.
 7. You now have access to the Git repository from Eclipse. Remember that you can toggle between both perpectives via the top 	 right buttons labeled "Java" and "Git". Other buttons will appear here as you open more perspectives.
 
 How to Add/Remove/Update the Repo with your work
+
 1. All modifications you make can be applied by right clicking the "MesaTraining" entry in Git, and hitting "Commit", and then after posting a commit message, selecting "Commit and Push". This will sync the project with the upstream.
 
 If you get an error saying "Non-fast forward" you have most likely pushed an empty commit.
