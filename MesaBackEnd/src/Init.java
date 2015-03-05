@@ -5,7 +5,6 @@ import java.io.*;
  * 
  * 
  * @author hackjunky, jacrin
- * hi
  *
  */
 
@@ -49,7 +48,7 @@ public class Init {
 	}
 
 	public void ParseConfigFile() {
-
+		
 	}
 
 	/** Container for the Configuration Data that is parsed at runtime.
