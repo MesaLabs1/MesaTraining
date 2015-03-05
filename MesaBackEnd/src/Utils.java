@@ -25,6 +25,12 @@ public class Utils {
         CLIENT_CODE_STACK_INDEX = i;
     }
     
+    /**
+     * Log is a universal static class that posts the sender name, the time, and the message.
+     * @param message The message to display in the system console.
+     * 
+     * TODO: Fix the freaking calendar time thing.
+     */
 	static void Log(String message) {
 		Calendar cal = Calendar.getInstance();
 		String sender = Thread.currentThread().getStackTrace()[CLIENT_CODE_STACK_INDEX].getMethodName();
