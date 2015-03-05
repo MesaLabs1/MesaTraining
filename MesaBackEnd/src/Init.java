@@ -5,6 +5,7 @@ import java.io.*;
  * 
  * 
  * @author hackjunky, jacrin
+ * hi
  *
  */
 
@@ -25,6 +26,10 @@ public class Init {
 		boolean pathIsValid = false;
 		if (path.endsWith("/") || path.endsWith("/")) {
 			pathIsValid = true;
+		}
+		
+		if (!pathIsValid) {
+			
 		}
 
 		if (pathIsValid) {
