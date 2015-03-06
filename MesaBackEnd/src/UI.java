@@ -28,6 +28,13 @@ public class UI extends JFrame{
 	/**
 	 * The constructor here will simply define the GUI components, make sure the style is visually neutral (to avoid random UI inconsistencies),
 	 * and set the font package of the target system.
+	 * 
+	 * IT is highly recommended that you install WindowBuilder (native to Luna Eclipse) in order to modify
+	 * the User Interface, as hard-coding interfaces is laborious and pretty freaking boring.
+	 * 
+	 * Note: Notice below, that we used Xs to placehold characters for their size. Why did we use Xs? The character
+	 * X takes up the most possible space when capitalized, as opposed to a character like ?, where it does not take
+	 * up as much space as as number. Always use a capital letter to placehold label sizes.
 	 */
 	public UI() {
 		setTitle("MESA Backend - User Interface");
@@ -36,6 +43,8 @@ public class UI extends JFrame{
 		
 		//Make sure that when the user terminates the UI, we don't leave our socket running in the background.
 		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
+		
+		//We want to use a neutral UI Layout.
 		getContentPane().setLayout(null);
 		
 		JPanel pnlConnection = new JPanel();

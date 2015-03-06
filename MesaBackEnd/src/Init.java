@@ -29,10 +29,16 @@ public class Init {
 	NodeList nodeList;
 	
 	//See PropertyMaster class. This class will contain all data and object references that need to be passed to the main program.
-
 	PropertyMaster propMaster;
 	
+	//Command Line Arguments.
+	static String[] arguments;
+	
+	//User Interface.
+	UI ui;
+	
 	public static void main (String[] args) {
+		arguments = args;
 		new Init();
 	}
 
@@ -51,10 +57,20 @@ public class Init {
 		
 		boolean configResult = LoadConfigFile("config.xml");
 		if (configResult) {
+			ParseConfigFile();
 			
+			/**
+			 * Here, we check to see if the launch parameter wants a "silent" run (in the background), by using
+			 * a tag we dubbed "nogui". By adding "-nogui" to the command line launch options for the Jar, you
+			 * can disable the User Interface. It is not a necessary component to the server, used purely
+			 * for debugging and visual effect purposes.
+			 */
+			
+			if (!CheckForArgument("nogui")) {
+				ui = new UI();
+			}
 		}else {
 			propMaster.util.Log("Received ABORT. Please send a copy of these logs to the System Administrator.");
-		
 		}
 	}
 	
@@ -193,9 +209,25 @@ public class Init {
 		return elementValue;
 	}
 	
+	/**
+	 * Searches the command line arguments given when launching the program for a specific argument.
+	 * @param arg The name of the argument you're looking for.
+	 * @return Returns true if the argument exists, false if not.
+	 */
+	public boolean CheckForArgument(String arg) {
+		boolean found = false;
+		propMaster.util.Log("SEARCH: " + arg + " IN arguments[].");
+		for (int i = 0; i < arguments.length; i++) {
+			if (arguments[i].toLowerCase().equals(arg.toLowerCase())) {
+				found = true;
+				break;
+			}
+		}
+		return found;
+	}
 
-	/** Container for the Configuration Data that is parsed at runtime.
-	 * 
+	/** 
+	 * Container for the Configuration Data that is parsed at runtime.
 	 */
 	public class PropertyMaster {
 		//A reference to the utility class, to keep the output file name available and the same.
