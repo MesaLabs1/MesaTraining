@@ -29,6 +29,7 @@ public class Init {
 	NodeList nodeList;
 	
 	//See PropertyMaster class. This class will contain all data and object references that need to be passed to the main program.
+
 	PropertyMaster propMaster;
 	
 	public static void main (String[] args) {
@@ -53,7 +54,7 @@ public class Init {
 			
 		}else {
 			propMaster.util.Log("Received ABORT. Please send a copy of these logs to the System Administrator.");
-			System.exit(-1);
+		
 		}
 	}
 	
@@ -135,6 +136,7 @@ public class Init {
 			e.printStackTrace();
 
 			propMaster.util.Log("IOException in Backend bootstrapper! Aborting.");
+
 		}
 
 		return readSuccessful;
@@ -142,7 +144,7 @@ public class Init {
 
 	public void ParseConfigFile() {
 		propMaster.util.Log("Load complete! Parsing entries into master object...");
-		
+	
 		doc.getDocumentElement().normalize();
 		nodeList = doc.getElementsByTagName("INIT");
 		
@@ -187,6 +189,7 @@ public class Init {
 		}else {
 			propMaster.util.Log("Premature call to GetElementByNode! You must first initialize the Document with LoadConfigFile(). Ignoring.");
 		}
+		
 		return elementValue;
 	}
 	
