@@ -5,7 +5,7 @@ import java.io.*;
  * 
  * 
  * @author hackjunky, jacrin
- * hi
+ *
  *
  */
 
@@ -26,10 +26,6 @@ public class Init {
 		boolean pathIsValid = false;
 		if (path.endsWith("/") || path.endsWith("/")) {
 			pathIsValid = true;
-		}
-		
-		if (!pathIsValid) {
-			
 		}
 
 		if (pathIsValid) {
@@ -58,6 +54,6 @@ public class Init {
 	public class PropertyMaster {
 		//The newline character must be used when formatting a new line. Using \n or \r will NOT work cross-system.
 		final String newline = System.getProperty("line.separator");
-
+		
 	}
 }
