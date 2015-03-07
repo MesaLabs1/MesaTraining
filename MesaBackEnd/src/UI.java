@@ -43,14 +43,16 @@ public class UI extends JFrame{
 		
 		//Make sure that when the user terminates the UI, we don't leave our socket running in the background.
 		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
+		getContentPane().setLayout(new BorderLayout(0, 0));
 		
-		//We want to use a neutral UI Layout.
-		getContentPane().setLayout(null);
+		JPanel pnlHolder = new JPanel();
+		getContentPane().add(pnlHolder);
+		pnlHolder.setLayout(null);
 		
 		JPanel pnlConnection = new JPanel();
+		pnlConnection.setBounds(6, 6, 263, 96);
+		pnlHolder.add(pnlConnection);
 		pnlConnection.setBorder(new LineBorder(new Color(0, 0, 0), 1, true));
-		pnlConnection.setBounds(6, 6, 256, 96);
-		getContentPane().add(pnlConnection);
 		pnlConnection.setLayout(null);
 		
 		JLabel lblConnStatusH = new JLabel("Connection Status");
@@ -86,9 +88,9 @@ public class UI extends JFrame{
 		pnlConnection.add(lblOverall);
 		
 		JPanel pnlOutput = new JPanel();
-		pnlOutput.setBorder(new LineBorder(new Color(0, 0, 0), 1, true));
 		pnlOutput.setBounds(6, 108, 628, 322);
-		getContentPane().add(pnlOutput);
+		pnlHolder.add(pnlOutput);
+		pnlOutput.setBorder(new LineBorder(new Color(0, 0, 0), 1, true));
 		pnlOutput.setLayout(null);
 		
 		JLabel lblOutputH = new JLabel("Output");
@@ -133,9 +135,9 @@ public class UI extends JFrame{
 		pnlOutput.add(lblRunningxxx);
 		
 		JPanel pnlSystem = new JPanel();
-		pnlSystem.setBorder(new LineBorder(new Color(0, 0, 0)));
 		pnlSystem.setBounds(274, 6, 360, 96);
-		getContentPane().add(pnlSystem);
+		pnlHolder.add(pnlSystem);
+		pnlSystem.setBorder(new LineBorder(new Color(0, 0, 0)));
 		pnlSystem.setLayout(null);
 		
 		JLabel lblPeerInformation = new JLabel("System Information");
