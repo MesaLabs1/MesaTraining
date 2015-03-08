@@ -51,7 +51,7 @@ public class Init {
 		 * host system, not on your specific OS.
 		 */
 		try {
-			UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
+			UIManager.setLookAndFeel("com.sun.java.swing.plaf.gtk.GTKLookAndFeel");
 			
 			/**
 			 * A Button Mnemonic is the key a user has to press to activate that button automatically.
@@ -59,13 +59,13 @@ public class Init {
 			 */
 			UIManager.getDefaults().put("Button.showMnemonics", Boolean.TRUE);
 		}catch (UnsupportedLookAndFeelException e) {
-			
+			e.printStackTrace();
 		}catch (ClassNotFoundException e) {
-			
+			e.printStackTrace();
 		}catch (InstantiationException e) {
-			
+			e.printStackTrace();
 		}catch (IllegalAccessException e) {
-			
+			e.printStackTrace();
 		}
 
 		new Init();

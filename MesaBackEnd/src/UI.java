@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.ListSelectionModel;
+import java.awt.Font;
 
 /**
  * This class is a simple GUI for this backend. You can disable it from appearing by adding the tag -nogui to
@@ -122,7 +123,7 @@ public class UI extends JFrame{
 		util = u;
 		logs = new ArrayList<String>();
 
-		setType(Type.UTILITY);
+		//setType(Type.UTILITY);
 		
 		setAlwaysOnTop(true);
 
@@ -139,59 +140,74 @@ public class UI extends JFrame{
 		pnlHolder.setLayout(null);
 
 		JPanel pnlConnection = new JPanel();
-		pnlConnection.setBounds(6, 6, 263, 96);
+		pnlConnection.setBounds(6, 6, 138, 96);
 		pnlHolder.add(pnlConnection);
 		pnlConnection.setBorder(new LineBorder(new Color(0, 0, 0), 1, true));
 		pnlConnection.setLayout(null);
 
 		JLabel lblConnStatusH = new JLabel("Connection Status");
-		lblConnStatusH.setBounds(6, 6, 119, 16);
+		lblConnStatusH.setFont(new Font("Lucida Grande", Font.PLAIN, 10));
+		lblConnStatusH.setBounds(6, 3, 119, 16);
 		pnlConnection.add(lblConnStatusH);
 
 		JLabel lblClientsH = new JLabel("Clients:");
-		lblClientsH.setBounds(16, 26, 57, 16);
+		lblClientsH.setFont(new Font("Lucida Grande", Font.PLAIN, 10));
+		lblClientsH.setBounds(16, 21, 57, 16);
 		pnlConnection.add(lblClientsH);
 
 		JLabel lblOverheadH = new JLabel("Overhead:");
-		lblOverheadH.setBounds(16, 45, 71, 16);
+		lblOverheadH.setFont(new Font("Lucida Grande", Font.PLAIN, 10));
+		lblOverheadH.setBounds(16, 38, 71, 16);
 		pnlConnection.add(lblOverheadH);
 
-		lblUptime = new JLabel("XXX:XXX:XXX");
-		lblUptime.setBounds(161, 6, 92, 16);
-		pnlConnection.add(lblUptime);
-
 		JLabel lblOverallH = new JLabel("Overall:");
-		lblOverallH.setBounds(16, 66, 48, 16);
+		lblOverallH.setFont(new Font("Lucida Grande", Font.PLAIN, 10));
+		lblOverallH.setBounds(16, 56, 48, 16);
 		pnlConnection.add(lblOverallH);
 
 		lblClients = new JLabel("XXX");
-		lblClients.setBounds(85, 26, 29, 16);
+		lblClients.setFont(new Font("Lucida Grande", Font.PLAIN, 10));
+		lblClients.setBounds(73, 21, 29, 16);
 		pnlConnection.add(lblClients);
 
 		lblOverhead = new JLabel("XXXXXX");
-		lblOverhead.setBounds(85, 45, 57, 16);
+		lblOverhead.setFont(new Font("Lucida Grande", Font.PLAIN, 10));
+		lblOverhead.setBounds(73, 38, 57, 16);
 		pnlConnection.add(lblOverhead);
 
-		lblOverall = new JLabel("XXXXXXXXXXXXX");
-		lblOverall.setBounds(85, 66, 112, 16);
+		lblOverall = new JLabel("XXXXXXXXX");
+		lblOverall.setFont(new Font("Lucida Grande", Font.PLAIN, 10));
+		lblOverall.setBounds(73, 56, 112, 16);
 		pnlConnection.add(lblOverall);
+		
+				lblErrors = new JLabel("XXX");
+				lblErrors.setBounds(73, 74, 30, 16);
+				pnlConnection.add(lblErrors);
+				lblErrors.setFont(new Font("Lucida Grande", Font.PLAIN, 10));
+				
+						JLabel lblErrorsH = new JLabel("Errors:");
+						lblErrorsH.setBounds(16, 74, 35, 16);
+						pnlConnection.add(lblErrorsH);
+						lblErrorsH.setFont(new Font("Lucida Grande", Font.PLAIN, 10));
 
 		JPanel pnlOutput = new JPanel();
-		pnlOutput.setBounds(6, 108, 611, 305);
+		pnlOutput.setBounds(6, 108, 628, 322);
 		pnlHolder.add(pnlOutput);
 		pnlOutput.setBorder(new LineBorder(new Color(0, 0, 0), 1, true));
 		pnlOutput.setLayout(null);
 
 		JLabel lblOutputH = new JLabel("Output");
+		lblOutputH.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
 		lblOutputH.setBounds(6, 6, 61, 16);
 		pnlOutput.add(lblOutputH);
 
 		scrollPane = new JScrollPane();
-		scrollPane.setBounds(6, 25, 597, 244);
+		scrollPane.setBounds(6, 30, 616, 266);
 		pnlOutput.add(scrollPane);
 
 		listModel = new DefaultListModel();
 		consoleList = new JList(listModel);
+		consoleList.setFont(new Font("Lucida Grande", Font.PLAIN, 10));
 		consoleList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
 		scrollPane.setViewportView(consoleList);
@@ -199,24 +215,25 @@ public class UI extends JFrame{
 		pnlRed = new JPanel();
 		pnlRed.setBackground(Color.RED);
 		pnlRed.setBorder(new LineBorder(new Color(0, 0, 0)));
-		pnlRed.setBounds(585, 280, 16, 16);
+		pnlRed.setBounds(606, 300, 16, 16);
 		pnlOutput.add(pnlRed);
 
 		pnlYellow = new JPanel();
 		pnlYellow.setBackground(Color.YELLOW);
 		pnlYellow.setBorder(new LineBorder(new Color(0, 0, 0)));
-		pnlYellow.setBounds(585, 280, 16, 16);
+		pnlYellow.setBounds(606, 300, 16, 16);
 		pnlOutput.add(pnlYellow);
 
 		pnlGreen = new JPanel();
 		pnlGreen.setBackground(Color.GREEN);
 		pnlGreen.setBorder(new LineBorder(new Color(0, 0, 0)));
-		pnlGreen.setBounds(585, 280, 16, 16);
+		pnlGreen.setBounds(606, 300, 16, 16);
 		pnlOutput.add(pnlGreen);
 
 		JButton btnClear = new JButton("Clear");
+		btnClear.setFont(new Font("Lucida Grande", Font.PLAIN, 10));
 		btnClear.setMnemonic('c');
-		btnClear.setBounds(540, 6, 61, 16);
+		btnClear.setBounds(561, 5, 61, 21);
 		btnClear.addActionListener(new ActionListener() {
 
 			@Override
@@ -228,100 +245,125 @@ public class UI extends JFrame{
 		pnlOutput.add(btnClear);
 
 		progressBar = new JProgressBar();
-		progressBar.setBounds(6, 280, 183, 14);
+		progressBar.setBounds(6, 302, 220, 14);
 		pnlOutput.add(progressBar);
 
 		lblRunning = new JLabel("Running... (XXX%)");
-		lblRunning.setBounds(199, 278, 117, 16);
+		lblRunning.setFont(new Font("Lucida Grande", Font.PLAIN, 10));
+		lblRunning.setBounds(238, 302, 359, 16);
 		pnlOutput.add(lblRunning);
+		
+				JLabel lblGCH = new JLabel("Garbage Collections:");
+				lblGCH.setBounds(155, 6, 111, 16);
+				pnlOutput.add(lblGCH);
+				lblGCH.setFont(new Font("Lucida Grande", Font.PLAIN, 10));
+				
+						lblGC = new JLabel("XXXXXXX");
+						lblGC.setBounds(262, 6, 111, 16);
+						pnlOutput.add(lblGC);
+						lblGC.setFont(new Font("Lucida Grande", Font.PLAIN, 10));
 
 		JPanel pnlSystem = new JPanel();
-		pnlSystem.setBounds(274, 6, 343, 96);
+		pnlSystem.setBounds(150, 6, 223, 96);
 		pnlHolder.add(pnlSystem);
 		pnlSystem.setBorder(new LineBorder(new Color(0, 0, 0)));
 		pnlSystem.setLayout(null);
 
 		JLabel lblPeerInformationH = new JLabel("System Information");
-		lblPeerInformationH.setBounds(6, 6, 132, 16);
+		lblPeerInformationH.setFont(new Font("Lucida Grande", Font.PLAIN, 10));
+		lblPeerInformationH.setBounds(6, 3, 132, 16);
 		pnlSystem.add(lblPeerInformationH);
 
 		JLabel lblThreadsH = new JLabel("Threads:");
-		lblThreadsH.setBounds(16, 25, 61, 16);
+		lblThreadsH.setFont(new Font("Lucida Grande", Font.PLAIN, 10));
+		lblThreadsH.setBounds(16, 21, 45, 16);
 		pnlSystem.add(lblThreadsH);
 
 		JLabel lblHandlesH = new JLabel("Handles:");
-		lblHandlesH.setBounds(16, 43, 61, 16);
+		lblHandlesH.setFont(new Font("Lucida Grande", Font.PLAIN, 10));
+		lblHandlesH.setBounds(16, 38, 45, 16);
 		pnlSystem.add(lblHandlesH);
 
-		JLabel lblGCH = new JLabel("Garbage Collections:");
-		lblGCH.setBounds(16, 74, 137, 16);
-		pnlSystem.add(lblGCH);
-
-		JLabel lblErrorsH = new JLabel("Errors:");
-		lblErrorsH.setBounds(255, 74, 35, 16);
-		pnlSystem.add(lblErrorsH);
-
 		JLabel lblMemoryUsageH = new JLabel("Memory Usage:");
-		lblMemoryUsageH.setBounds(134, 25, 102, 16);
+		lblMemoryUsageH.setFont(new Font("Lucida Grande", Font.PLAIN, 10));
+		lblMemoryUsageH.setBounds(16, 56, 82, 16);
 		pnlSystem.add(lblMemoryUsageH);
 
 		JLabel lblAccessCountH = new JLabel("Access Count:");
-		lblAccessCountH.setBounds(134, 43, 102, 16);
+		lblAccessCountH.setFont(new Font("Lucida Grande", Font.PLAIN, 10));
+		lblAccessCountH.setBounds(16, 74, 82, 16);
 		pnlSystem.add(lblAccessCountH);
 
 		lblThreads = new JLabel("XXX");
-		lblThreads.setBounds(77, 25, 31, 16);
+		lblThreads.setFont(new Font("Lucida Grande", Font.PLAIN, 10));
+		lblThreads.setBounds(121, 21, 31, 16);
 		pnlSystem.add(lblThreads);
 
 		lblHandles = new JLabel("XXXXX");
-		lblHandles.setBounds(77, 43, 45, 16);
+		lblHandles.setFont(new Font("Lucida Grande", Font.PLAIN, 10));
+		lblHandles.setBounds(121, 38, 45, 16);
 		pnlSystem.add(lblHandles);
 
-		lblGC = new JLabel("XXXXXXXXXXXXX");
-		lblGC.setBounds(125, 74, 111, 16);
-		pnlSystem.add(lblGC);
-
-		lblErrors = new JLabel("XXX");
-		lblErrors.setBounds(300, 74, 30, 16);
-		pnlSystem.add(lblErrors);
-
 		lblMemUsage = new JLabel("XXXXXXXXXXXX K");
-		lblMemUsage.setBounds(235, 25, 117, 16);
+		lblMemUsage.setFont(new Font("Lucida Grande", Font.PLAIN, 10));
+		lblMemUsage.setBounds(121, 55, 92, 16);
 		pnlSystem.add(lblMemUsage);
 
 		lblAccessCount = new JLabel("XXXXXXXXXXXXXX");
-		lblAccessCount.setBounds(235, 43, 117, 16);
+		lblAccessCount.setFont(new Font("Lucida Grande", Font.PLAIN, 10));
+		lblAccessCount.setBounds(121, 74, 92, 16);
 		pnlSystem.add(lblAccessCount);
+		
+		JPanel panel = new JPanel();
+		panel.setBorder(new LineBorder(new Color(0, 0, 0)));
+		panel.setBounds(379, 6, 255, 96);
+		pnlHolder.add(panel);
+				panel.setLayout(null);
+		
+				lblUptime = new JLabel("Uptime: XXX:XXX:XXX");
+				lblUptime.setBounds(6, 6, 101, 13);
+				panel.add(lblUptime);
+				lblUptime.setFont(new Font("Lucida Grande", Font.PLAIN, 10));
 
 		menuBar = new JMenuBar();
+		menuBar.setFont(new Font("Lucida Grande", Font.PLAIN, 10));
 		menuBar.setBackground(Color.LIGHT_GRAY);
 		setJMenuBar(menuBar);
 
 		mnConnection = new JMenu("Connection");
+		mnConnection.setFont(new Font("Lucida Grande", Font.PLAIN, 10));
 		menuBar.add(mnConnection);
 
 		mnListener = new JMenu("Listener");
+		mnListener.setFont(new Font("Lucida Grande", Font.PLAIN, 10));
 		mnConnection.add(mnListener);
 
 		mntmActivate = new JMenuItem("Activate");
+		mntmActivate.setFont(new Font("Lucida Grande", Font.PLAIN, 10));
 		mnListener.add(mntmActivate);
 
 		mntmDeactivate = new JMenuItem("Deactivate");
+		mntmDeactivate.setFont(new Font("Lucida Grande", Font.PLAIN, 10));
 		mnListener.add(mntmDeactivate);
 
 		mnSystem = new JMenu("System");
+		mnSystem.setFont(new Font("Lucida Grande", Font.PLAIN, 10));
 		menuBar.add(mnSystem);
 
 		mntmClearStatistics = new JMenuItem("Clear Statistics");
+		mntmClearStatistics.setFont(new Font("Lucida Grande", Font.PLAIN, 10));
 		mnSystem.add(mntmClearStatistics);
 
 		mnHelp = new JMenu("Help");
+		mnHelp.setFont(new Font("Lucida Grande", Font.PLAIN, 10));
 		menuBar.add(mnHelp);
 
 		menuAbout = new JMenuItem("About");
+		menuAbout.setFont(new Font("Lucida Grande", Font.PLAIN, 10));
 		mnHelp.add(menuAbout);
 
 		mntmHelp = new JMenuItem("Help");
+		mntmHelp.setFont(new Font("Lucida Grande", Font.PLAIN, 10));
 		mnHelp.add(mntmHelp);
 
 		SetUpInterface();	//Anything that needs to be done, should get done here.
