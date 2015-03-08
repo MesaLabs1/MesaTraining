@@ -27,6 +27,7 @@ import java.util.ArrayList;
 
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
+import javax.swing.ListSelectionModel;
 
 /**
  * This class is a simple GUI for this backend. You can disable it from appearing by adding the tag -nogui to
@@ -49,6 +50,8 @@ public class UI extends JFrame{
 	JLabel lblErrors;
 	JLabel lblMemUsage;
 	JLabel lblAccessCount;
+	
+	JLabel lblRunning;
 
 	JPanel pnlRed;
 	JPanel pnlYellow;
@@ -61,6 +64,15 @@ public class UI extends JFrame{
 	JProgressBar progressBar;
 
 	JMenuBar menuBar;
+	JMenu mnConnection;
+	JMenu mnListener;
+	JMenu mnSystem;
+	JMenu mnHelp;
+	JMenuItem mntmActivate;
+	JMenuItem mntmDeactivate;
+	JMenuItem mntmClearStatistics;
+	JMenuItem menuAbout;
+	JMenuItem mntmHelp;
 
 	//Timer
 	Timer eventTicker;
@@ -79,6 +91,13 @@ public class UI extends JFrame{
 	int accessCount;
 
 	ArrayList logs;
+	
+	//Indicator
+	enum ServerStatus {
+		Active, Inactive, Busy
+	}
+	
+	ServerStatus status;
 
 	/**
 	 * The constructor here will simply define the GUI components, make sure the style is visually neutral (to avoid random UI inconsistencies),
@@ -104,6 +123,8 @@ public class UI extends JFrame{
 		logs = new ArrayList<String>();
 
 		setType(Type.UTILITY);
+		
+		setAlwaysOnTop(true);
 
 		setTitle("MESA Backend - User Interface");
 		//We chose 640x480 because this is the default minimum resolution support ratio for non-graphically enabled systems.
@@ -136,7 +157,7 @@ public class UI extends JFrame{
 		pnlConnection.add(lblOverheadH);
 
 		lblUptime = new JLabel("XXX:XXX:XXX");
-		lblUptime.setBounds(170, 6, 80, 16);
+		lblUptime.setBounds(161, 6, 92, 16);
 		pnlConnection.add(lblUptime);
 
 		JLabel lblOverallH = new JLabel("Overall:");
@@ -171,19 +192,20 @@ public class UI extends JFrame{
 
 		listModel = new DefaultListModel();
 		consoleList = new JList(listModel);
+		consoleList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
 		scrollPane.setViewportView(consoleList);
 
 		pnlRed = new JPanel();
 		pnlRed.setBackground(Color.RED);
 		pnlRed.setBorder(new LineBorder(new Color(0, 0, 0)));
-		pnlRed.setBounds(533, 280, 16, 16);
+		pnlRed.setBounds(585, 280, 16, 16);
 		pnlOutput.add(pnlRed);
 
 		pnlYellow = new JPanel();
 		pnlYellow.setBackground(Color.YELLOW);
 		pnlYellow.setBorder(new LineBorder(new Color(0, 0, 0)));
-		pnlYellow.setBounds(559, 280, 16, 16);
+		pnlYellow.setBounds(585, 280, 16, 16);
 		pnlOutput.add(pnlYellow);
 
 		pnlGreen = new JPanel();
@@ -195,15 +217,23 @@ public class UI extends JFrame{
 		JButton btnClear = new JButton("Clear");
 		btnClear.setMnemonic('c');
 		btnClear.setBounds(540, 6, 61, 16);
+		btnClear.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				util.logs = new ArrayList();
+				listModel.clear();
+			}
+		});
 		pnlOutput.add(btnClear);
 
 		progressBar = new JProgressBar();
 		progressBar.setBounds(6, 280, 183, 14);
 		pnlOutput.add(progressBar);
 
-		JLabel lblRunningxxx = new JLabel("Running... (XXX%)");
-		lblRunningxxx.setBounds(199, 278, 117, 16);
-		pnlOutput.add(lblRunningxxx);
+		lblRunning = new JLabel("Running... (XXX%)");
+		lblRunning.setBounds(199, 278, 117, 16);
+		pnlOutput.add(lblRunning);
 
 		JPanel pnlSystem = new JPanel();
 		pnlSystem.setBounds(274, 6, 343, 96);
@@ -267,31 +297,31 @@ public class UI extends JFrame{
 		menuBar.setBackground(Color.LIGHT_GRAY);
 		setJMenuBar(menuBar);
 
-		JMenu mnConnection = new JMenu("Connection");
+		mnConnection = new JMenu("Connection");
 		menuBar.add(mnConnection);
 
-		JMenu mnListener = new JMenu("Listener");
+		mnListener = new JMenu("Listener");
 		mnConnection.add(mnListener);
 
-		JMenuItem mntmActivate = new JMenuItem("Activate");
+		mntmActivate = new JMenuItem("Activate");
 		mnListener.add(mntmActivate);
 
-		JMenuItem mntmDeactivate = new JMenuItem("Deactivate");
+		mntmDeactivate = new JMenuItem("Deactivate");
 		mnListener.add(mntmDeactivate);
 
-		JMenu mnSystem = new JMenu("System");
+		mnSystem = new JMenu("System");
 		menuBar.add(mnSystem);
 
-		JMenuItem mntmClearStatistics = new JMenuItem("Clear Statistics");
+		mntmClearStatistics = new JMenuItem("Clear Statistics");
 		mnSystem.add(mntmClearStatistics);
 
-		JMenu mnHelp = new JMenu("Help");
+		mnHelp = new JMenu("Help");
 		menuBar.add(mnHelp);
 
-		JMenuItem menuAbout = new JMenuItem("About");
+		menuAbout = new JMenuItem("About");
 		mnHelp.add(menuAbout);
 
-		JMenuItem mntmHelp = new JMenuItem("Help");
+		mntmHelp = new JMenuItem("Help");
 		mnHelp.add(mntmHelp);
 
 		SetUpInterface();	//Anything that needs to be done, should get done here.
@@ -301,12 +331,24 @@ public class UI extends JFrame{
 		util.Log("User Interface successfully initialized. Standby for Network Layer...");
 	}
 
+	/**
+	 * All things that need to get done before the interface is shown, it needs to be added here.
+	 */
 	public void SetUpInterface() {
+		status = ServerStatus.Inactive;
+		
 		eventHandler = new EventHandler();
 		eventTicker = new Timer(100, eventHandler);		//This timer will execute once every 100 milliseconds (10 times a second).
 		eventTicker.start();
 	}
-
+	
+	/**
+	 * Set the UI status.
+	 * @param status The status to set the UI to.
+	 */
+	public void SetStatus(ServerStatus status) {
+		this.status = status;
+	}
 
 	public class EventHandler implements ActionListener {
 		UI ui;
@@ -348,6 +390,27 @@ public class UI extends JFrame{
 				ui.uptime++;
 				internalTicks = 0;
 			}
+			
+			if (status.equals(ServerStatus.Inactive)) {
+				lblRunning.setText("Inactive... (" + progressBar.getValue() + "%)");
+				pnlRed.setVisible(true);
+				pnlYellow.setVisible(false);
+				pnlGreen.setVisible(false);
+			}else if (status.equals(ServerStatus.Busy)) {
+				lblRunning.setText("Busy... (" + progressBar.getValue() + "%)");
+				pnlRed.setVisible(false);
+				pnlYellow.setVisible(true);
+				pnlGreen.setVisible(false);
+			}else if (status.equals(ServerStatus.Active)) {
+				lblRunning.setText("Running.. (" + progressBar.getValue() + "%)");
+				pnlRed.setVisible(false);
+				pnlYellow.setVisible(false);
+				pnlGreen.setVisible(true);
+			}
+			
+			internalTicks++;
+			
+			consoleList.setSelectedIndex(consoleList.getModel().getSize() - 1);
 		}
 
 		/**
@@ -435,6 +498,8 @@ public class UI extends JFrame{
 			}else {
 				sHours = "" + hours;
 			}
+			
+			sUptime = "Uptime: " + sHours + ":" + sMinutes + ":" + sSeconds;
 
 			return sUptime;
 		}

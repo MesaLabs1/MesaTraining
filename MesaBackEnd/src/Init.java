@@ -36,8 +36,7 @@ public class Init {
 	//Command Line Arguments.
 	static String[] arguments;
 
-	//User Interface.
-	UI ui;
+	Backend backend;
 
 	public static void main (String[] args) {
 		//Capture Command Line Arguments
@@ -97,8 +96,10 @@ public class Init {
 			 */
 
 			if (!CheckForArgument("nogui")) {
-				ui = new UI(propMaster.util);
+				propMaster.ui = new UI(propMaster.util);
 			}
+			
+			backend = new Backend(propMaster);
 		}else {
 			propMaster.util.Log("Received ABORT. Please send a copy of these logs to the System Administrator.");
 		}
@@ -262,12 +263,20 @@ public class Init {
 	public class PropertyMaster {
 		//A reference to the utility class, to keep the output file name available and the same.
 		Utils util = new Utils();
+		
+		//User Interface.
+		UI ui;
 
 		//The newline character must be used when formatting a new line. Using \n or \r will NOT work cross-system.
 		final String newline = System.getProperty("line.separator");
 
 		//Version of the program, for network compatibility issues
 		static final int BACKEND_VERSION = 0;
-
+		
+		//List of Variables that can be set by config
+		int NETWORK_PORT = 1337;				//Port for the Server
+		int NETWORK_MAX_CONNECTIONS = 12;		//Maximum Concurrent Users
+		int NETWORK_MAX_OVERHEAD = 0;			//Maximum Data to be Sent per Tick; 0 to send all
+		
 	}
 }
