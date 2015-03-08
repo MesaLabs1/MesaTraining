@@ -2,6 +2,7 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Random;
@@ -12,21 +13,35 @@ import java.util.Random;
  *
  */
 public class Utils {
-	//This is the number of digits appended to the log name, to avoid overwriting.
+	//The number of digits appended to the log name, to avoid overwriting.
 	static final int LOG_NUM_IDENTIFIERS = 6;
 	
+	//The log name, assigned by the constructor.
 	static String LOG_NAME = "";
+	
+	BufferedWriter logWriter;
+	
+	//The logs, posted to this array for usage by the UI.
+	ArrayList logs;
 	
 	/**
 	 * The constructor of this class initializes a unique numeric identifier that attaches to the log output.
 	 */
 	public Utils() {
+		logs = new ArrayList<String>();
+		
 		Random random = new Random();
 		LOG_NAME = "output";
 		for (int i = 0; i < LOG_NUM_IDENTIFIERS; i++) {
 			LOG_NAME += new Random().nextInt(10);
 		}
 		LOG_NAME += ".log";
+		
+		try {
+			logWriter = new BufferedWriter(new FileWriter(LOG_NAME, true));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 		
 		Log("Selected " + LOG_NAME + " as default logging location.");
 	}
@@ -64,13 +79,19 @@ public class Utils {
 
 		String log = "[" + sender + "@" + time +"]: " + message;
 		
+		//Print it
 		System.out.println(log);
 		
+		//Log it
 		try {
-			new BufferedWriter(new FileWriter(LOG_NAME, true));
+			logWriter.write(log);;
+			logWriter.newLine();
 		} catch (IOException e) {
-			
+			e.printStackTrace();
 		}
+		
+		//Save it
+		logs.add(log);
 	}
 }
 

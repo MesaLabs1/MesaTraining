@@ -48,11 +48,17 @@ public class Init {
 		 * Whoa, isn't Java supposed to be super cross compatible with everything forver? Yes. But heres the thing.
 		 * UI Look and Feel, a UI Manager derivative, tells the system how buttons, controls, and interfaces Look.
 		 * However, each systems visual interfaces take up marginally more or less pixels-per-control to display.
-		 * By setting the L&F to Linux, the display editor will show us the interface as it will appear on the 
+		 * By setting the L&F to Windows, the display editor will show us the interface as it will appear on the 
 		 * host system, not on your specific OS.
 		 */
 		try {
-			UIManager.setLookAndFeel("com.sun.java.swing.plaf.gtk.GTKLookAndFeel");
+			UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
+			
+			/**
+			 * A Button Mnemonic is the key a user has to press to activate that button automatically.
+			 * Since we want the program to display them, when the user hits ALT, the mnemonic will display.
+			 */
+			UIManager.getDefaults().put("Button.showMnemonics", Boolean.TRUE);
 		}catch (UnsupportedLookAndFeelException e) {
 			
 		}catch (ClassNotFoundException e) {
@@ -91,7 +97,7 @@ public class Init {
 			 */
 
 			if (!CheckForArgument("nogui")) {
-				ui = new UI();
+				ui = new UI(propMaster.util);
 			}
 		}else {
 			propMaster.util.Log("Received ABORT. Please send a copy of these logs to the System Administrator.");
