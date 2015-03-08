@@ -51,7 +51,8 @@ public class UI extends JFrame{
 	JLabel lblErrors;
 	JLabel lblMemUsage;
 	JLabel lblAccessCount;
-	
+	JLabel lblVersion;
+
 	JLabel lblRunning;
 
 	JPanel pnlRed;
@@ -92,12 +93,12 @@ public class UI extends JFrame{
 	int accessCount;
 
 	ArrayList logs;
-	
+
 	//Indicator
 	enum ServerStatus {
 		Active, Inactive, Busy
 	}
-	
+
 	ServerStatus status;
 
 	/**
@@ -124,7 +125,7 @@ public class UI extends JFrame{
 		logs = new ArrayList<String>();
 
 		//setType(Type.UTILITY);
-		
+
 		setAlwaysOnTop(true);
 
 		setTitle("MESA Backend - User Interface");
@@ -179,19 +180,19 @@ public class UI extends JFrame{
 		lblOverall.setFont(new Font("Lucida Grande", Font.PLAIN, 10));
 		lblOverall.setBounds(73, 56, 112, 16);
 		pnlConnection.add(lblOverall);
-		
-				lblErrors = new JLabel("XXX");
-				lblErrors.setBounds(73, 74, 30, 16);
-				pnlConnection.add(lblErrors);
-				lblErrors.setFont(new Font("Lucida Grande", Font.PLAIN, 10));
-				
-						JLabel lblErrorsH = new JLabel("Errors:");
-						lblErrorsH.setBounds(16, 74, 35, 16);
-						pnlConnection.add(lblErrorsH);
-						lblErrorsH.setFont(new Font("Lucida Grande", Font.PLAIN, 10));
+
+		lblErrors = new JLabel("XXX");
+		lblErrors.setBounds(73, 74, 30, 16);
+		pnlConnection.add(lblErrors);
+		lblErrors.setFont(new Font("Lucida Grande", Font.PLAIN, 10));
+
+		JLabel lblErrorsH = new JLabel("Errors:");
+		lblErrorsH.setBounds(16, 74, 35, 16);
+		pnlConnection.add(lblErrorsH);
+		lblErrorsH.setFont(new Font("Lucida Grande", Font.PLAIN, 10));
 
 		JPanel pnlOutput = new JPanel();
-		pnlOutput.setBounds(6, 108, 628, 322);
+		pnlOutput.setBounds(6, 108, 628, 309);
 		pnlHolder.add(pnlOutput);
 		pnlOutput.setBorder(new LineBorder(new Color(0, 0, 0), 1, true));
 		pnlOutput.setLayout(null);
@@ -202,7 +203,7 @@ public class UI extends JFrame{
 		pnlOutput.add(lblOutputH);
 
 		scrollPane = new JScrollPane();
-		scrollPane.setBounds(6, 30, 616, 266);
+		scrollPane.setBounds(6, 30, 616, 254);
 		pnlOutput.add(scrollPane);
 
 		listModel = new DefaultListModel();
@@ -215,19 +216,19 @@ public class UI extends JFrame{
 		pnlRed = new JPanel();
 		pnlRed.setBackground(Color.RED);
 		pnlRed.setBorder(new LineBorder(new Color(0, 0, 0)));
-		pnlRed.setBounds(606, 300, 16, 16);
+		pnlRed.setBounds(606, 287, 16, 16);
 		pnlOutput.add(pnlRed);
 
 		pnlYellow = new JPanel();
 		pnlYellow.setBackground(Color.YELLOW);
 		pnlYellow.setBorder(new LineBorder(new Color(0, 0, 0)));
-		pnlYellow.setBounds(606, 300, 16, 16);
+		pnlYellow.setBounds(606, 287, 16, 16);
 		pnlOutput.add(pnlYellow);
 
 		pnlGreen = new JPanel();
 		pnlGreen.setBackground(Color.GREEN);
 		pnlGreen.setBorder(new LineBorder(new Color(0, 0, 0)));
-		pnlGreen.setBounds(606, 300, 16, 16);
+		pnlGreen.setBounds(606, 287, 16, 16);
 		pnlOutput.add(pnlGreen);
 
 		JButton btnClear = new JButton("Clear");
@@ -245,23 +246,23 @@ public class UI extends JFrame{
 		pnlOutput.add(btnClear);
 
 		progressBar = new JProgressBar();
-		progressBar.setBounds(6, 302, 220, 14);
+		progressBar.setBounds(6, 287, 220, 14);
 		pnlOutput.add(progressBar);
 
 		lblRunning = new JLabel("Running... (XXX%)");
 		lblRunning.setFont(new Font("Lucida Grande", Font.PLAIN, 10));
-		lblRunning.setBounds(238, 302, 359, 16);
+		lblRunning.setBounds(238, 287, 359, 16);
 		pnlOutput.add(lblRunning);
-		
-				JLabel lblGCH = new JLabel("Garbage Collections:");
-				lblGCH.setBounds(155, 6, 111, 16);
-				pnlOutput.add(lblGCH);
-				lblGCH.setFont(new Font("Lucida Grande", Font.PLAIN, 10));
-				
-						lblGC = new JLabel("XXXXXXX");
-						lblGC.setBounds(262, 6, 111, 16);
-						pnlOutput.add(lblGC);
-						lblGC.setFont(new Font("Lucida Grande", Font.PLAIN, 10));
+
+		JLabel lblGCH = new JLabel("Garbage Collections:");
+		lblGCH.setBounds(159, 6, 111, 16);
+		pnlOutput.add(lblGCH);
+		lblGCH.setFont(new Font("Lucida Grande", Font.PLAIN, 10));
+
+		lblGC = new JLabel("XXXXXXX");
+		lblGC.setBounds(266, 6, 111, 16);
+		pnlOutput.add(lblGC);
+		lblGC.setFont(new Font("Lucida Grande", Font.PLAIN, 10));
 
 		JPanel pnlSystem = new JPanel();
 		pnlSystem.setBounds(150, 6, 223, 96);
@@ -313,17 +314,32 @@ public class UI extends JFrame{
 		lblAccessCount.setFont(new Font("Lucida Grande", Font.PLAIN, 10));
 		lblAccessCount.setBounds(121, 74, 92, 16);
 		pnlSystem.add(lblAccessCount);
-		
+
 		JPanel panel = new JPanel();
 		panel.setBorder(new LineBorder(new Color(0, 0, 0)));
 		panel.setBounds(379, 6, 255, 96);
 		pnlHolder.add(panel);
-				panel.setLayout(null);
-		
-				lblUptime = new JLabel("Uptime: XXX:XXX:XXX");
-				lblUptime.setBounds(6, 6, 101, 13);
-				panel.add(lblUptime);
-				lblUptime.setFont(new Font("Lucida Grande", Font.PLAIN, 10));
+		panel.setLayout(null);
+
+		lblUptime = new JLabel("Uptime: XXX:XXX:XXX");
+		lblUptime.setBounds(6, 6, 101, 13);
+		panel.add(lblUptime);
+		lblUptime.setFont(new Font("Lucida Grande", Font.PLAIN, 10));
+
+		JLabel lblByMOI = new JLabel("By Jad Aboulhosn and Jacqueline Clow");
+		lblByMOI.setBounds(460, 416, 184, 16);
+		pnlHolder.add(lblByMOI);
+		lblByMOI.setFont(new Font("Lucida Grande", Font.PLAIN, 9));
+
+		JLabel lblVersionH = new JLabel("You are running Mesa Server version");
+		lblVersionH.setFont(new Font("Lucida Grande", Font.PLAIN, 9));
+		lblVersionH.setBounds(6, 416, 169, 16);
+		pnlHolder.add(lblVersionH);
+
+		lblVersion = new JLabel("XX");
+		lblVersion.setFont(new Font("Lucida Grande", Font.PLAIN, 9));
+		lblVersion.setBounds(178, 416, 169, 16);
+		pnlHolder.add(lblVersion);
 
 		menuBar = new JMenuBar();
 		menuBar.setFont(new Font("Lucida Grande", Font.PLAIN, 10));
@@ -369,7 +385,7 @@ public class UI extends JFrame{
 		SetUpInterface();	//Anything that needs to be done, should get done here.
 
 		this.setVisible(true);
-		
+
 		util.Log("User Interface successfully initialized. Standby for Network Layer...");
 	}
 
@@ -378,12 +394,12 @@ public class UI extends JFrame{
 	 */
 	public void SetUpInterface() {
 		status = ServerStatus.Inactive;
-		
+
 		eventHandler = new EventHandler();
 		eventTicker = new Timer(100, eventHandler);		//This timer will execute once every 100 milliseconds (10 times a second).
 		eventTicker.start();
 	}
-	
+
 	/**
 	 * Set the UI status.
 	 * @param status The status to set the UI to.
@@ -411,6 +427,7 @@ public class UI extends JFrame{
 			ui.lblOverall.setText("" + ui.numOverall);
 			ui.lblThreads.setText("" + ui.numThreads);
 			ui.lblOverhead.setText("" + ui.numOverhead);
+			ui.lblVersion.setText("" + Init.PropertyMaster.BACKEND_VERSION);
 
 			//Special variables
 			ui.lblUptime.setText(convertUpTime());
@@ -432,7 +449,7 @@ public class UI extends JFrame{
 				ui.uptime++;
 				internalTicks = 0;
 			}
-			
+
 			if (status.equals(ServerStatus.Inactive)) {
 				lblRunning.setText("Inactive... (" + progressBar.getValue() + "%)");
 				pnlRed.setVisible(true);
@@ -449,9 +466,9 @@ public class UI extends JFrame{
 				pnlYellow.setVisible(false);
 				pnlGreen.setVisible(true);
 			}
-			
+
 			internalTicks++;
-			
+
 			consoleList.setSelectedIndex(consoleList.getModel().getSize() - 1);
 		}
 
@@ -508,7 +525,7 @@ public class UI extends JFrame{
 			int div = uptime / 60;
 
 			if (div > 0) {
-				seconds = (uptime - (seconds * div));
+				seconds = (uptime - (div * 60));
 				if (div > 60) {
 					hours = (div / 60);
 					minutes = (div - (hours * 60));
@@ -540,7 +557,7 @@ public class UI extends JFrame{
 			}else {
 				sHours = "" + hours;
 			}
-			
+
 			sUptime = "Uptime: " + sHours + ":" + sMinutes + ":" + sSeconds;
 
 			return sUptime;

@@ -271,7 +271,7 @@ public class Init {
 		final String newline = System.getProperty("line.separator");
 
 		//Version of the program, for network compatibility issues
-		static final int BACKEND_VERSION = 0;
+		static final int BACKEND_VERSION = 1;
 		
 		//List of Variables that can be set by config
 		int NETWORK_PORT = 1337;				//Port for the Server
