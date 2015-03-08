@@ -1,5 +1,7 @@
 import java.io.*;
 
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.ParserConfigurationException;
@@ -24,48 +26,70 @@ import java.io.File;
 public class Init {
 	//See LoadConfigFile. This object will contain the normalized config file after the ParseConfigFile() call.
 	Document doc;
-	
+
 	//See ParseConfigFile. This object will contain the nodeList based on the name of the Master Node.
 	NodeList nodeList;
-	
+
 	//See PropertyMaster class. This class will contain all data and object references that need to be passed to the main program.
 	PropertyMaster propMaster;
-	
+
 	//Command Line Arguments.
 	static String[] arguments;
-	
+
 	//User Interface.
 	UI ui;
-	
+
 	public static void main (String[] args) {
+		//Capture Command Line Arguments
 		arguments = args;
+		
+		/**
+		 * Set the visual style to be Linux, since we are developing this for a Linux target. BUT WAIT.
+		 * Whoa, isn't Java supposed to be super cross compatible with everything forver? Yes. But heres the thing.
+		 * UI Look and Feel, a UI Manager derivative, tells the system how buttons, controls, and interfaces Look.
+		 * However, each systems visual interfaces take up marginally more or less pixels-per-control to display.
+		 * By setting the L&F to Linux, the display editor will show us the interface as it will appear on the 
+		 * host system, not on your specific OS.
+		 */
+		try {
+			UIManager.setLookAndFeel("com.sun.java.swing.plaf.gtk.GTKLookAndFeel");
+		}catch (UnsupportedLookAndFeelException e) {
+			
+		}catch (ClassNotFoundException e) {
+			
+		}catch (InstantiationException e) {
+			
+		}catch (IllegalAccessException e) {
+			
+		}
+
 		new Init();
 	}
 
 	public Init() {
 		//You must initialize the PropertyMaster before logging, since it contains the logger.
 		propMaster = new PropertyMaster();
-	
+
 		propMaster.util.Log("Mesa BackEnd v." + propMaster.BACKEND_VERSION + " initializing...");
-		
+
 		//TODO: Don't worry about this until waaaaaay at the end. It's simply not worth our time.
 		if (CheckForUpdate()) {
 			DoUpdate();
 		}else {
 			propMaster.util.Log("No update reported from the Master Server. Proceeding.");
 		}
-		
+
 		boolean configResult = LoadConfigFile("config.xml");
 		if (configResult) {
 			ParseConfigFile();
-			
+
 			/**
 			 * Here, we check to see if the launch parameter wants a "silent" run (in the background), by using
 			 * a tag we dubbed "nogui". By adding "-nogui" to the command line launch options for the Jar, you
 			 * can disable the User Interface. It is not a necessary component to the server, used purely
 			 * for debugging and visual effect purposes.
 			 */
-			
+
 			if (!CheckForArgument("nogui")) {
 				ui = new UI();
 			}
@@ -73,10 +97,10 @@ public class Init {
 			propMaster.util.Log("Received ABORT. Please send a copy of these logs to the System Administrator.");
 		}
 	}
-	
+
 	public boolean CheckForUpdate() {
 		propMaster.util.Log("Querying master server for update data...");
-		 
+
 		/**
 		 * TODO: Bootstrap an update method here, where we check a specific remote source for a ZIP/TARBALL update.
 		 * IF there is a remote update (in whatever medium we choose to package it in), we will need to download that file
@@ -88,10 +112,10 @@ public class Init {
 		 */
 		return false;
 	}
-	
+
 	public void DoUpdate() {
 		propMaster.util.Log("Preparing to update this backend via a remote source...");
-		
+
 		/**
 		 * How do I update this application when its running? Easy. We need to...
 		 * TODO: Create another project that is a bootstrapping Java jar, and all it
@@ -109,10 +133,10 @@ public class Init {
 		 * 
 		 * tl;dr TODO: Create bootstrapping class, along the parameters described above.
 		 * TODO: Also, we need to keep a copy on the server of a master copy, that the
-		 * boostrapper can return to in the event of a broken update. 
+		 * bootstrapper can return to in the event of a broken update. 
 		 */
 	}
-	
+
 	/**
 	 * Loads a Configuration File to the backend memory space.
 	 * @param path Path to the configuration file, along with the file name and extension.
@@ -160,20 +184,20 @@ public class Init {
 
 	public void ParseConfigFile() {
 		propMaster.util.Log("Load complete! Parsing entries into master object...");
-	
+
 		doc.getDocumentElement().normalize();
 		nodeList = doc.getElementsByTagName("INIT");
-		
+
 		/**
 		 * This is where we make checks for crucial entry data, using the GetElementByNode helper method.
 		 * If there are entries we ABSOLUTELY NEED in our lives at this point, now is an excellent time to
 		 * find out if the configuration file has them.
 		 */
-		
-		
+
+
 	}
-	
-	
+
+
 	/**
 	 * Helper Method. Allows you to fetch an element's contents via a node tag, and an element's name.
 	 * @param node The tag of the node you're attempting to access.
@@ -189,7 +213,7 @@ public class Init {
 				System.out.println("SEEK_" + node.getNodeName());
 				if (node.getNodeType() == Node.ELEMENT_NODE) {
 					Element element = (Element) node;
-					
+
 					/**
 					 * Fun decision you (jacrin) get to make... XML. Do we use Attributes to store the data, or Elements?
 					 * Attributes are single-value entries. Elements can contain multiple entries for the same element name.
@@ -197,18 +221,18 @@ public class Init {
 					 */
 					//element.getAttribute(elementName);
 					//element.getElementsByTagName(elementName).item(0).getTextContent();
-					
+
 					elementValue = element.getAttribute(elementName);	//Replace this line with your decision from above.
 				}
 			}
-			
+
 		}else {
 			propMaster.util.Log("Premature call to GetElementByNode! You must first initialize the Document with LoadConfigFile(). Ignoring.");
 		}
-		
+
 		return elementValue;
 	}
-	
+
 	/**
 	 * Searches the command line arguments given when launching the program for a specific argument.
 	 * @param arg The name of the argument you're looking for.
@@ -232,12 +256,12 @@ public class Init {
 	public class PropertyMaster {
 		//A reference to the utility class, to keep the output file name available and the same.
 		Utils util = new Utils();
-		
+
 		//The newline character must be used when formatting a new line. Using \n or \r will NOT work cross-system.
 		final String newline = System.getProperty("line.separator");
-		
+
 		//Version of the program, for network compatibility issues
 		static final int BACKEND_VERSION = 0;
-		
+
 	}
 }

@@ -16,6 +16,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JList;
 import javax.swing.JButton;
 import javax.swing.JProgressBar;
+import java.awt.Window.Type;
 
 /**
  * This class is a simple GUI for this backend. You can disable it from appearing by adding the tag -nogui to
@@ -36,7 +37,10 @@ public class UI extends JFrame{
 	 * X takes up the most possible space when capitalized, as opposed to a character like ?, where it does not take
 	 * up as much space as as number. Always use a capital letter to placehold label sizes.
 	 */
+	
 	public UI() {
+		setType(Type.UTILITY);
+		
 		setTitle("MESA Backend - User Interface");
 		//We chose 640x480 because this is the default minimum resolution support ratio for non-graphically enabled systems.
 		this.setSize(new Dimension(640, 480));
