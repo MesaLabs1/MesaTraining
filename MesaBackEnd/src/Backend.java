@@ -151,7 +151,7 @@ public class Backend {
 					UpdateUI(); 
 					ui.SetStatus(UI.ServerStatus.Active);
 					ui.progressBar.setValue(100);
-					
+
 					//Wait for the socket to accept a connection. This thread halts here until a new user approaches us.
 					util.Log("Awaiting connections on Port " + serverSocket.getLocalPort() + "...");
 					Socket socket = serverSocket.accept();
@@ -188,7 +188,7 @@ public class Backend {
 								isClear = true;
 
 								ui.accessCount++;
-								
+
 								//We'll call GC on our own just in case
 								ui.numGCs++;
 								System.gc();
@@ -244,7 +244,7 @@ public class Backend {
 		private boolean active;
 
 		private String remoteName;
-		
+
 		//Client
 		private String username;
 		private String password;
@@ -304,7 +304,7 @@ public class Backend {
 					String remoteVersion = entries[0];
 					String remoteName = entries[1];
 					String remoteIP = entries[2];
-					
+
 					ui.progressBar.setValue(20);
 
 					if (remoteVersion.equals(propMaster.BACKEND_VERSION)) {
@@ -331,7 +331,7 @@ public class Backend {
 								message += rand.nextInt(10);
 							}
 							out.writeUTF(message);
-							
+
 							ui.progressBar.setValue(45);
 
 							/**
@@ -348,42 +348,66 @@ public class Backend {
 								 * Okay, we got it. The client is legitimate and up-to-date with this server version. Let's go ahead and let them know.
 								 */
 								out.writeUTF("$IDENTIFY");	//This command specifically forces the client to respond with the User's information
-								
+
 								/**
 								 * We expect to read something back like this
 								 * $IDENTIFY HACKJUNKY PASSWORD
 								 * 
 								 * So, let's break it down.
 								 */
-								
-								String identification = in.readUTF();
-								String[] split = identification.split(" ");
-								if (split[0].equals("$IDENTIFY")) {
-									username = split[1];
-									password = split[2];
-								}
-								
-								//We have the user's information, let's check with the database..
-								//TODO: Check w/ database.
-								
-								out.writeUTF("[MSG] Welcome to the Mesa Labs Database! I am at your disposal, make a request!");
-								boolean done = false;
 
-								while (!done) {
-									ui.progressBar.setValue(75);
-									String request = in.readUTF();
-									if (request.equals("Test")) {
-										
-									}else if (request.equals("Test")) {
-										
-									}else if (request.equals("Test")) {
-										
-									}else if (request.equals("Test")) {
-										
+								boolean verified = false;
+
+								while (!verified) {		//We want to repeat this loop as many times as is necessary
+									String identification = in.readUTF();
+									if (identification.equals("$ABORT")) {
+										break;
 									}
-									ui.progressBar.setValue(100);
+									String[] split = GetParameters(identification);
+									if (identification.startsWith("$IDENTIFY") && split.length == 3) {
+										username = split[0];
+										password = split[0];
+									}
+
+									boolean isValid = false;
+									//We have the user's information, let's check with the database..
+									//TODO: Check w/ database. Set isValid to true if this is the case.
+									if (isValid) {
+										verified = true;
+										out.writeUTF("$VALID");
+										util.Log("Remote Client (" + username + ") has verified their identity. Welcome, " + username + ".");
+									}else {
+										util.Log("Remote Client failed to propery verify themselves. Retrying query...");
+										out.writeUTF("$INVALID");
+									}
 								}
 
+								if (verified) {			//Given that the loop above terminated, and the userinfo was valid, we are now in the main loop.
+									out.writeUTF("$MSG Welcome to the Mesa Labs Database! I am at your disposal, make a request!");
+									boolean done = false;
+
+									while (!done) {
+										ui.progressBar.setValue(75);
+										String request = in.readUTF();
+										if (request.startsWith("$MSG")) {					//We can use MSG to send information from the client directly to the console, here. This is for debugging.
+											String msg = request.substring("$MSG ".length(), request.length());
+											util.Log("[MSG] " + msg);
+										}else {
+											if (request.startsWith("$GET")) {
+	
+											}else if (request.startsWith("$TEST")) {
+	
+											}else if (request.startsWith("$TEST")) {
+	
+											}else if (request.equals("$ABORT")) {
+												done = true;
+											}
+										}
+										ui.progressBar.setValue(100);
+									}
+								}else {
+									util.Log("Remote Client failed to identify themselves. This is not malicious, they simply failed to log in.");
+								}
 							}else {
 								util.Log("MISMATCH! Client failed to provide proper handshake! Closing the Server!");
 							}
@@ -407,6 +431,26 @@ public class Backend {
 					break;
 				}
 			}
+		}
+		
+		/**
+		 * This takes a network message and returns the parameters. Excludes the command
+		 * itself, it is recommended that you assess the actual command with String.startsWith().
+		 * 
+		 * Example:
+		 * 		input = "$COMMAND CAT DOG MOUSE
+		 * 		return = Array: "CAT, DOG, MOUSE";
+		 * @param input	The input string.
+		 * @return An array of the parameters.
+		 */
+		public String[] GetParameters(String input) {
+			String[] split = input.split(" ");
+			String[] output = new String[split.length - 1];
+			for (int i = 1; i < split.length; i++) {
+				//We dont want the item at index 0, since its a $COMMAND
+				output[i - 1] = split[i];
+			}
+			return output;
 		}
 	}
 }
