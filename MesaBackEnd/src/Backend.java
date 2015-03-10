@@ -244,6 +244,10 @@ public class Backend {
 		private boolean active;
 
 		private String remoteName;
+		
+		//Client
+		private String username;
+		private String password;
 
 		public NetworkSocket(Socket socket, String threadName) {
 			ui = instance.properties.ui;
@@ -311,7 +315,7 @@ public class Backend {
 
 							/**
 							 * We are expecting the characters at the indices of 57,72,15,66,49 to be returned to us.
-							 * This is Euler's number. We can, of course, change this to something else if we feel
+							 * This is Euler's number (0.5772156649). We can, of course, change this to something else if we feel
 							 * the security has been compromised. It is important that clients of this version
 							 * and servers of this version both expect and send the same data.
 							 * 
@@ -343,7 +347,25 @@ public class Backend {
 								/**
 								 * Okay, we got it. The client is legitimate and up-to-date with this server version. Let's go ahead and let them know.
 								 */
-
+								out.writeUTF("$IDENTIFY");	//This command specifically forces the client to respond with the User's information
+								
+								/**
+								 * We expect to read something back like this
+								 * $IDENTIFY HACKJUNKY PASSWORD
+								 * 
+								 * So, let's break it down.
+								 */
+								
+								String identification = in.readUTF();
+								String[] split = identification.split(" ");
+								if (split[0].equals("$IDENTIFY")) {
+									username = split[1];
+									password = split[2];
+								}
+								
+								//We have the user's information, let's check with the database..
+								//TODO: Check w/ database.
+								
 								out.writeUTF("[MSG] Welcome to the Mesa Labs Database! I am at your disposal, make a request!");
 								boolean done = false;
 
