@@ -38,14 +38,13 @@ public class AppletMain extends Applet{
 	ImageIcon tab2Icon;
 	ImageIcon tab3Icon;
 	ImageIcon tab4Icon;
-	
+
 	//Applet Data
 	File appletRoot = new File("");
 	File appletRes = new File(appletRoot.getPath() + "/resources/res/");
-	
 
 	public static void main(String[] args) {
-		
+		AppletMain instance = new AppletMain();
 	}
 
 	public void AllocateResources() {
@@ -57,7 +56,7 @@ public class AppletMain extends Applet{
 		if (!appletRes.exists()) {
 			verified = false;
 		}
-		
+
 		//Let's allocate all the ImageIcons
 		mesaIcon = new ImageIcon(appletRes.getPath() + "mesa.png");
 		tab1Icon = new ImageIcon(appletRes.getPath() + "flight.png");
@@ -67,9 +66,11 @@ public class AppletMain extends Applet{
 	}
 
 	public AppletMain() {
+		JLoginDialog loginDialog = new JLoginDialog(this);
+		
 		//Allocate all Resources, make sure they're there, etc etc
 		AllocateResources();
-		
+
 		//A Java toolkit that provides us with information about the target system.
 		Toolkit toolkit = Toolkit.getDefaultToolkit();
 		int SCREEN_SIZE_X = toolkit.getScreenSize().width;
@@ -116,7 +117,7 @@ public class AppletMain extends Applet{
 		panel.add(btnLogout, "cell 47 0");
 
 		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
-		tabbedPane.setSelectedIndex(0);
+		tabbedPane.setSelectedIndex(-1);
 		tabbedPane.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
 		add(tabbedPane, BorderLayout.CENTER);
 
@@ -132,20 +133,15 @@ public class AppletMain extends Applet{
 
 		JPanel panel_1 = new JPanel();
 		tabbedPane.addTab("Administration", tab4Icon, panel_1, null);
-
-
 	}
-	
-	/**
-	 * This class is a re-usable JDialog implementation that queries the user for a username and password.
-	 * @author Hack
-	 *
-	 */
-//	public class JLoginDialog extends JDialog {
-//		private static final long serialVersionUID = -4321771706687810511L;
-//		
-//		public JLoginDialog() {
-//			
-//		}
-//	}
+
+	public boolean Authenticate(String username, String password) {
+		boolean isValid = false;
+
+		if (isValid) {
+			return true;
+		}else {
+			return false;
+		}
+	}
 }	

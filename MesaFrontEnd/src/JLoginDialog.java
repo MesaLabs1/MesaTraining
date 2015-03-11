@@ -1,23 +1,52 @@
 import java.awt.Dimension;
 
 import javax.swing.JDialog;
+
 import net.miginfocom.swing.MigLayout;
+
 import java.awt.BorderLayout;
+
 import javax.swing.JPanel;
-import java.awt.Window.Type;
 import javax.swing.JLabel;
+
 import java.awt.Canvas;
+
 import javax.swing.JTextField;
+
 import java.awt.Component;
+
 import javax.swing.Box;
+import javax.swing.JFrame;
+import javax.swing.JPasswordField;
+import javax.swing.JButton;
 
+import java.awt.Font;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.Color;
 
+/**
+ * This class outlines the JLoginDialog. This login dialog extends JDialog (meaning it behaves as a popup). It is
+ * intended to be called or projected BEFORE AppletMain's UI loads. It must then establish a connection with the 
+ * master server, and verify your identity before you will be redirected to the AppletMain UI. The UI must then
+ * be modified to match your security clearance. NOTE: This class is a visual event, meaning it retains no 
+ * network-related entities, NOR SHOULD IT.
+ * @author hackjunky, jacrin
+ *
+ */
 public class JLoginDialog extends JDialog{
-	private JTextField textField;
+	private static final long serialVersionUID = 8224336328398525415L;
+	private JTextField usernameField;
+	private JPasswordField passwordField;
+	JLabel lblHelptext;
+	JLabel lblHelptext_1;
 	
-	public JLoginDialog() {
+	AppletMain superInstance;
+	
+	public JLoginDialog(AppletMain master) {
+		superInstance = master;
+		
 		setTitle("Mesa Labs WebConnect Single Sign-on");
-		setType(Type.POPUP);
 		//Set Size of Dialog to something smaller than 640x480, preferably in multiples of 8 or 16.
 		this.setSize(new Dimension(512, 256));
 		getContentPane().setLayout(new BorderLayout(0, 0));
@@ -30,23 +59,81 @@ public class JLoginDialog extends JDialog{
 		panel.add(mesaIcon, "cell 0 0");
 		
 		JLabel lblWelcomeToMesalabs = new JLabel("Welcome to MesaLabs WebConnect! Please enter your credentials below to authenticate.");
+		lblWelcomeToMesalabs.setFont(new Font("Lucida Grande", Font.PLAIN, 10));
 		panel.add(lblWelcomeToMesalabs, "cell 1 0");
 		
 		JPanel panel_1 = new JPanel();
 		getContentPane().add(panel_1, BorderLayout.CENTER);
-		panel_1.setLayout(new MigLayout("", "[][grow][]", "[][][][][][]"));
+		panel_1.setLayout(new MigLayout("", "[][grow][][][]", "[][][][][][][][]"));
+		
+		lblHelptext = new JLabel("Enter your credentials below.");
+		lblHelptext.setFont(new Font("Lucida Grande", Font.ITALIC, 10));
+		panel_1.add(lblHelptext, "cell 1 0");
 		
 		JLabel lblid = new JLabel("UCMNetID (Username)");
-		panel_1.add(lblid, "cell 1 1");
+		lblid.setFont(new Font("Lucida Grande", Font.BOLD, 11));
+		panel_1.add(lblid, "cell 1 2");
 		
-		textField = new JTextField();
-		panel_1.add(textField, "cell 1 2,growx");
-		textField.setColumns(10);
+		usernameField = new JTextField();
+		panel_1.add(usernameField, "cell 1 3 3 1,growx");
+		usernameField.setColumns(10);
 		
-		Component horizontalStrut = Box.createHorizontalStrut(20);
-		panel_1.add(horizontalStrut, "cell 2 3");
+		JLabel lblExampleJsmith = new JLabel("Example: JSmith");
+		lblExampleJsmith.setFont(new Font("Lucida Grande", Font.ITALIC, 10));
+		panel_1.add(lblExampleJsmith, "cell 4 3");
 		
 		JLabel lblPassword = new JLabel("Password");
-		panel_1.add(lblPassword, "cell 1 5");
+		lblPassword.setFont(new Font("Lucida Grande", Font.BOLD, 11));
+		panel_1.add(lblPassword, "cell 1 4");
+		
+		passwordField = new JPasswordField();
+		panel_1.add(passwordField, "cell 1 5 3 1,growx");
+		
+		JButton btnAuthenticate = new JButton("Authenticate");
+		btnAuthenticate.addActionListener(new ActionListener() {
+
+			/*
+			 * JPasswordField doesn't actually return a String, it returns char[]. No idea why. Just to
+			 * clarify, here, we create a new String object and pass in char[]. It gives us back the pass
+			 * word but in a String.
+			 */
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				if (superInstance.Authenticate(usernameField.getText(), new String(passwordField.getPassword()))) {
+					ShowHelpText("Authenticating...");
+					JLoginDialog.this.dispose();	//We call dispose because it manually adds a callback to windowDeactivated 
+													//and windowClosed. This will notify our applet that we're ready.
+				}else {
+					ShowHelpText("Invalid Username or Password.");
+				}
+			}
+		});
+		
+		lblHelptext_1 = new JLabel("");
+		lblHelptext_1.setFont(new Font("Lucida Grande", Font.BOLD | Font.ITALIC, 11));
+		lblHelptext_1.setForeground(Color.RED);
+		panel_1.add(lblHelptext_1, "cell 1 7");
+		panel_1.add(btnAuthenticate, "cell 3 7");
+		
+		JButton btnCancel = new JButton("Cancel");
+		btnCancel.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				System.exit(0);
+				//Terminate the Applet, we might even want to have the web-page redirect to home when this happens.
+			}
+		});
+		panel_1.add(btnCancel, "cell 4 7");
+		
+		this.setVisible(true);
+	}
+	
+	/**
+	 * Just a little something something for us to be able to indicate to the user information.
+	 * @param text
+	 */
+	public void ShowHelpText(String text) {
+		lblHelptext_1.setText(text);
 	}
 }

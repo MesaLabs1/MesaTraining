@@ -67,7 +67,9 @@ public class Backend {
 
 	/**
 	 * This class, the NetworkMaster, is the master class of the NetworkSocket.
-	 * 
+	 * @author hackjunky, jacrin
+	 */
+	/*
 	 * Multi-threading Introduction.
 	 * 
 	 * Runnable, the implementation, allows this while-true loop to run continuously until the connection with the client has been fully
@@ -90,8 +92,6 @@ public class Backend {
 	 * We've stored all the threads here in a NetworkThreads variable. At any point, we can interrupt an active connection by accessing it in the Array, and
 	 * calling Interrupt(). This will cancel the running job, and set the thread to idle. It is also recommended that a thread make a callback such that when
 	 * it terminates, we can delete the object, and mark the slot as available.
-	 *  
-	 * @author hackjunky, jacrin
 	 *
 	 */
 	public class NetworkMaster implements Runnable {
@@ -161,7 +161,7 @@ public class Backend {
 
 					util.Log("Connection requested from " + socket.getRemoteSocketAddress() + "... Delegating thread.");
 
-					/**
+					/*
 					 * Here, we iterate over the network threads and look for a null slot. This will only be the case the first time
 					 * we use a slot, since after it terminates it won't return to null. For this reason, the variable flag "active" in
 					 * the child class NetworkSocket will be toggled to false to indicate to us that it's time to kill this one off.
@@ -173,7 +173,7 @@ public class Backend {
 						if (networkThreads[i] != null) {
 							//Thread is not null, so lets see if we can clear it.
 							if (!networkSockets[i].GetActive()) {
-								/**
+								/*
 								 * GC - Garbage Collection
 								 * 
 								 * Garbage Collection involves Java searching memory spaces for defunct/unused data and destroying it
@@ -274,7 +274,7 @@ public class Backend {
 					util.Log("You've awoken " + name + " on " + server.getLocalAddress() + "@" + server.getLocalPort() + ".");
 					util.Log("[" + name + "] Authorizing " + server.getRemoteSocketAddress() + "... Do you know the secret handshake?");
 
-					/**
+					/*
 					 * What is a Handshake? A handshake is a sequence exchanged by Server-Client systems to prove to each other first that
 					 * the connection is being made by our program (not some other program), and also that the client is both legitimate
 					 * (not security compromised), and also up-to-date. Review the details of our secret handshake below.
@@ -313,7 +313,7 @@ public class Backend {
 							ui.progressBar.setValue(30);
 							this.remoteName = remoteName;
 
-							/**
+							/*
 							 * We are expecting the characters at the indices of 57,72,15,66,49 to be returned to us.
 							 * This is Euler's number (0.5772156649). We can, of course, change this to something else if we feel
 							 * the security has been compromised. It is important that clients of this version
@@ -334,7 +334,7 @@ public class Backend {
 
 							ui.progressBar.setValue(45);
 
-							/**
+							/*
 							 * Now, once the next line passes, this means the client has responded to us. We then
 							 * need to decode the text to make sure it's compliant.
 							 */
@@ -344,12 +344,12 @@ public class Backend {
 
 							if (actualResponse.equals(expectedResponse)) {
 								ui.progressBar.setValue(65);
-								/**
+								/*
 								 * Okay, we got it. The client is legitimate and up-to-date with this server version. Let's go ahead and let them know.
 								 */
 								out.writeUTF("$IDENTIFY");	//This command specifically forces the client to respond with the User's information
 
-								/**
+								/*
 								 * We expect to read something back like this
 								 * $IDENTIFY HACKJUNKY PASSWORD
 								 * 

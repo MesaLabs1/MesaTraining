@@ -42,7 +42,7 @@ public class Init {
 		//Capture Command Line Arguments
 		arguments = args;
 		
-		/**
+		/*
 		 * Set the visual style to be Linux, since we are developing this for a Linux target. BUT WAIT.
 		 * Whoa, isn't Java supposed to be super cross compatible with everything forver? Yes. But heres the thing.
 		 * UI Look and Feel, a UI Manager derivative, tells the system how buttons, controls, and interfaces Look.
@@ -88,7 +88,7 @@ public class Init {
 		if (configResult) {
 			ParseConfigFile();
 
-			/**
+			/*
 			 * Here, we check to see if the launch parameter wants a "silent" run (in the background), by using
 			 * a tag we dubbed "nogui". By adding "-nogui" to the command line launch options for the Jar, you
 			 * can disable the User Interface. It is not a necessary component to the server, used purely
@@ -108,7 +108,7 @@ public class Init {
 	public boolean CheckForUpdate() {
 		propMaster.util.Log("Querying master server for update data...");
 
-		/**
+		/*
 		 * TODO: Bootstrap an update method here, where we check a specific remote source for a ZIP/TARBALL update.
 		 * IF there is a remote update (in whatever medium we choose to package it in), we will need to download that file
 		 * and extract it. Bear in mind that while Linux Shell allows us to send commands to console and do the extraction...
@@ -123,7 +123,7 @@ public class Init {
 	public void DoUpdate() {
 		propMaster.util.Log("Preparing to update this backend via a remote source...");
 
-		/**
+		/*
 		 * How do I update this application when its running? Easy. We need to...
 		 * TODO: Create another project that is a bootstrapping Java jar, and all it
 		 * does is take a predesignated YOURFILE.ZIP from a config file we get in 
@@ -156,7 +156,7 @@ public class Init {
 
 		File xmlInput = new File(path);
 
-		/**
+		/*
 		 * What is DocumentBuilderFactory? This class specializes in accessing XML format files. As opposed to manually parsing the file,
 		 * the Factory will generate an instance around the indicated file. This object must be passed to the ParseConfigFile method in 
 		 * order to populate needed entries and package them into the PropertyMaster class.
@@ -195,7 +195,7 @@ public class Init {
 		doc.getDocumentElement().normalize();
 		nodeList = doc.getElementsByTagName("INIT");
 
-		/**
+		/*
 		 * This is where we make checks for crucial entry data, using the GetElementByNode helper method.
 		 * If there are entries we ABSOLUTELY NEED in our lives at this point, now is an excellent time to
 		 * find out if the configuration file has them.
@@ -221,7 +221,7 @@ public class Init {
 				if (node.getNodeType() == Node.ELEMENT_NODE) {
 					Element element = (Element) node;
 
-					/**
+					/*
 					 * Fun decision you (jacrin) get to make... XML. Do we use Attributes to store the data, or Elements?
 					 * Attributes are single-value entries. Elements can contain multiple entries for the same element name.
 					 * See the commented lines below to get an idea. Your call.

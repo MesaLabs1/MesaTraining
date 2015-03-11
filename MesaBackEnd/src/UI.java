@@ -37,6 +37,8 @@ import java.awt.Font;
  *
  */
 public class UI extends JFrame{
+	private static final long serialVersionUID = 3855917297699177329L;
+
 	//Passed-in Objects
 	Utils util;
 
@@ -101,7 +103,7 @@ public class UI extends JFrame{
 
 	ServerStatus status;
 
-	/**
+	/*
 	 * The constructor here will simply define the GUI components, make sure the style is visually neutral (to avoid random UI inconsistencies),
 	 * and set the font package of the target system.
 	 * 
@@ -113,7 +115,7 @@ public class UI extends JFrame{
 	 * up as much space as as number. Always use a capital letter to placehold label sizes.
 	 */
 
-	/**
+	/*
 	 * This is a Visual Interface. Since this is the case, we use a JavaX Timer to regulate the updating of controls. See the class below.
 	 * 
 	 * We initialize the timer in the constructor. Then, we start it. The timer hooks the ActionEvent of the EventHandler class, and calls
