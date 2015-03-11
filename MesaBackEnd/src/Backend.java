@@ -61,7 +61,7 @@ public class Backend {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-
+			
 		}
 	}
 
@@ -371,6 +371,7 @@ public class Backend {
 
 									boolean isValid = false;
 									//We have the user's information, let's check with the database..
+									//TODO: Implement an un-encryption method here
 									//TODO: Check w/ database. Set isValid to true if this is the case.
 									if (isValid) {
 										verified = true;
