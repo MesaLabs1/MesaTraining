@@ -1,4 +1,6 @@
 import java.awt.Dimension;
+import java.awt.Point;
+import java.awt.Toolkit;
 
 import javax.swing.JDialog;
 
@@ -25,6 +27,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.Color;
 
+import javax.swing.border.LineBorder;
+import javax.swing.border.EtchedBorder;
+
 /**
  * This class outlines the JLoginDialog. This login dialog extends JDialog (meaning it behaves as a popup). It is
  * intended to be called or projected BEFORE AppletMain's UI loads. It must then establish a connection with the 
@@ -47,11 +52,20 @@ public class JLoginDialog extends JDialog{
 		superInstance = master;
 		
 		setTitle("Mesa Labs WebConnect Single Sign-on");
+		setResizable(false);
+		
 		//Set Size of Dialog to something smaller than 640x480, preferably in multiples of 8 or 16.
 		this.setSize(new Dimension(512, 256));
+		
+		//A Java toolkit that provides us with information about the target system.
+		Toolkit toolkit = Toolkit.getDefaultToolkit();
+		
+		//Center this dialog on the screen
+		this.setLocation(new Point(toolkit.getScreenSize().width / 2- (256),  toolkit.getScreenSize().height / 2 - (128)));
 		getContentPane().setLayout(new BorderLayout(0, 0));
 		
 		JPanel panel = new JPanel();
+		panel.setBorder(new LineBorder(new Color(0, 0, 0)));
 		getContentPane().add(panel, BorderLayout.NORTH);
 		panel.setLayout(new MigLayout("", "[][]", "[]"));
 		
@@ -63,6 +77,7 @@ public class JLoginDialog extends JDialog{
 		panel.add(lblWelcomeToMesalabs, "cell 1 0");
 		
 		JPanel panel_1 = new JPanel();
+		panel_1.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
 		getContentPane().add(panel_1, BorderLayout.CENTER);
 		panel_1.setLayout(new MigLayout("", "[][grow][][][]", "[][][][][][][][]"));
 		
@@ -99,8 +114,8 @@ public class JLoginDialog extends JDialog{
 			 */
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
+				ShowHelpText("Authenticating...");
 				if (superInstance.Authenticate(usernameField.getText(), new String(passwordField.getPassword()))) {
-					ShowHelpText("Authenticating...");
 					JLoginDialog.this.dispose();	//We call dispose because it manually adds a callback to windowDeactivated 
 													//and windowClosed. This will notify our applet that we're ready.
 				}else {
