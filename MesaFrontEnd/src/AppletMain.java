@@ -86,12 +86,14 @@ public class AppletMain extends Applet{
 			verified = false;
 		}
 
-		//Let's allocate all the ImageIcons
-		mesaIcon = new ImageIcon(appletRes.getPath() + "mesa.png");
-		tab1Icon = new ImageIcon(appletRes.getPath() + "flight.png");
-		tab2Icon = new ImageIcon(appletRes.getPath() + "maintinence.png");
-		tab3Icon = new ImageIcon(appletRes.getPath() + "training1.png");
-		tab4Icon = new ImageIcon(appletRes.getPath() + "controlpanel.png");
+		if (verified) {
+			//Let's allocate all the ImageIcons
+			mesaIcon = new ImageIcon(appletRes.getPath() + "mesa.png");
+			tab1Icon = new ImageIcon(appletRes.getPath() + "flight.png");
+			tab2Icon = new ImageIcon(appletRes.getPath() + "maintinence.png");
+			tab3Icon = new ImageIcon(appletRes.getPath() + "training1.png");
+			tab4Icon = new ImageIcon(appletRes.getPath() + "controlpanel.png");
+		}
 	}
 
 	public AppletMain() {
@@ -116,126 +118,132 @@ public class AppletMain extends Applet{
 		this.setSize(1024,  512);
 		setLayout(new BorderLayout(0, 0));
 
-		JPanel panel = new JPanel();
-		panel.setBorder(new LineBorder(new Color(0, 0, 0)));
-		add(panel, BorderLayout.NORTH);
-		panel.setLayout(new MigLayout("", "[][][][][][][][][][][][][][][grow][20px:n:24px,grow][20px:n:24px,grow][20px:n:24px,grow][::8px][]", "[grow]"));
+		JPanel pnlHeader = new JPanel();
+		pnlHeader.setBorder(new LineBorder(new Color(0, 0, 0)));
+		add(pnlHeader, BorderLayout.NORTH);
+		pnlHeader.setLayout(new MigLayout("", "[][][][][][][][][][][][][][][grow][20px:n:24px,grow][20px:n:24px,grow][20px:n:24px,grow][::8px][]", "[grow]"));
 
 		Canvas MesaIcon = new Canvas();
-		panel.add(MesaIcon, "cell 0 0");
+		pnlHeader.add(MesaIcon, "cell 0 0");
 
 		JLabel lblWelcomeToMesa = new JLabel("Welcome to Mesa Labs WebConnect, ");
-		panel.add(lblWelcomeToMesa, "cell 1 0");
+		pnlHeader.add(lblWelcomeToMesa, "cell 1 0");
 
 		lblUsername = new JLabel("USERNAME (ID)");
-		panel.add(lblUsername, "cell 2 0");
+		pnlHeader.add(lblUsername, "cell 2 0");
 
 		JLabel lblConnectionTime = new JLabel("Connection Time:");
-		panel.add(lblConnectionTime, "cell 5 0");
+		pnlHeader.add(lblConnectionTime, "cell 5 0");
 
 		lblTime = new JLabel("XX:XX:XX");
-		panel.add(lblTime, "cell 6 0");
+		pnlHeader.add(lblTime, "cell 6 0");
 
-		JPanel panel_14 = new JPanel();
-		panel_14.setBorder(new EtchedBorder(EtchedBorder.RAISED, null, null));
-		panel.add(panel_14, "cell 15 0,grow");
+		JPanel pnlNotification1 = new JPanel();
+		pnlNotification1.setBorder(new EtchedBorder(EtchedBorder.RAISED, null, null));
+		pnlHeader.add(pnlNotification1, "cell 15 0,grow");
 
-		JPanel panel_6 = new JPanel();
-		panel_6.setBorder(new EtchedBorder(EtchedBorder.RAISED, null, null));
-		panel.add(panel_6, "cell 16 0,grow");
+		JPanel pnlNotification2 = new JPanel();
+		pnlNotification2.setBorder(new EtchedBorder(EtchedBorder.RAISED, null, null));
+		pnlHeader.add(pnlNotification2, "cell 16 0,grow");
 
-		JPanel panel_15 = new JPanel();
-		panel_15.setBorder(new EtchedBorder(EtchedBorder.RAISED, null, null));
-		panel.add(panel_15, "cell 17 0,grow");
+		JPanel pnlNotification3 = new JPanel();
+		pnlNotification3.setBorder(new EtchedBorder(EtchedBorder.RAISED, null, null));
+		pnlHeader.add(pnlNotification3, "cell 17 0,grow");
 
 		JButton btnLogout = new JButton("Logout");
-		panel.add(btnLogout, "cell 19 0");
+		pnlHeader.add(btnLogout, "cell 19 0,aligny baseline");
 
-		JPanel panel_3 = new JPanel();
-		add(panel_3, BorderLayout.CENTER);
-		panel_3.setBorder(new LineBorder(new Color(0, 0, 0)));
-		panel_3.setLayout(new MigLayout("", "[grow][256px:n:256px,grow][]", "[grow][32px:n:32px][]"));
+		JPanel pnlMain = new JPanel();
+		add(pnlMain, BorderLayout.CENTER);
+		pnlMain.setBorder(new LineBorder(new Color(0, 0, 0)));
+		pnlMain.setLayout(new MigLayout("", "[grow][256px:n:256px,grow][]", "[grow][32px:n:32px][]"));
 
-		JPanel panel_5 = new JPanel();
-		panel_5.setBorder(new EtchedBorder(EtchedBorder.RAISED, null, null));
-		panel_3.add(panel_5, "cell 0 0 1 2,grow");
-		panel_5.setLayout(new MigLayout("", "[128px:n:128px,grow][196px:n:196px,grow][grow]", "[grow]"));
+		JPanel pnlInternalPane = new JPanel();
+		pnlInternalPane.setBorder(new SoftBevelBorder(BevelBorder.RAISED, null, null, null, null));
+		pnlMain.add(pnlInternalPane, "cell 0 0 1 2,grow");
+		pnlInternalPane.setLayout(new MigLayout("", "[128px:n:128px,grow][196px:n:196px,grow][grow]", "[grow]"));
 
-		JPanel panel_8 = new JPanel();
-		panel_8.setBorder(new LineBorder(new Color(0, 0, 0)));
-		panel_5.add(panel_8, "cell 0 0,grow");
-		panel_8.setLayout(new BorderLayout(0, 0));
+		JPanel pnlDateHolder = new JPanel();
+		pnlDateHolder.setBorder(new LineBorder(new Color(0, 0, 0)));
+		pnlInternalPane.add(pnlDateHolder, "cell 0 0,grow");
+		pnlDateHolder.setLayout(new BorderLayout(0, 0));
 
-		JPanel panel_9 = new JPanel();
-		panel_9.setBorder(new SoftBevelBorder(BevelBorder.RAISED, null, null, null, null));
-		panel_8.add(panel_9, BorderLayout.NORTH);
-		panel_9.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
+		JPanel pnlDate = new JPanel();
+		pnlDate.setBorder(new SoftBevelBorder(BevelBorder.RAISED, null, null, null, null));
+		pnlDateHolder.add(pnlDate, BorderLayout.NORTH);
+		pnlDate.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
 
 		JLabel lblDate = new JLabel("Date");
-		panel_9.add(lblDate);
+		pnlDate.add(lblDate);
 
-		JList list = new JList();
-		panel_8.add(list, BorderLayout.CENTER);
+		JList listDate = new JList();
+		pnlDateHolder.add(listDate, BorderLayout.CENTER);
 
-		JPanel panel_12 = new JPanel();
-		panel_12.setBorder(new LineBorder(new Color(0, 0, 0)));
-		panel_5.add(panel_12, "cell 1 0,grow");
-		panel_12.setLayout(new BorderLayout(0, 0));
+		JPanel pnlPilotHolder = new JPanel();
+		pnlPilotHolder.setBorder(new LineBorder(new Color(0, 0, 0)));
+		pnlInternalPane.add(pnlPilotHolder, "cell 1 0,grow");
+		pnlPilotHolder.setLayout(new BorderLayout(0, 0));
 
-		JPanel panel_13 = new JPanel();
-		panel_13.setBorder(new SoftBevelBorder(BevelBorder.RAISED, null, null, null, null));
-		panel_12.add(panel_13, BorderLayout.NORTH);
+		JPanel pnlPilot = new JPanel();
+		pnlPilot.setBorder(new SoftBevelBorder(BevelBorder.RAISED, null, null, null, null));
+		pnlPilotHolder.add(pnlPilot, BorderLayout.NORTH);
 
 		JLabel lblPilot = new JLabel("Pilot");
-		panel_13.add(lblPilot);
+		pnlPilot.add(lblPilot);
+		
+		JList listPilot = new JList();
+		pnlPilotHolder.add(listPilot, BorderLayout.CENTER);
 
-		JPanel panel_10 = new JPanel();
-		panel_10.setBorder(new LineBorder(new Color(0, 0, 0)));
-		panel_5.add(panel_10, "cell 2 0,grow");
-		panel_10.setLayout(new BorderLayout(0, 0));
+		JPanel pnlAircraftHolder = new JPanel();
+		pnlAircraftHolder.setBorder(new LineBorder(new Color(0, 0, 0)));
+		pnlInternalPane.add(pnlAircraftHolder, "cell 2 0,grow");
+		pnlAircraftHolder.setLayout(new BorderLayout(0, 0));
 
-		JPanel panel_11 = new JPanel();
-		panel_11.setBorder(new SoftBevelBorder(BevelBorder.RAISED, null, null, null, null));
-		panel_10.add(panel_11, BorderLayout.NORTH);
+		JPanel pnlAircraftName = new JPanel();
+		pnlAircraftName.setBorder(new SoftBevelBorder(BevelBorder.RAISED, null, null, null, null));
+		pnlAircraftHolder.add(pnlAircraftName, BorderLayout.NORTH);
 
 		JLabel lblAircraftName = new JLabel("Aircraft Name");
-		panel_11.add(lblAircraftName);
+		pnlAircraftName.add(lblAircraftName);
 
-		JList list_1 = new JList();
-		panel_10.add(list_1, BorderLayout.CENTER);
+		JList listName = new JList();
+		pnlAircraftHolder.add(listName, BorderLayout.CENTER);
 
 		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
-		panel_3.add(tabbedPane, "cell 1 0 2 3,grow");
+		pnlMain.add(tabbedPane, "cell 1 0 2 3,grow");
 		tabbedPane.setSelectedIndex(-1);
 		tabbedPane.setBorder(new LineBorder(new Color(0, 0, 0)));
 
-		JPanel panel_4 = new JPanel();
-		tabbedPane.addTab("Training Logs", tab3Icon, panel_4, null);
-		panel_4.setLayout(new MigLayout("", "[][grow][]", "[][][][][grow][]"));
+		JPanel pnlMaintinenceLogsHolder = new JPanel();
+		tabbedPane.addTab("Maintinence Logs", null, pnlMaintinenceLogsHolder, null);
+		
+		JPanel pnlTrainingLogsHolder = new JPanel();
+		tabbedPane.addTab("Training Logs", tab3Icon, pnlTrainingLogsHolder, null);
+		pnlTrainingLogsHolder.setLayout(new MigLayout("", "[][grow][]", "[][][][][grow][]"));
 
-		JPanel panel_2 = new JPanel();
-		tabbedPane.addTab("Flight Logs", tab1Icon, panel_2, null);
-		panel_2.setLayout(new MigLayout("", "[]", "[]"));
+		JPanel pnlFlightLogsHolder = new JPanel();
+		tabbedPane.addTab("Flight Logs", tab1Icon, pnlFlightLogsHolder, null);
+		pnlFlightLogsHolder.setLayout(new MigLayout("", "[]", "[]"));
+		
+		JPanel pnlAdministrationHolder = new JPanel();
+		tabbedPane.addTab("Administration", tab4Icon, pnlAdministrationHolder, null);
 
-		JPanel panel_1 = new JPanel();
-		tabbedPane.addTab("Administration", tab4Icon, panel_1, null);
-
-		JPanel panel_7 = new JPanel();
-		panel_7.setBorder(new LineBorder(new Color(0, 0, 0), 1, true));
-		panel_3.add(panel_7, "cell 0 2,grow");
-		panel_7.setLayout(new MigLayout("", "[256px:n:256px][][][][][][][][][][][][][][][][]", "[]"));
+		JPanel pnlFooter = new JPanel();
+		pnlFooter.setBorder(new LineBorder(new Color(0, 0, 0), 1, true));
+		pnlMain.add(pnlFooter, "cell 0 2,grow");
+		pnlFooter.setLayout(new MigLayout("", "[256px:n:256px][][][][][][][][][][][][][][][][]", "[]"));
 
 		JProgressBar progressBar = new JProgressBar();
-		panel_7.add(progressBar, "cell 0 0,growx");
+		pnlFooter.add(progressBar, "cell 0 0,growx");
 
-		JLabel lblIdle = new JLabel("Idle.");
-		panel_7.add(lblIdle, "cell 1 0");
+		JLabel lblStatus = new JLabel("Idle.");
+		pnlFooter.add(lblStatus, "cell 1 0");
 
 		JLabel lblUserStatus = new JLabel("User Status:");
-		panel_7.add(lblUserStatus, "cell 15 0");
+		pnlFooter.add(lblUserStatus, "cell 15 0");
 
-		JLabel lblAdministratorregular = new JLabel("XXXXXXXXXXXXX");
-		panel_7.add(lblAdministratorregular, "cell 16 0");
+		JLabel lblUserPermissions = new JLabel("XXXXXXXXXXXXX");
+		pnlFooter.add(lblUserPermissions, "cell 16 0");
 
 		eventHandler = new EventHandler();
 		eventTicker = new Timer(100, eventHandler);
