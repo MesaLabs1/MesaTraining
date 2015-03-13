@@ -36,6 +36,7 @@ import javax.swing.border.EtchedBorder;
  * master server, and verify your identity before you will be redirected to the AppletMain UI. The UI must then
  * be modified to match your security clearance. NOTE: This class is a visual event, meaning it retains no 
  * network-related entities, NOR SHOULD IT.
+ * 
  * @author hackjunky, jacrin
  *
  */
@@ -46,13 +47,13 @@ public class JLoginDialog extends JDialog{
 	JLabel lblHelptext;
 	JLabel lblHelptext_1;
 	
-	AppletMain superInstance;
+	ClientMain superInstance;
 	
-	public JLoginDialog(AppletMain master) {
-		superInstance = master;
-		
+	public JLoginDialog(ClientMain instance) {
 		setTitle("Mesa Labs WebConnect Single Sign-on");
 		setResizable(false);
+		
+		superInstance = instance;
 		
 		//Set Size of Dialog to something smaller than 640x480, preferably in multiples of 8 or 16.
 		this.setSize(new Dimension(512, 256));
@@ -116,6 +117,7 @@ public class JLoginDialog extends JDialog{
 			public void actionPerformed(ActionEvent arg0) {
 				ShowHelpText("Authenticating...");
 				if (superInstance.Authenticate(usernameField.getText(), new String(passwordField.getPassword()))) {
+					JLoginDialog.this.setVisible(false);
 					JLoginDialog.this.dispose();	//We call dispose because it manually adds a callback to windowDeactivated 
 													//and windowClosed. This will notify our applet that we're ready.
 				}else {
@@ -135,6 +137,7 @@ public class JLoginDialog extends JDialog{
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				JLoginDialog.this.setVisible(false);
 				System.exit(0);
 				//Terminate the Applet, we might even want to have the web-page redirect to home when this happens.
 			}

@@ -26,24 +26,39 @@ import java.awt.Canvas;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+
 import javax.swing.JList;
+
 import java.awt.Component;
+
 import javax.swing.Box;
 import javax.swing.border.SoftBevelBorder;
 import javax.swing.border.BevelBorder;
 import javax.swing.JSplitPane;
 import javax.swing.JProgressBar;
+
 import java.awt.Panel;
+
 import javax.swing.BoxLayout;
+
 import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.layout.ColumnSpec;
 import com.jgoodies.forms.layout.RowSpec;
+
 import java.awt.FlowLayout;
 import java.awt.Button;
 import java.awt.Font;
+import java.awt.Image;
+
 import javax.swing.SwingConstants;
 
-public class AppletMain extends Applet{
+/**
+ * This is the Visual Applet that the web browser will display.
+ * 
+ * @author hackjunky, jacrin
+ *
+ */
+public class AppletUI extends Applet{
 	//UID Automatically Generated
 	private static final long serialVersionUID = 6373615470012072107L;
 
@@ -53,10 +68,16 @@ public class AppletMain extends Applet{
 
 	//Applet Resources
 	ImageIcon mesaIcon;
+
 	ImageIcon tab1Icon;
 	ImageIcon tab2Icon;
 	ImageIcon tab3Icon;
 	ImageIcon tab4Icon;
+
+	Image notify1Icon;
+	Image notify2Icon;
+	Image notify3Icon;
+	Image notifyPop;
 
 	//Applet Data
 	File appletRoot = new File("");
@@ -71,9 +92,14 @@ public class AppletMain extends Applet{
 
 	JLabel lblUsername;
 	JLabel lblTime;
-
+	JPanel pnlNotification1;
+	JPanel pnlNotification2;
+	JPanel pnlNotification3;
+	
+	ClientMain clientMain;
+	
 	public static void main(String[] args) {
-		AppletMain instance = new AppletMain();
+		new AppletUI();
 	}
 
 	public void AllocateResources() {
@@ -93,16 +119,20 @@ public class AppletMain extends Applet{
 			tab2Icon = new ImageIcon(appletRes.getPath() + "maintinence.png");
 			tab3Icon = new ImageIcon(appletRes.getPath() + "training1.png");
 			tab4Icon = new ImageIcon(appletRes.getPath() + "controlpanel.png");
+			notify1Icon = Toolkit.getDefaultToolkit().getImage(appletRes.getPath() + "notify.png");
+			notify2Icon = Toolkit.getDefaultToolkit().getImage(appletRes.getPath() + "quiz.png");
+			notify3Icon = Toolkit.getDefaultToolkit().getImage(appletRes.getPath() + "help.png");
+			notifyPop = Toolkit.getDefaultToolkit().getImage(appletRes.getPath() + "pop.png");
 		}
 	}
 
-	public AppletMain() {
+	public AppletUI() {
+		clientMain = new ClientMain(this);
+		
 		//A Java toolkit that provides us with information about the target system.
 		Toolkit toolkit = Toolkit.getDefaultToolkit();
 		int SCREEN_SIZE_X = toolkit.getScreenSize().width;
 		int SCREEN_SIZE_Y = toolkit.getScreenSize().height;
-
-		JLoginDialog loginDialog = new JLoginDialog(this);
 
 		//Allocate all Resources, make sure they're there, etc etc
 		AllocateResources();
@@ -121,7 +151,7 @@ public class AppletMain extends Applet{
 		JPanel pnlHeader = new JPanel();
 		pnlHeader.setBorder(new LineBorder(new Color(0, 0, 0)));
 		add(pnlHeader, BorderLayout.NORTH);
-		pnlHeader.setLayout(new MigLayout("", "[][][][][][][][][][][][][][][grow][20px:n:24px,grow][20px:n:24px,grow][20px:n:24px,grow][::8px][]", "[grow]"));
+		pnlHeader.setLayout(new MigLayout("", "[][][][][][][][][][][][][][][grow][32px:n:32px,grow][32px:n:32px,grow][32px:n:32px,grow][::8px][]", "[32px:n:32px,grow]"));
 
 		Canvas MesaIcon = new Canvas();
 		pnlHeader.add(MesaIcon, "cell 0 0");
@@ -138,15 +168,15 @@ public class AppletMain extends Applet{
 		lblTime = new JLabel("XX:XX:XX");
 		pnlHeader.add(lblTime, "cell 6 0");
 
-		JPanel pnlNotification1 = new JPanel();
+		pnlNotification1 = new JPanel();
 		pnlNotification1.setBorder(new EtchedBorder(EtchedBorder.RAISED, null, null));
 		pnlHeader.add(pnlNotification1, "cell 15 0,grow");
 
-		JPanel pnlNotification2 = new JPanel();
+		pnlNotification2 = new JPanel();
 		pnlNotification2.setBorder(new EtchedBorder(EtchedBorder.RAISED, null, null));
 		pnlHeader.add(pnlNotification2, "cell 16 0,grow");
 
-		JPanel pnlNotification3 = new JPanel();
+		pnlNotification3 = new JPanel();
 		pnlNotification3.setBorder(new EtchedBorder(EtchedBorder.RAISED, null, null));
 		pnlHeader.add(pnlNotification3, "cell 17 0,grow");
 
@@ -190,7 +220,7 @@ public class AppletMain extends Applet{
 
 		JLabel lblPilot = new JLabel("Pilot");
 		pnlPilot.add(lblPilot);
-		
+
 		JList listPilot = new JList();
 		pnlPilotHolder.add(listPilot, BorderLayout.CENTER);
 
@@ -216,7 +246,7 @@ public class AppletMain extends Applet{
 
 		JPanel pnlMaintinenceLogsHolder = new JPanel();
 		tabbedPane.addTab("Maintinence Logs", null, pnlMaintinenceLogsHolder, null);
-		
+
 		JPanel pnlTrainingLogsHolder = new JPanel();
 		tabbedPane.addTab("Training Logs", tab3Icon, pnlTrainingLogsHolder, null);
 		pnlTrainingLogsHolder.setLayout(new MigLayout("", "[][grow][]", "[][][][][grow][]"));
@@ -224,7 +254,7 @@ public class AppletMain extends Applet{
 		JPanel pnlFlightLogsHolder = new JPanel();
 		tabbedPane.addTab("Flight Logs", tab1Icon, pnlFlightLogsHolder, null);
 		pnlFlightLogsHolder.setLayout(new MigLayout("", "[]", "[]"));
-		
+
 		JPanel pnlAdministrationHolder = new JPanel();
 		tabbedPane.addTab("Administration", tab4Icon, pnlAdministrationHolder, null);
 
@@ -244,33 +274,58 @@ public class AppletMain extends Applet{
 
 		JLabel lblUserPermissions = new JLabel("XXXXXXXXXXXXX");
 		pnlFooter.add(lblUserPermissions, "cell 16 0");
-
+		
+		hideControls();
+		
 		eventHandler = new EventHandler();
 		eventTicker = new Timer(100, eventHandler);
+		
+		eventTicker.start();
+		
+		JLoginDialog dialog = new JLoginDialog(clientMain);
 	}
-
-	public boolean Authenticate(String username, String password) {
-		boolean isValid = false;
-
-		if (isValid) {
-			return true;
-		}else {
-			return false;
+	
+	
+	public void hideControls() {
+		for (Component c : this.getComponents()) {
+			c.setVisible(false);
+		}
+	}
+	
+	public void showControls() {
+		for (Component c : this.getComponents()) {
+			c.setVisible(true);
 		}
 	}
 
 	public class EventHandler implements ActionListener {
 		int secondsTicker = 0;
-
+		AppletUI superInstance;
+		
+		public EventHandler() {
+			superInstance = AppletUI.this;
+		}
+		
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
-			lblUsername.setText(username);
+			lblUsername.setText(username + "!");
 
 			secondsTicker++;
 			if (secondsTicker == 10) {
 				secondsTicker = 0;
 				uptime++;
 			}
+			
+			//Draw the Icon
+			pnlNotification1.getGraphics().drawImage(notify1Icon, 0, 0, pnlNotification1.getSize().width, pnlNotification1.getSize().height, superInstance);
+			pnlNotification2.getGraphics().drawImage(notify2Icon, 0, 0, pnlNotification2.getSize().width, pnlNotification2.getSize().height, superInstance);
+			pnlNotification3.getGraphics().drawImage(notify3Icon, 0, 0, pnlNotification3.getSize().width, pnlNotification3.getSize().height, superInstance);
+
+			//Draw the Blip
+			pnlNotification1.getGraphics().drawImage(notifyPop, pnlNotification1.getSize().width - 10, 2, 8, 8, superInstance);
+
+			//Fill the Blip with a number
+			pnlNotification1.getGraphics().drawString("0", pnlNotification1.getSize().width - 10, 2);
 
 			lblTime.setText(convertUptime());
 		}
