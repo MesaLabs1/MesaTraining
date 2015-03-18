@@ -364,9 +364,9 @@ public class Backend {
 										break;
 									}
 									String[] split = GetParameters(identification);
-									if (identification.startsWith("$IDENTIFY") && split.length == 3) {
+									if (identification.startsWith("$IDENTIFY") && split.length == 2) {
 										username = split[0];
-										password = split[0];
+										password = split[1];
 									}
 
 									boolean isValid = false;
@@ -384,7 +384,6 @@ public class Backend {
 								}
 
 								if (verified) {			//Given that the loop above terminated, and the userinfo was valid, we are now in the main loop.
-									out.writeUTF("$MSG Welcome to the Mesa Labs Database! I am at your disposal, make a request!");
 									boolean done = false;
 
 									while (!done) {
@@ -410,12 +409,15 @@ public class Backend {
 									util.Log("Remote Client failed to identify themselves. This is not malicious, they simply failed to log in.");
 								}
 							}else {
+								out.writeUTF("$ERROR, HANDSHAKE");
 								util.Log("MISMATCH! Client failed to provide proper handshake! Closing the Server!");
 							}
 						}else {
+							out.writeUTF("$ERROR, IP");
 							util.Log("MISMATCH! Client says their IP is " + remoteIP + " but we see " + server.getRemoteSocketAddress() + "! Closing the Server!");
 						}
 					}else {
+						out.writeUTF("$ERROR, VERSION");
 						util.Log("MISMATCH! Client is version " + remoteVersion + " but we are version " + propMaster.BACKEND_VERSION + "! Closing the Server!");
 						server.close();
 						active = false;
