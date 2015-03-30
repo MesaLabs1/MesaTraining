@@ -1,3 +1,4 @@
+import java.awt.Dialog;
 import java.awt.Dimension;
 
 import javax.swing.JFrame;
@@ -12,6 +13,7 @@ import java.awt.Color;
 import javax.swing.DefaultListModel;
 import javax.swing.JLabel;
 import javax.swing.JMenuBar;
+import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JList;
 import javax.swing.JButton;
@@ -28,7 +30,10 @@ import java.util.ArrayList;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.ListSelectionModel;
+
 import java.awt.Font;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 /**
  * This class is a simple GUI for this backend. You can disable it from appearing by adding the tag -nogui to
@@ -93,6 +98,18 @@ public class UI extends JFrame{
 	int numErrors;
 	int memUsage;
 	int accessCount;
+	
+	/*
+	 * Async Flags
+	 * 
+	 * What's the purpose of an Async flag? Since this thread runs in a separate thread, we cannot hook functions
+	 * in the main loop in the server. Therefore, we set these flags and expect the server thread to read these
+	 * flags for modifications to the thread. 
+	 * 
+	 * Example: Setting activate=true will make the main thread read it and set it to false when done.
+	 */
+	boolean activate = false;
+	boolean deactivate = false;
 
 	ArrayList logs;
 
@@ -359,16 +376,42 @@ public class UI extends JFrame{
 		mntmActivate = new JMenuItem("Activate");
 		mntmActivate.setFont(new Font("Lucida Grande", Font.PLAIN, 10));
 		mnListener.add(mntmActivate);
+		mntmActivate.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				activate = true;
+			}
+		});
 
 		mntmDeactivate = new JMenuItem("Deactivate");
 		mntmDeactivate.setFont(new Font("Lucida Grande", Font.PLAIN, 10));
 		mnListener.add(mntmDeactivate);
+		mntmDeactivate.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				deactivate = true;
+			}
+		});
 
 		mnSystem = new JMenu("System");
 		mnSystem.setFont(new Font("Lucida Grande", Font.PLAIN, 10));
 		menuBar.add(mnSystem);
 
 		mntmClearStatistics = new JMenuItem("Clear Statistics");
+		mntmClearStatistics.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				numClients = 0;
+				numOverhead = 0;
+				numOverall = 0;
+				numThreads = 0;
+				numHandles = 0;
+				numGCs = 0;
+				numErrors = 0;
+				memUsage = 0;
+				accessCount = 0;
+				util.Log("Statistics reset!");
+			}
+		});
 		mntmClearStatistics.setFont(new Font("Lucida Grande", Font.PLAIN, 10));
 		mnSystem.add(mntmClearStatistics);
 
@@ -377,6 +420,11 @@ public class UI extends JFrame{
 		menuBar.add(mnHelp);
 
 		menuAbout = new JMenuItem("About");
+		menuAbout.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				JOptionPane.showMessageDialog(UI.this.getContentPane(), "WebConnect Server Backend designed by Jad Aboulhosn and Jacqueline Clow. 2015.");
+			}
+		});
 		menuAbout.setFont(new Font("Lucida Grande", Font.PLAIN, 10));
 		mnHelp.add(menuAbout);
 
@@ -457,6 +505,9 @@ public class UI extends JFrame{
 				pnlRed.setVisible(true);
 				pnlYellow.setVisible(false);
 				pnlGreen.setVisible(false);
+				
+				mntmActivate.setEnabled(true);
+				mntmDeactivate.setEnabled(false);
 			}else if (status.equals(ServerStatus.Busy)) {
 				lblRunning.setText("Busy... (" + progressBar.getValue() + "%)");
 				pnlRed.setVisible(false);
@@ -467,6 +518,9 @@ public class UI extends JFrame{
 				pnlRed.setVisible(false);
 				pnlYellow.setVisible(false);
 				pnlGreen.setVisible(true);
+				
+				mntmActivate.setEnabled(false);
+				mntmDeactivate.setEnabled(true);
 			}
 
 			internalTicks++;

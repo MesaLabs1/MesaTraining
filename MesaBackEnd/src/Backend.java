@@ -58,10 +58,34 @@ public class Backend {
 
 
 	public class EventHandler implements ActionListener{
+		Backend backend;
+		UI ui;
+		NetworkMaster netMaster;
+
+		public EventHandler() {
+			backend = Backend.this;
+			netMaster = backend.netMaster;
+			ui = netMaster.ui;
+		}
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			
+			backend = Backend.this;
+			netMaster = backend.netMaster;
+			ui = netMaster.ui;
+
+			if (ui.activate) {
+				util.Log("Activating the Network Listener...");
+				ui.activate = false;
+				netMasterThread = new Thread(netMaster);
+				netMasterThread.start();
+			}
+			if (ui.deactivate) {
+				util.Log("Deactivating the Network Listener...");
+				ui.deactivate = false;
+				ui.SetStatus(UI.ServerStatus.Inactive);
+				netMasterThread.interrupt();
+			}
 		}
 	}
 
@@ -108,6 +132,8 @@ public class Backend {
 
 		NetworkSocket[] networkSockets;
 
+		Socket socket;
+
 		public NetworkMaster() {
 			networkThreads = new Thread[properties.NETWORK_MAX_CONNECTIONS];
 			networkSockets = new NetworkSocket[properties.NETWORK_MAX_CONNECTIONS];
@@ -137,12 +163,14 @@ public class Backend {
 		}
 
 		public void run() {
+			//Create a master socket at our port, defined in PropertyMaster.NETWORK_PORT
 			try {
-				//Create a master socket at our port, defined in PropertyMaster.NETWORK_PORT
-				serverSocket = new ServerSocket(instance.properties.NETWORK_PORT);
-
-				//Set the Timeout to 10000 ms (basically, we really really really don't want a timeout)
-				//serverSocket.setSoTimeout(10000);
+				try {
+					serverSocket = new ServerSocket(instance.properties.NETWORK_PORT);
+				}catch (Exception e) {
+					util.Log("Server failed to bind to port... is it already running?");
+					util.Log("Ignore this message if you've just reactivated the listener.");
+				}
 
 				Random rand = new Random();
 
@@ -154,7 +182,7 @@ public class Backend {
 
 					//Wait for the socket to accept a connection. This thread halts here until a new user approaches us.
 					util.Log("Awaiting connections on Port " + serverSocket.getLocalPort() + "...");
-					Socket socket = serverSocket.accept();
+					socket = serverSocket.accept();
 
 					ui.SetStatus(UI.ServerStatus.Busy);
 					UpdateUI(); 
@@ -217,9 +245,10 @@ public class Backend {
 					}
 					ui.accessCount++;
 					UpdateUI();
+
 				}
-			} catch (IOException exp) {
-				exp.printStackTrace();
+			} catch (IOException e1) {
+				e1.printStackTrace();
 			} finally {
 				try {
 					serverSocket.close();
@@ -227,6 +256,14 @@ public class Backend {
 
 				}
 			}
+		}
+
+		/**
+		 * Fetches the current client from the thread.
+		 * @return The client as a Socket.
+		 */
+		public Socket GetCurrentSocket() {
+			return socket;
 		}
 	}
 
@@ -394,11 +431,11 @@ public class Backend {
 											util.Log("[MSG] " + msg);
 										}else {
 											if (request.startsWith("$GET")) {
-	
+
 											}else if (request.startsWith("$TEST")) {
-	
+
 											}else if (request.startsWith("$TEST")) {
-	
+
 											}else if (request.equals("$ABORT")) {
 												done = true;
 											}
@@ -435,7 +472,7 @@ public class Backend {
 				}
 			}
 		}
-		
+
 		/**
 		 * This takes a network message and returns the parameters. Excludes the command
 		 * itself, it is recommended that you assess the actual command with String.startsWith().

@@ -2,6 +2,7 @@ import java.applet.Applet;
 import java.awt.Dialog;
 import java.awt.Toolkit;
 
+import javax.swing.BorderFactory;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JDialog;
@@ -52,6 +53,9 @@ import java.awt.Image;
 
 import javax.swing.SwingConstants;
 
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+
 /**
  * This is the Visual Applet that the web browser will display.
  * 
@@ -80,7 +84,7 @@ public class AppletUI extends Applet{
 	Image notifyPop;
 
 	//Applet Data
-	File appletRoot = new File("");
+	File appletRoot = new File(new File("").getAbsolutePath());
 	File appletRes = new File(appletRoot.getPath() + "/resources/res/");
 
 	//User Data
@@ -106,23 +110,25 @@ public class AppletUI extends Applet{
 		//Verify all appletXXX variables are defined
 		boolean verified = true;
 		if (!appletRoot.exists()) {
+			System.out.println("Failed to verify APPLET_ROOT@" + appletRoot.getPath());
 			verified = false;
 		}
 		if (!appletRes.exists()) {
+			System.out.println("Failed to verify APPLET_RES@" + appletRes.getPath());
 			verified = false;
 		}
 
 		if (verified) {
 			//Let's allocate all the ImageIcons
-			mesaIcon = new ImageIcon(appletRes.getPath() + "mesa.png");
-			tab1Icon = new ImageIcon(appletRes.getPath() + "flight.png");
-			tab2Icon = new ImageIcon(appletRes.getPath() + "maintinence.png");
-			tab3Icon = new ImageIcon(appletRes.getPath() + "training1.png");
-			tab4Icon = new ImageIcon(appletRes.getPath() + "controlpanel.png");
-			notify1Icon = Toolkit.getDefaultToolkit().getImage(appletRes.getPath() + "notify.png");
-			notify2Icon = Toolkit.getDefaultToolkit().getImage(appletRes.getPath() + "quiz.png");
-			notify3Icon = Toolkit.getDefaultToolkit().getImage(appletRes.getPath() + "help.png");
-			notifyPop = Toolkit.getDefaultToolkit().getImage(appletRes.getPath() + "pop.png");
+			mesaIcon = new ImageIcon(appletRes.getPath() + "/mesa.png");
+			tab1Icon = new ImageIcon(appletRes.getPath() + "/flight.png");
+			tab2Icon = new ImageIcon(appletRes.getPath() + "/maintinence.png");
+			tab3Icon = new ImageIcon(appletRes.getPath() + "/training1.png");
+			tab4Icon = new ImageIcon(appletRes.getPath() + "/controlpanel.png");
+			notify1Icon = Toolkit.getDefaultToolkit().getImage(appletRes.getPath() + "/notify.png");
+			notify2Icon = Toolkit.getDefaultToolkit().getImage(appletRes.getPath() + "/quiz.png");
+			notify3Icon = Toolkit.getDefaultToolkit().getImage(appletRes.getPath() + "/help.png");
+			notifyPop = Toolkit.getDefaultToolkit().getImage(appletRes.getPath() + "/pop.png");
 		}
 	}
 
@@ -169,15 +175,69 @@ public class AppletUI extends Applet{
 		pnlHeader.add(lblTime, "cell 6 0");
 
 		pnlNotification1 = new JPanel();
-		pnlNotification1.setBorder(new EtchedBorder(EtchedBorder.RAISED, null, null));
+		pnlNotification1.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseEntered(MouseEvent arg0) {
+				pnlNotification1.setBorder(BorderFactory.createRaisedBevelBorder());
+			}
+			@Override
+			public void mouseExited(MouseEvent e) {
+				pnlNotification1.setBorder(BorderFactory.createEtchedBorder());
+			}
+			@Override
+			public void mousePressed(MouseEvent e) {
+				pnlNotification1.setBorder(BorderFactory.createLoweredBevelBorder());
+			}
+			@Override
+			public void mouseReleased(MouseEvent e) {
+				pnlNotification1.setBorder(BorderFactory.createEtchedBorder());
+			}
+		});
+		pnlNotification1.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
 		pnlHeader.add(pnlNotification1, "cell 15 0,grow");
 
 		pnlNotification2 = new JPanel();
-		pnlNotification2.setBorder(new EtchedBorder(EtchedBorder.RAISED, null, null));
+		pnlNotification2.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseEntered(MouseEvent arg0) {
+				pnlNotification2.setBorder(BorderFactory.createRaisedBevelBorder());
+			}
+			@Override
+			public void mouseExited(MouseEvent e) {
+				pnlNotification2.setBorder(BorderFactory.createEtchedBorder());
+			}
+			@Override
+			public void mousePressed(MouseEvent e) {
+				pnlNotification2.setBorder(BorderFactory.createLoweredBevelBorder());
+			}
+			@Override
+			public void mouseReleased(MouseEvent e) {
+				pnlNotification2.setBorder(BorderFactory.createEtchedBorder());
+			}
+		});
+		pnlNotification2.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
 		pnlHeader.add(pnlNotification2, "cell 16 0,grow");
 
 		pnlNotification3 = new JPanel();
-		pnlNotification3.setBorder(new EtchedBorder(EtchedBorder.RAISED, null, null));
+		pnlNotification3.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseEntered(MouseEvent arg0) {
+				pnlNotification3.setBorder(BorderFactory.createRaisedBevelBorder());
+			}
+			@Override
+			public void mouseExited(MouseEvent e) {
+				pnlNotification3.setBorder(BorderFactory.createEtchedBorder());
+			}
+			@Override
+			public void mousePressed(MouseEvent e) {
+				pnlNotification3.setBorder(BorderFactory.createLoweredBevelBorder());
+			}
+			@Override
+			public void mouseReleased(MouseEvent e) {
+				pnlNotification3.setBorder(BorderFactory.createEtchedBorder());
+			}
+		});
+		pnlNotification3.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
 		pnlHeader.add(pnlNotification3, "cell 17 0,grow");
 
 		JButton btnLogout = new JButton("Logout");
@@ -278,11 +338,11 @@ public class AppletUI extends Applet{
 		hideControls();
 		
 		eventHandler = new EventHandler();
-		eventTicker = new Timer(100, eventHandler);
-		
-		eventTicker.start();
+		eventTicker = new Timer(1, eventHandler);
 		
 		JLoginDialog dialog = new JLoginDialog(clientMain);
+		
+		eventTicker.start();
 	}
 	
 	
@@ -311,21 +371,21 @@ public class AppletUI extends Applet{
 			lblUsername.setText(username + "!");
 
 			secondsTicker++;
-			if (secondsTicker == 10) {
+			if (secondsTicker == 1000) {
 				secondsTicker = 0;
 				uptime++;
 			}
 			
 			//Draw the Icon
-			pnlNotification1.getGraphics().drawImage(notify1Icon, 0, 0, pnlNotification1.getSize().width, pnlNotification1.getSize().height, superInstance);
-			pnlNotification2.getGraphics().drawImage(notify2Icon, 0, 0, pnlNotification2.getSize().width, pnlNotification2.getSize().height, superInstance);
-			pnlNotification3.getGraphics().drawImage(notify3Icon, 0, 0, pnlNotification3.getSize().width, pnlNotification3.getSize().height, superInstance);
+			pnlNotification1.getGraphics().drawImage(notify1Icon, 8, 8, pnlNotification1.getSize().width - 16, pnlNotification1.getSize().height - 16, superInstance);
+			pnlNotification2.getGraphics().drawImage(notify2Icon, 8, 8, pnlNotification2.getSize().width - 16, pnlNotification2.getSize().height - 16, superInstance);
+			pnlNotification3.getGraphics().drawImage(notify3Icon, 8, 8, pnlNotification3.getSize().width - 16, pnlNotification3.getSize().height - 16, superInstance);
 
 			//Draw the Blip
-			pnlNotification1.getGraphics().drawImage(notifyPop, pnlNotification1.getSize().width - 10, 2, 8, 8, superInstance);
+			superInstance.getGraphics().drawImage(notifyPop, pnlNotification1.getLocation().x + pnlNotification1.getSize().width - 16, pnlNotification1.getLocation().y + pnlNotification1.getSize().height - 18, 24, 24, superInstance);
 
 			//Fill the Blip with a number
-			pnlNotification1.getGraphics().drawString("0", pnlNotification1.getSize().width - 10, 2);
+			superInstance.getGraphics().drawString("0", pnlNotification1.getLocation().x + pnlNotification1.getSize().width - 8, pnlNotification1.getLocation().y + 30);
 
 			lblTime.setText(convertUptime());
 		}

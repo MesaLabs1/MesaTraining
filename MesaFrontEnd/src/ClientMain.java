@@ -65,7 +65,7 @@ public class ClientMain {
 	 * @return Returns true if the username and the password in the database exist.
 	 */
 	public boolean Authenticate(String username, String password) {
-		boolean isValid = false;
+		boolean isValid = true;
 
 		if (networkClient != null) {
 			networkClient.interrupt();
