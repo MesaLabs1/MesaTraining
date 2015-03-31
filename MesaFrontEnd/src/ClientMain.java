@@ -1,8 +1,10 @@
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.net.ConnectException;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.net.SocketAddress;
 import java.net.SocketTimeoutException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -65,14 +67,26 @@ public class ClientMain {
 	 * @return Returns true if the username and the password in the database exist.
 	 */
 	public boolean Authenticate(String username, String password) {
-		boolean isValid = true;
+		boolean isValid = false;
 
 		if (networkClient != null) {
 			networkClient.interrupt();
 		}
 
 		networkClient = new Thread(client = new NetworkLayer(username, password));
-
+		Log("Authenticating with remote server... (this process may hang)");
+		networkClient.start();
+		
+		while (!client.validated) {
+			if (client.active) {
+				//The client is still working on that connection...
+			}else {
+				//The client didn't resolve a valid login.
+				isValid = false;
+				break;
+			}
+		}
+		
 		if (isValid) {
 			ui.showControls();
 			ui.username = username;
@@ -113,10 +127,14 @@ public class ClientMain {
 		public void run() {
 			while(active) {
 				try {
+					//TODO: We need the remote address for this connection.
+					client = new Socket("127.0.0.1", 1337);
+					
 					in = new DataInputStream(client.getInputStream());
 					out = new DataOutputStream(client.getOutputStream());
 
 					Log("Client initializing on " + client.getLocalAddress() + "@" + client.getLocalPort() + ".");
+					
 					Log("Preparing to handshake the client at " + client.getRemoteSocketAddress() + ". I hope I know the secret handshake.");
 
 					/*
@@ -146,7 +164,7 @@ public class ClientMain {
 					//Should be of format: %VERSION%NAME%IP%
 					InetAddress addr;
 					addr = InetAddress.getLocalHost();
-					out.writeUTF("%" + FRONTEND_VERSION + "%" + addr.getHostName() + "%" + client.getLocalAddress() + "%");
+					out.writeUTF(FRONTEND_VERSION + "%" + addr.getHostName() + "%" + client.getLocalAddress() + ":" + client.getLocalPort() + "%");
 
 					/*
 					 * The server will terminate the connection here if we don't sign correctly. However, it will return a command string letting us
@@ -163,6 +181,8 @@ public class ClientMain {
 
 						//Send the code.
 						out.writeUTF(response);
+						
+						Log("Sending authorization code " + response + ".");
 
 						//Again, the server will terminate the connection here if we don't respond correctly above.
 
@@ -193,10 +213,17 @@ public class ClientMain {
 						active = false;
 					}
 				}catch(SocketTimeoutException s) {
-					System.out.println("The socket has timed out and been reset.");
+					Log("The socket has timed out and been reset.");
+					active = false;
+					s.printStackTrace();
+					break;
+				}catch(ConnectException c) {
+					Log("Connection Refused.. is the server running?");
+					active = false;
 					break;
 				}catch(IOException e) {
-					System.out.println("IOException!");
+					Log("IOException!");
+					active = false;
 					e.printStackTrace();
 					break;
 				}
@@ -209,7 +236,7 @@ public class ClientMain {
 				String response = "$NODATA";
 				try {
 					out.writeUTF(request);
-					Log("Decoding...");
+					Log("Requesting...");
 					response = in.readUTF();
 				} catch (IOException e) {
 					e.printStackTrace();

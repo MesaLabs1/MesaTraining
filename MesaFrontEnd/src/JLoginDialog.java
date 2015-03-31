@@ -15,10 +15,6 @@ import java.awt.Canvas;
 
 import javax.swing.JTextField;
 
-import java.awt.Component;
-
-import javax.swing.Box;
-import javax.swing.JFrame;
 import javax.swing.JPasswordField;
 import javax.swing.JButton;
 

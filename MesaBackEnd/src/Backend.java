@@ -308,7 +308,7 @@ public class Backend {
 					DataInputStream in = new DataInputStream(server.getInputStream());
 					DataOutputStream out = new DataOutputStream(server.getOutputStream());
 
-					util.Log("You've awoken " + name + " on " + server.getLocalAddress() + "@" + server.getLocalPort() + ".");
+					util.Log("You've awoken " + name + " on port " + server.getLocalPort() + ".");
 					util.Log("[" + name + "] Authorizing " + server.getRemoteSocketAddress() + "... Do you know the secret handshake?");
 
 					/*
@@ -344,15 +344,15 @@ public class Backend {
 
 					ui.progressBar.setValue(20);
 
-					if (remoteVersion.equals(propMaster.BACKEND_VERSION)) {
+					if (remoteVersion.equals(String.valueOf(propMaster.BACKEND_VERSION))) {
 						ui.progressBar.setValue(25);
-						if (remoteIP.equals(server.getRemoteSocketAddress())) {
+						if (remoteIP.equals(server.getRemoteSocketAddress().toString())) {
 							ui.progressBar.setValue(30);
 							this.remoteName = remoteName;
 
 							/*
 							 * We are expecting the characters at the indices of 57,72,15,66,49 to be returned to us.
-							 * This is Euler's number (0.5772156649). We can, of course, change this to something else if we feel
+							 * This is Euler's number (6.5772156649). We can, of course, change this to something else if we feel
 							 * the security has been compromised. It is important that clients of this version
 							 * and servers of this version both expect and send the same data.
 							 * 
@@ -378,6 +378,8 @@ public class Backend {
 
 							String expectedResponse = "" + message.charAt(57) + message.charAt(72) + message.charAt(15) + message.charAt(66) + message.charAt(49);
 							String actualResponse = in.readUTF();
+							
+							util.Log ("Comparing expected access code (" + expectedResponse + ") to actual (" + actualResponse + ").");
 
 							if (actualResponse.equals(expectedResponse)) {
 								ui.progressBar.setValue(65);
