@@ -309,7 +309,7 @@ public class Backend {
 					DataOutputStream out = new DataOutputStream(server.getOutputStream());
 
 					util.Log("You've awoken " + name + " on port " + server.getLocalPort() + ".");
-					util.Log("[" + name + "] Authorizing " + server.getRemoteSocketAddress() + "... Do you know the secret handshake?");
+					util.Log("[" + name + "] Authorizing " + server.getRemoteSocketAddress() + "...");
 
 					/*
 					 * What is a Handshake? A handshake is a sequence exchanged by Server-Client systems to prove to each other first that
@@ -379,8 +379,6 @@ public class Backend {
 							String expectedResponse = "" + message.charAt(57) + message.charAt(72) + message.charAt(15) + message.charAt(66) + message.charAt(49);
 							String actualResponse = in.readUTF();
 							
-							util.Log ("Comparing expected access code (" + expectedResponse + ") to actual (" + actualResponse + ").");
-
 							if (actualResponse.equals(expectedResponse)) {
 								ui.progressBar.setValue(65);
 								/*
@@ -408,7 +406,7 @@ public class Backend {
 										password = split[1];
 									}
 
-									boolean isValid = false;
+									boolean isValid = true;
 									//We have the user's information, let's check with the database..
 									//TODO: Implement an un-encryption method here
 									//TODO: Check w/ database. Set isValid to true if this is the case.

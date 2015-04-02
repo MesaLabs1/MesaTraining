@@ -199,6 +199,7 @@ public class ClientMain {
 								 * server.
 								 */
 								validated = true;		//We set this flag so the client doesn't terminate automatically.
+								break;
 							}else if (ret.equals("$INVALID")) {
 								/* The server is written to handle repeated login attempts. However, we can also just tell the server
 								 * to forget about it, so if a user stays on the log-in page, they don't hold a slot forever.
