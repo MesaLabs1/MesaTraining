@@ -7,6 +7,7 @@ import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JDialog;
 import javax.swing.JTabbedPane;
+import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 
 import net.miginfocom.swing.MigLayout;
@@ -26,6 +27,7 @@ import javax.swing.JLabel;
 import java.awt.Canvas;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseListener;
 import java.io.File;
 
 import javax.swing.JList;
@@ -50,6 +52,7 @@ import java.awt.FlowLayout;
 import java.awt.Button;
 import java.awt.Font;
 import java.awt.Image;
+import java.awt.Rectangle;
 
 import javax.swing.SwingConstants;
 
@@ -99,6 +102,15 @@ public class AppletUI extends Applet{
 	JPanel pnlNotification1;
 	JPanel pnlNotification2;
 	JPanel pnlNotification3;
+	
+	JPanel pnlDate;
+	boolean sortByDate;
+	
+	JPanel pnlPilot;
+	boolean sortByPilot;
+	
+	JPanel pnlAircraftName;
+	boolean sortByName;
 	
 	ClientMain clientMain;
 	
@@ -258,7 +270,7 @@ public class AppletUI extends Applet{
 		pnlInternalPane.add(pnlDateHolder, "cell 0 0,grow");
 		pnlDateHolder.setLayout(new BorderLayout(0, 0));
 
-		JPanel pnlDate = new JPanel();
+		pnlDate = new JPanel();
 		pnlDate.setBorder(new SoftBevelBorder(BevelBorder.RAISED, null, null, null, null));
 		pnlDateHolder.add(pnlDate, BorderLayout.NORTH);
 		pnlDate.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
@@ -274,7 +286,7 @@ public class AppletUI extends Applet{
 		pnlInternalPane.add(pnlPilotHolder, "cell 1 0,grow");
 		pnlPilotHolder.setLayout(new BorderLayout(0, 0));
 
-		JPanel pnlPilot = new JPanel();
+		pnlPilot = new JPanel();
 		pnlPilot.setBorder(new SoftBevelBorder(BevelBorder.RAISED, null, null, null, null));
 		pnlPilotHolder.add(pnlPilot, BorderLayout.NORTH);
 
@@ -289,7 +301,7 @@ public class AppletUI extends Applet{
 		pnlInternalPane.add(pnlAircraftHolder, "cell 2 0,grow");
 		pnlAircraftHolder.setLayout(new BorderLayout(0, 0));
 
-		JPanel pnlAircraftName = new JPanel();
+		pnlAircraftName = new JPanel();
 		pnlAircraftName.setBorder(new SoftBevelBorder(BevelBorder.RAISED, null, null, null, null));
 		pnlAircraftHolder.add(pnlAircraftName, BorderLayout.NORTH);
 
@@ -340,6 +352,8 @@ public class AppletUI extends Applet{
 		eventHandler = new EventHandler();
 		eventTicker = new Timer(1, eventHandler);
 		
+		this.addMouseListener(eventHandler);
+		
 		JLoginDialog dialog = new JLoginDialog(clientMain);
 		
 		eventTicker.start();
@@ -358,7 +372,7 @@ public class AppletUI extends Applet{
 		}
 	}
 
-	public class EventHandler implements ActionListener {
+	public class EventHandler implements ActionListener, MouseListener {
 		int secondsTicker = 0;
 		AppletUI superInstance;
 		
@@ -388,6 +402,21 @@ public class AppletUI extends Applet{
 			superInstance.getGraphics().drawString("0", pnlNotification1.getLocation().x + pnlNotification1.getSize().width - 8, pnlNotification1.getLocation().y + 30);
 
 			lblTime.setText(convertUptime());
+			
+			//Sort Visual Element
+			if (sortByDate) {
+				pnlDate.setBorder(BorderFactory.createLoweredBevelBorder());
+				pnlPilot.setBorder(new SoftBevelBorder(BevelBorder.RAISED, null, null, null, null));
+				pnlAircraftName.setBorder(new SoftBevelBorder(BevelBorder.RAISED, null, null, null, null));
+			}else if (sortByPilot) {
+				pnlPilot.setBorder(BorderFactory.createLoweredBevelBorder());
+				pnlDate.setBorder(new SoftBevelBorder(BevelBorder.RAISED, null, null, null, null));
+				pnlAircraftName.setBorder(new SoftBevelBorder(BevelBorder.RAISED, null, null, null, null));
+			}else if (sortByName) {
+				pnlAircraftName.setBorder(BorderFactory.createLoweredBevelBorder());
+				pnlDate.setBorder(new SoftBevelBorder(BevelBorder.RAISED, null, null, null, null));
+				pnlPilot.setBorder(new SoftBevelBorder(BevelBorder.RAISED, null, null, null, null));
+			}
 		}
 
 		public String convertUptime() {
@@ -434,6 +463,52 @@ public class AppletUI extends Applet{
 
 			sUptime = sHours + ":" + sMinutes + ":" + sSeconds;
 			return sUptime;
+		}
+
+		@Override
+		public void mouseClicked(MouseEvent e) {
+			
+		}
+
+		@Override
+		public void mouseEntered(MouseEvent e) {
+			
+		}
+
+		@Override
+		public void mouseExited(MouseEvent e) {
+			
+		}
+
+		@Override
+		public void mousePressed(MouseEvent e) {
+//			System.out.println("Mouse_Press event at " + e.getPoint());
+//			Rectangle rect = new Rectangle(pnlDateX, pnlDateY, AppletUI.this.pnlDate.getWidth(), AppletUI.this.pnlDate.getHeight());
+//			System.out.println("Date panel at " + rect);
+//			if (rect.contains(e.getPoint())) {
+//				sortByDate = true;
+//				sortByPilot = false;
+//				sortByName = false;
+//			}
+//			
+//			Rectangle rect2 = AppletUI.this.pnlPilot.getBounds(); 
+//			if (rect2.contains(e.getPoint())) {
+//				sortByDate = false; 
+//				sortByPilot = true; 
+//				sortByName = false;
+//			}
+//			
+//			Rectangle rect3 = AppletUI.this.pnlAircraftName.getBounds(); 
+//			if (rect3.contains(e.getPoint())) {
+//				sortByDate = false;
+//				sortByPilot = false;
+//				sortByName = true;
+//			}
+		}
+
+		@Override
+		public void mouseReleased(MouseEvent e) {
+			
 		}
 	}
 }	

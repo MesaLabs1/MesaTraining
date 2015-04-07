@@ -86,6 +86,17 @@ public class Backend {
 				ui.SetStatus(UI.ServerStatus.Inactive);
 				netMasterThread.interrupt();
 			}
+
+			for (int i = 0; i < netMaster.networkThreads.length; i++) {
+				if (netMaster.networkThreads[i] != null) {
+					if (!netMaster.networkThreads[i].isAlive()) {
+						netMaster.networkThreads[i] = null;
+						netMaster.networkSockets[i] = null;
+					}
+				}
+			}
+
+			netMaster.UpdateUI();
 		}
 	}
 
@@ -378,7 +389,7 @@ public class Backend {
 
 							String expectedResponse = "" + message.charAt(57) + message.charAt(72) + message.charAt(15) + message.charAt(66) + message.charAt(49);
 							String actualResponse = in.readUTF();
-							
+
 							if (actualResponse.equals(expectedResponse)) {
 								ui.progressBar.setValue(65);
 								/*
@@ -466,7 +477,7 @@ public class Backend {
 					System.out.println("[" + name + "] The socket has timed out and been reset.");
 					break;
 				}catch(IOException e) {
-					System.out.println("[" + name + "] IOException!");
+					util.Log("[" + name + "] has been terminated by the remote client.");
 					e.printStackTrace();
 					break;
 				}

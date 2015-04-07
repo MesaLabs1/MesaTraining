@@ -431,6 +431,8 @@ public class UI extends JFrame{
 		mntmHelp = new JMenuItem("Help");
 		mntmHelp.setFont(new Font("Lucida Grande", Font.PLAIN, 10));
 		mnHelp.add(mntmHelp);
+		
+		this.setResizable(false);
 
 		SetUpInterface();	//Anything that needs to be done, should get done here.
 

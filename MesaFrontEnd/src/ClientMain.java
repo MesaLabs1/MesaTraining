@@ -9,6 +9,9 @@ import java.net.SocketTimeoutException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+
 /**
  * This class contains all Network-related things that must run in the background of the UI. 
  * 
@@ -21,6 +24,8 @@ public class ClientMain {
 
 	Thread networkClient;
 	NetworkLayer client;
+	
+	boolean authenticated = false;
 
 	public ClientMain(AppletUI instance) {
 		ui = instance;
@@ -66,34 +71,20 @@ public class ClientMain {
 	 * @param password The password of the client.
 	 * @return Returns true if the username and the password in the database exist.
 	 */
-	public boolean Authenticate(String username, String password) {
-		boolean isValid = false;
-
+	public void Authenticate(String username, String password, JLoginDialog callback) {
 		if (networkClient != null) {
 			networkClient.interrupt();
 		}
 
-		networkClient = new Thread(client = new NetworkLayer(username, password));
-		Log("Authenticating with remote server... (this process may hang)");
+		/*
+		 *	What is a callback? We can pass a superclass as a variable into a method knowing we will need to 
+		 *	"call-back" the super class and let it know when we're done, since our operation is a BDO...
+		 *	(background data operation), otherwise known as an ADO (asynchronous data operation).
+		 */
+		client = new NetworkLayer(username, password, callback);
+		networkClient = new Thread(client);
+		Log("Authenticating '" + username + "' with the remote server... (this process may hang)");
 		networkClient.start();
-		
-		while (!client.validated) {
-			if (client.active) {
-				//The client is still working on that connection...
-			}else {
-				//The client didn't resolve a valid login.
-				isValid = false;
-				break;
-			}
-		}
-		
-		if (isValid) {
-			ui.showControls();
-			ui.username = username;
-			return true;
-		}else {
-			return false;
-		}
 	}
 
 	/**
@@ -109,128 +100,136 @@ public class ClientMain {
 
 		boolean active = true;
 		boolean validated = false;
-		
+
 		DataInputStream in;
 		DataOutputStream out;
 		
+		JLoginDialog callback;
+
 		/**
 		 * Initialize this class with the attempted authentication information.
 		 * @param user The client's username.
 		 * @param pass The client's password.
 		 */
-		public NetworkLayer(String user, String pass) {
+		public NetworkLayer(String user, String pass, JLoginDialog cback) {
 			username = user;
 			password = pass;
-		}
-
-		@Override
-		public void run() {
-			while(active) {
-				try {
-					//TODO: We need the remote address for this connection.
-					client = new Socket("127.0.0.1", 1337);
-					
-					in = new DataInputStream(client.getInputStream());
-					out = new DataOutputStream(client.getOutputStream());
-
-					Log("Client initializing on " + client.getLocalAddress() + "@" + client.getLocalPort() + ".");
-					
-					Log("Preparing to handshake the client at " + client.getRemoteSocketAddress() + ". I hope I know the secret handshake.");
-
-					/*
-					 * Client Sends: Version, Computer Name, IP-Address
-					 * client Checks: Version MATCH, IP-Address MATCH, Computer Name store.
-					 * client Sends: Random sequence.
-					 * Client Sends: Specific characters from the sequence. 
-					 * client Checks: Sequence MATCH
-					 * client Sends: Welcome!
-					 * 
-					 * -> Repeat
-					 * 
-					 * client Waits for Client Request
-					 * Client: Request
-					 * 
-					 * -> Repeat
-					 * 
-					 * If the target fails out, we will close this connection and interpret the connection as malicious.
-					 */
-
-					/*
-					 * We do not provide feedback to the user for the first two transmissions since we do not want them to know why they
-					 * got rejected. These kinds of errors would only be solicited by attackers. Our software should always be compliant 
-					 * with its own protocols.
-					 */
-
-					//Should be of format: %VERSION%NAME%IP%
-					InetAddress addr;
-					addr = InetAddress.getLocalHost();
-					out.writeUTF(FRONTEND_VERSION + "%" + addr.getHostName() + "%" + client.getLocalAddress() + ":" + client.getLocalPort() + "%");
-
-					/*
-					 * The server will terminate the connection here if we don't sign correctly. However, it will return a command string letting us
-					 * know why we hurt it's feelings. 
-					 */
-
-					String callsign = in.readUTF();
-
-					if (callsign.startsWith("$ERROR")) {		//Is the return not a callsign, but actually, an error report?
-						Log("Server returned the network message " + callsign + ".");
-					}else {
-						//We need to return characters 57, 72, 15, 66, and 49
-						String response = "" + callsign.charAt(57) + callsign.charAt(72) + callsign.charAt(15) + callsign.charAt(66) + callsign.charAt(49);
-
-						//Send the code.
-						out.writeUTF(response);
-						
-						Log("Sending authorization code " + response + ".");
-
-						//Again, the server will terminate the connection here if we don't respond correctly above.
-
-						String ident = in.readUTF();
-
-						if (ident.equals("$IDENTIFY")) {	//The server wants us to send our login information
-							out.writeUTF("$IDENTIFY " + username + " " + password);
-
-							String ret = in.readUTF();
-							if (ret.equals("$VALID")) {
-								/*
-								 * The connection is validated. In this case, the server always waits for us to ask, and then
-								 * responds. As long as a user is connected, we can send a network message at any time to request new data from the
-								 * server.
-								 */
-								validated = true;		//We set this flag so the client doesn't terminate automatically.
-								break;
-							}else if (ret.equals("$INVALID")) {
-								/* The server is written to handle repeated login attempts. However, we can also just tell the server
-								 * to forget about it, so if a user stays on the log-in page, they don't hold a slot forever.
-								 */
-								out.writeUTF("$ABORT");
-							}
-						}
-					}
-
-					if (!validated) {
-						client.close();
-						active = false;
-					}
-				}catch(SocketTimeoutException s) {
-					Log("The socket has timed out and been reset.");
-					active = false;
-					s.printStackTrace();
-					break;
-				}catch(ConnectException c) {
-					Log("Connection Refused.. is the server running?");
-					active = false;
-					break;
-				}catch(IOException e) {
-					Log("IOException!");
-					active = false;
-					e.printStackTrace();
-					break;
-				}
-			}
+			callback = cback;
 		}
 		
+		@Override
+		public void run() {
+			try {
+				//TODO: We need the remote address for this connection.
+				client = new Socket("127.0.0.1", 1337);
+
+				in = new DataInputStream(client.getInputStream());
+				out = new DataOutputStream(client.getOutputStream());
+
+				Log("Client initializing on " + client.getLocalAddress() + "@" + client.getLocalPort() + ".");
+
+				Log("Preparing to handshake the client at " + client.getRemoteSocketAddress() + ". I hope I know the secret handshake.");
+
+				/*
+				 * Client Sends: Version, Computer Name, IP-Address
+				 * client Checks: Version MATCH, IP-Address MATCH, Computer Name store.
+				 * client Sends: Random sequence.
+				 * Client Sends: Specific characters from the sequence. 
+				 * client Checks: Sequence MATCH
+				 * client Sends: Welcome!
+				 * 
+				 * -> Repeat
+				 * 
+				 * client Waits for Client Request
+				 * Client: Request
+				 * 
+				 * -> Repeat
+				 * 
+				 * If the target fails out, we will close this connection and interpret the connection as malicious.
+				 */
+
+				/*
+				 * We do not provide feedback to the user for the first two transmissions since we do not want them to know why they
+				 * got rejected. These kinds of errors would only be solicited by attackers. Our software should always be compliant 
+				 * with its own protocols.
+				 */
+
+				//Should be of format: VERSION%NAME%IP%
+				InetAddress addr;
+				addr = InetAddress.getLocalHost();
+				out.writeUTF(FRONTEND_VERSION + "%" + addr.getHostName() + "%" + client.getLocalAddress() + ":" + client.getLocalPort() + "%");
+
+				/*
+				 * The server will terminate the connection here if we don't sign correctly. However, it will return a command string letting us
+				 * know why we hurt it's feelings. 
+				 */
+
+				String callsign = in.readUTF();
+
+				if (callsign.startsWith("$ERROR")) {		//Is the return not a callsign, but actually, an error report?
+					Log("Server returned the network message " + callsign + ".");
+				}else {
+					//We need to return characters 57, 72, 15, 66, and 49
+					String response = "" + callsign.charAt(57) + callsign.charAt(72) + callsign.charAt(15) + callsign.charAt(66) + callsign.charAt(49);
+
+					//Send the code.
+					out.writeUTF(response);
+
+					Log("Sending authorization code " + response + ".");
+
+					//Again, the server will terminate the connection here if we don't respond correctly above.
+
+					String ident = in.readUTF();
+					
+					if (ident.equals("$IDENTIFY")) {	//The server wants us to send our login information
+						String identification = "$IDENTIFY " + username + " " + password;
+						out.writeUTF(identification);
+
+						String ret = in.readUTF();
+						if (ret.equals("$VALID")) {
+							Log("Server says we're good to go. Awaiting serialization index list...");
+							/*
+							 * The connection is validated. In this case, the server always waits for us to ask, and then
+							 * responds. As long as a user is connected, we can send a network message at any time to request new data from the
+							 * server.
+							 */
+							validated = true;		//We set this flag so the client doesn't terminate automatically.
+							authenticated = true;
+							
+							//Let's show the controls on the applet.
+							ui.showControls();
+							ui.username = username;
+							
+							//Tell the dialog we're good, so it can hide itself.
+							callback.AuthSucess();
+						}else if (ret.equals("$INVALID")) {
+							/* The server is written to handle repeated login attempts. However, we can also just tell the server
+							 * to forget about it, so if a user stays on the log-in page, they don't hold a slot forever.
+							 */
+							out.writeUTF("$ABORT");
+							callback.AuthFailure();
+						}
+					}
+				}
+
+				if (!validated) {
+					client.close();
+					active = false;
+				}
+			}catch(SocketTimeoutException s) {
+				Log("The socket has timed out and been reset.");
+				active = false;
+				s.printStackTrace();
+			}catch(ConnectException c) {
+				Log("Connection Refused.. is the server running?");
+				active = false;
+			}catch(IOException e) {
+				Log("IOException!");
+				active = false;
+				e.printStackTrace();
+			}
+		}
+
 		public String RemoteRequest(String request) {
 			Log("Requesting data from the server...");
 			if (validated) {

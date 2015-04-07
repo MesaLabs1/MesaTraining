@@ -112,13 +112,7 @@ public class JLoginDialog extends JDialog{
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				ShowHelpText("Authenticating...");
-				if (superInstance.Authenticate(usernameField.getText(), new String(passwordField.getPassword()))) {
-					JLoginDialog.this.setVisible(false);
-					JLoginDialog.this.dispose();	//We call dispose because it manually adds a callback to windowDeactivated 
-													//and windowClosed. This will notify our applet that we're ready.
-				}else {
-					ShowHelpText("Invalid Username or Password.");
-				}
+				superInstance.Authenticate(usernameField.getText(), new String(passwordField.getPassword()), JLoginDialog.this);
 			}
 		});
 		
@@ -141,6 +135,24 @@ public class JLoginDialog extends JDialog{
 		panel_1.add(btnCancel, "cell 4 7");
 		
 		this.setVisible(true);
+	}
+	
+	/**
+	 * We will call this method from the client layer to indicate a valid login attempt.
+	 */
+	public void AuthSucess() {
+		//We call dispose because it manually adds a callback to windowDeactivated 
+		//and windowClosed. This will notify our applet that we're ready.
+		JLoginDialog.this.setVisible(false);
+		JLoginDialog.this.dispose();
+		
+	}
+	
+	/**
+	 * We will call this method from the client layer to indicate an invalid login attempt.
+	 */
+	public void AuthFailure() {
+		ShowHelpText("Invalid Username or Password.");
 	}
 	
 	/**
