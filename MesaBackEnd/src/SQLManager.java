@@ -33,6 +33,9 @@ public class SQLManager {
 		 * Let's begin by creating the lock.d file. If it exists, we might have a problem, or it might
 		 * be a residual file from the previous run. 
 		*/
+		
+		lockFile.deleteOnExit();
+		
 		if (!lockFile.exists()) {
 			try {
 				lockFile.createNewFile();
@@ -57,6 +60,9 @@ public class SQLManager {
 				util.Log("Database checks out okay. Continuing...");
 			}
 		}
+		
+		//Delete the lockfile since we're done for now.
+		lockFile.delete();
 	}
 
 	/**
@@ -87,14 +93,14 @@ public class SQLManager {
 	 * does not return a boolean for validity.
 	 */
 	public void FixFS() {
-
+		
 	}
 
 	class DatabaseRunner implements ActionListener {
 
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
-
+			
 		}
 	}
 }
