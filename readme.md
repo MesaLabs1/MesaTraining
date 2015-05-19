@@ -28,7 +28,7 @@ Optional: Check "Store in Secure store". Hit Next.
 7. You now have access to the Git repository from Eclipse. Remember that you can toggle between both perpectives via the top 	 right buttons labeled "Java" and "Git". Other buttons will appear here as you open more perspectives.
 
 
-Important Note: This software implements Derby and DTP (Database Tools Platform) by Java. In order to install these into your target environment, we have already added the Derby libs into the git system, and added them to the build path. However you must manually intall DTP, which is included in the git download as a Zip. To install this, locate the file labeled db-derby-XX.XX.X.X-lib.zip, and extract it to YOUR eclipse directory, and overwrite any files it asks for. The plugin is now installed. All compiler errors and db errors should now be resolved.
+Important Note: This software implements Derby and DTP (Database Tools Platform) by Java. In order to install these into your target environment, we have already added the Derby libs into the git system, and added them to the build path. However you must manually intall DTP, which is included in the git download as a Zip. To install this, locate the file labeled dtp-sdk_X.XX.X.zip, and extract it to YOUR eclipse directory, and overwrite any files it asks for. The plugin is now installed. All compiler errors and db errors should now be resolved.
 
 How to Add/Remove/Update the Repo with your work
 
