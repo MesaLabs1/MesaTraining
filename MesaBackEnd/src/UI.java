@@ -46,7 +46,7 @@ public class UI extends JFrame{
 
 	//Passed-in Objects
 	Utils util;
-
+ 
 	//GUI Controls
 	JLabel lblUptime;
 	JLabel lblClients;
