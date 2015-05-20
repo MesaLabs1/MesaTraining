@@ -1,0 +1,14 @@
+<Database Header="com.mesalabs1.xml.database">
+	<!--Database contains all USER and AIRCRAFT information.--><Data>
+		<!--Contains Date, Pilot, Aircraft, and Logs for Maintinence, Training, Flight, and Administration--><Date></Date>
+		<Pilot>
+		</Pilot><Aircraft>
+</Aircraft><Logs><Maintinence></Maintinence><Training></Training>
+	<Flight></Flight>
+	<Administration></Administration></Logs>
+		
+		
+	</Data>
+	
+	<Users></Users>
+</Database>

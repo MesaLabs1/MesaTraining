@@ -2,8 +2,13 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
-import java.sql.*;
-import java.util.Random;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.NodeList;
+import org.w3c.dom.Node;
+import org.w3c.dom.Element;
 
 /**
  * This class outlines the basic get/set methods of the SQL database along with BDO support for the
@@ -74,9 +79,8 @@ public class DatabaseManager {
 	 * @return True/False if the File System is correct.
 	 */
 	public boolean CheckFS() {
-		util.Log("Initializing filesystem check...");
-		
-		return true;
+		util.Log("Checking FS...");
+		return new File("db.xml").exists();
 	}
 
 	/**
@@ -86,7 +90,15 @@ public class DatabaseManager {
 	 */
 	public boolean MakeFS() {
 		util.Log("Making the filesystem...");
-		
+		File dbtemp = new File("db_template.xml");
+		if (!new File("db.xml").exists()) {
+			try {
+				Files.copy(new File("dbtemp.xml").toPath(), new File("db.xml").toPath(), StandardCopyOption.REPLACE_EXISTING);
+			} catch (IOException e) {
+				System.out.println("Failed to create proper FS. Unexpected behavior could occur.");
+				e.printStackTrace();
+			}
+		}
 		return true;
 	}
 
