@@ -5,10 +5,15 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Node;
 import org.w3c.dom.Element;
+import org.xml.sax.SAXException;
 
 /**
  * This class outlines the basic get/set methods of the SQL database along with BDO support for the
@@ -26,23 +31,29 @@ public class DatabaseManager {
 
 	//If this file exists, this is a first-run. We delete it, if it does.
 	File fRunFile = new File("firstrun");
-	
+
 	Utils util;
 	UI ui;
+
+	//DB Stuff
+	DocumentBuilderFactory dbFactory;
+	File dbFile;
+	DocumentBuilder dbBuilder;
+	Document doc;
 
 	public DatabaseManager(Utils ut, UI u) {
 		util = ut;
 		ui = u;
-		
+
 		util.Log("Initializing DBManager...");
-		
+
 		/*
 		 * Let's begin by creating the lock.d file. If it exists, we might have a problem, or it might
 		 * be a residual file from the previous run. 
-		*/
-		
+		 */
+
 		lockFile.deleteOnExit();
-		
+
 		if (!lockFile.exists()) {
 			try {
 				lockFile.createNewFile();
@@ -52,7 +63,7 @@ public class DatabaseManager {
 		}else {
 			util.Log("Lockfile exists but we are the super... let's pretend we didn't see that.");
 		}
-		
+
 		if (fRunFile.exists()) {
 			//This is our first run, let's make the DB.
 			util.Log("Database is in First-Run mode. Initializing with a full sweep.");
@@ -67,7 +78,25 @@ public class DatabaseManager {
 				util.Log("Database checks out okay. Continuing...");
 			}
 		}
-		
+
+		dbFile = new File("db.xml");
+		dbFactory = DocumentBuilderFactory.newInstance();
+		dbBuilder = null;
+		try {
+			dbBuilder = dbFactory.newDocumentBuilder();
+		} catch (ParserConfigurationException e) {
+			e.printStackTrace();
+		}
+		doc = null;
+		try {
+			doc = dbBuilder.parse(dbFile);
+		} catch (SAXException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		doc.getDocumentElement().normalize();
+
 		//Delete the lockfile since we're done for now.
 		lockFile.delete();
 	}
@@ -107,7 +136,25 @@ public class DatabaseManager {
 	 * does not return a boolean for validity.
 	 */
 	public void FixFS() {
-		
+
+	}
+
+	public boolean ParseUser(String username, String password) {
+		NodeList nList = doc.getElementsByTagName(username);
+		util.Log("Checking " + username + " against " + nList.getLength() + " users.");
+		for (int i = 0; i < nList.getLength(); i++) {
+			Node nNode = nList.item(i);
+			if (nNode.getNodeType() == Node.ELEMENT_NODE) {
+				Element eElement = (Element) nNode;
+				if (nNode.getNodeName().toLowerCase().equals(username.toLowerCase())) {
+					String localPass = eElement.getAttribute("Password");
+					if (password.equals(localPass)) {
+						return true;
+					}
+				}
+			}
+		}
+		return false;
 	}
 
 	class DatabaseRunner implements ActionListener {

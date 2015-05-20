@@ -424,10 +424,8 @@ public class Backend {
 										password = split[1];
 									}
 
-									boolean isValid = true;
-									//We have the user's information, let's check with the database..
-									//TODO: Implement an un-encryption method here
-									//TODO: Check w/ database. Set isValid to true if this is the case.
+									boolean isValid = dbMan.ParseUser(username, password);
+									//We have the user's information, let's check with the database...
 									if (isValid) {
 										verified = true;
 										out.writeUTF("$VALID");
