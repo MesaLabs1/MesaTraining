@@ -27,11 +27,6 @@ Optional: Check "Store in Secure store". Hit Next.
 
 7. You now have access to the Git repository from Eclipse. Remember that you can toggle between both perpectives via the top 	 right buttons labeled "Java" and "Git". Other buttons will appear here as you open more perspectives.
 
-
-Important Note: This software implements Derby and DTP (Database Tools Platform) by Java. In order to install these into your target environment, we have already added the Derby libs into the git system, and added them to the build path. However you must manually intall DTP, which is included in the git download as a Zip. To install this, locate the file labeled dtp-sdk_X.XX.X.zip, and extract it to YOUR eclipse directory, and overwrite any files it asks for. The plugin is now installed. Next open the "Install New Software" menu under the "Help" toolbar as before, and this time, once you have selected "--All Available Sites--", search for "EMF", and check all entries listed under "Modeling" and "EclipseRT Targeting Platforms". If any software does not install, ignore it. Eclipse will automatically computer other solutions. Finish the installation.
-
-Finally, you will need GEF (Graphical Editing Framework), and this can be installed by the steps following: Relaunch the Software Installer, like above, target "--All Available Sites--", search for "GEF" and install only one, under "Modeling", called "Graphical Editing Framework GEF SDK". Finally, relaunch Eclipse to finalize the install.
-
 How to Add/Remove/Update the Repo with your work
 
 1. All modifications you make can be applied by right clicking the "MesaTraining" entry in Git, and hitting "Commit", and then after posting a commit message, selecting "Commit and Push". This will sync the project with the upstream.
