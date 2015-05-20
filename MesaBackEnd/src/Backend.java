@@ -29,6 +29,9 @@ public class Backend {
 	//Network Master -- all hail
 	NetworkMaster netMaster;
 	Thread netMasterThread;
+	
+	//DatabaseRunner -- something witty
+	DatabaseManager dbMan;
 
 	//Timer
 	Timer eventTicker;
@@ -39,9 +42,13 @@ public class Backend {
 		util = properties.util;
 
 		util.Log("Backend main program is initializing...");
-
+		
 		//Create a new NetworkMaster
 		netMaster = new NetworkMaster();
+		
+		//Initialize the DBManager and point it to the shared resources
+		dbMan = new DatabaseManager(util, netMaster.ui);
+		
 		//Create a wrapper thread
 		netMasterThread = new Thread(netMaster);
 
