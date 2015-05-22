@@ -102,7 +102,7 @@ public class Backend {
 					}
 				}
 			}
-
+			
 			netMaster.UpdateUI();
 		}
 	}
@@ -424,7 +424,7 @@ public class Backend {
 										password = split[1];
 									}
 
-									boolean isValid = dbMan.ParseUser(username, password);
+									boolean isValid = dbMan.ParseUser(username.toLowerCase(), password);
 									//We have the user's information, let's check with the database...
 									if (isValid) {
 										verified = true;
@@ -436,24 +436,55 @@ public class Backend {
 									}
 								}
 
-								if (verified) {			//Given that the loop above terminated, and the userinfo was valid, we are now in the main loop.
+								if (verified) {			//Given that the loop above terminated, and the user info was valid, we are now in the main loop.
 									boolean done = false;
 
 									while (!done) {
-										ui.progressBar.setValue(75);
+										ui.progressBar.setValue(99);
 										String request = in.readUTF();
-										if (request.startsWith("$MSG")) {					//We can use MSG to send information from the client directly to the console, here. This is for debugging.
-											String msg = request.substring("$MSG ".length(), request.length());
-											util.Log("[MSG] " + msg);
+										if (request.equals("$NOREQUEST")) {
+											//No request at this time, reparse.
 										}else {
-											if (request.startsWith("$GET")) {
-
-											}else if (request.startsWith("$TEST")) {
-
-											}else if (request.startsWith("$TEST")) {
-
-											}else if (request.equals("$ABORT")) {
-												done = true;
+											if (request.startsWith("$MSG")) {					//We can use MSG to send information from the client directly to the console, here. This is for debugging.
+												String msg = request.substring("$MSG ".length(), request.length());
+												util.Log("[MSG] " + msg);
+											}else {
+												if (request.startsWith("$GET")) {
+													//$GET PILOTS,AIRCRAFTS,DATES,TRAINING,FLIGHT,MAINTINENCE,
+													//$GET RANK JABOULHOSN
+													
+													
+													String cmd = request.substring("$GET ".length(), request.length());
+													if (cmd.startsWith("RANK")) {
+														String user = cmd.substring("RANK ".length(), cmd.length());
+														//util.Log("RECV remote request for " + user + "'s rank...");
+														String rank = dbMan.RequestRank(user.toLowerCase());
+														if (rank != null) {
+															//util.Log("Transmitting rank...");
+															out.writeUTF(rank);
+														}else {
+															//util.Log("Could not locate user by ID, sending error...");
+															out.writeUTF("$ERROR");
+														}
+													}else {
+														//util.Log("RECV remote request for datalist " + cmd + "...");
+														String[] respArr = dbMan.RequestField(cmd);	//We have an array from the DB, let's stringify this.
+														String resp = "";
+														for (int i = 0; i < respArr.length; i++) {
+															resp += respArr[i] + "$";
+														}
+														if (resp.length() > 0) {
+															resp = resp.substring(0, resp.length() - 1);
+														}
+														//We now have a string separated like this Jad;Andy;Jacqueline;Tebiao, so lets send it.
+														//util.Log("Transmitting " + respArr.length + " bytes to client...");
+														out.writeUTF("$LIST " + resp);
+													}
+												}else if (request.startsWith("$SET")) {
+													
+												}else if (request.equals("$ABORT")) {
+													done = true;
+												}
 											}
 										}
 										ui.progressBar.setValue(100);

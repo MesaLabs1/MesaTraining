@@ -4,15 +4,18 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.w3c.dom.Document;
+import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Node;
 import org.w3c.dom.Element;
+import org.w3c.dom.Attr;
 import org.xml.sax.SAXException;
 
 /**
@@ -40,7 +43,7 @@ public class DatabaseManager {
 	File dbFile;
 	DocumentBuilder dbBuilder;
 	Document doc;
-
+	
 	public DatabaseManager(Utils ut, UI u) {
 		util = ut;
 		ui = u;
@@ -154,14 +157,102 @@ public class DatabaseManager {
 				}
 			}
 		}
+		ui.accessCount++;
 		return false;
+	}
+
+	public String RequestRank(String username) {
+		NodeList nList = doc.getElementsByTagName(username);
+		util.Log("Checking " + username + " against " + nList.getLength() + " users.");
+		for (int i = 0; i < nList.getLength(); i++) {
+			Node nNode = nList.item(i);
+			if (nNode.getNodeType() == Node.ELEMENT_NODE) {
+				Element eElement = (Element) nNode;
+				if (nNode.getNodeName().toLowerCase().equals(username.toLowerCase())) {
+					String rank = eElement.getAttribute("Rank");
+					return rank;
+				}
+			}
+		}
+		ui.accessCount++;
+		return null;
+	}
+
+	public String[] RequestField(String fieldname) {
+		//PILOTS,AIRCRAFTS,DATES,TRAINING,FLIGHT,MAINTINENCE
+
+		//Hotfix 1a for Capitalizations in XML issue
+		String subfield = "";
+		if (fieldname.equals("PILOTS")) {
+			fieldname = "Pilot";
+		}else if (fieldname.equals("AIRCRAFTS")) {
+			fieldname = "Aircraft";
+		}else if (fieldname.equals("DATES")) {
+			fieldname = "Date";
+		}else if (fieldname.equals("TRAINING")) {
+			fieldname = "Logs";
+			subfield = "Training";
+		}else if (fieldname.equals("FLIGHT")) {
+			fieldname = "Logs";
+			subfield = "Flight";
+		}else if (fieldname.equals("MAINTINENCE")) {
+			fieldname = "Logs";
+			subfield = "Maintinence";
+		} 
+
+		NodeList nList = null;
+		if (subfield.length() > 0) {		//Let's access by the tag we want, not the superlevel.
+			nList = doc.getElementsByTagName(subfield);
+			//util.Log("Accessing logs for " + subfield);
+		}else {
+			nList = doc.getElementsByTagName(fieldname);
+			//util.Log("Accessing logs for " + fieldname);
+		}
+
+		String values = "";
+		for (int i = 0; i < nList.getLength(); i++) {
+			Node nNode = nList.item(i);
+			if (nNode.getNodeType() == Node.ELEMENT_NODE) {
+				Element eElement = (Element)nNode;
+				if (eElement.hasAttributes()) {
+					NamedNodeMap map = eElement.getAttributes();
+					for (int j = 0; j < map.getLength(); j++) {
+						Node subNode = map.item(j);
+						Attr attribute = (Attr)subNode;
+						values += attribute.getValue() + "~";	
+					}
+				}else {
+					//This could be the Logs entries, since they use Elements, then attributes
+					NodeList subList = nNode.getChildNodes();
+					for (int j = 0; j < subList.getLength(); j++) {
+						Node subNode = subList.item(j);
+						if (subNode.getNodeType() == Node.ELEMENT_NODE) {
+							Element subElement = (Element)subNode;
+							if (subElement.hasAttributes()) {
+								NamedNodeMap map = subElement.getAttributes();
+								for (int k = 0; k < map.getLength(); k++) {
+									Node subSubNode = map.item(k);
+									Attr attribute = (Attr)subSubNode;
+									values += attribute.getValue() + "~";	
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		if (values.length() > 0) {
+			values = values.substring(0, values.length() - 1);
+		}
+		ui.accessCount++;
+		return values.split("~");
 	}
 
 	class DatabaseRunner implements ActionListener {
 
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
-			
+
 		}
 	}
 }

@@ -1,3 +1,5 @@
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -7,10 +9,12 @@ import java.net.Socket;
 import java.net.SocketAddress;
 import java.net.SocketTimeoutException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 
 import javax.swing.JDialog;
 import javax.swing.JFrame;
+import javax.swing.Timer;
 
 /**
  * This class contains all Network-related things that must run in the background of the UI. 
@@ -20,15 +24,23 @@ import javax.swing.JFrame;
  */
 public class ClientMain {
 	static final int FRONTEND_VERSION = 1;
+	boolean authenticated = false;
+	
 	AppletUI ui;
-
 	Thread networkClient;
 	NetworkLayer client;
-	
-	boolean authenticated = false;
 
+	ArrayList<String[]> data;
+	
+	ArrayList<StringPoint> refCodes;		//refCodes are used to help us store specific data points in the array that contain networked strings
+											//We made a custom class called StringPoint that stores a String and an index, like: Names, 0
+											//This tells the program that position 0 in the data array contains the names string
+	NetworkTimer netTicker;
+	Timer ticker;
+	
 	public ClientMain(AppletUI instance) {
 		ui = instance;
+		refCodes = new ArrayList<StringPoint>();
 	}
 
 	/**
@@ -86,6 +98,112 @@ public class ClientMain {
 		Log("Authenticating '" + username + "' with the remote server... (this process may hang)");
 		networkClient.start();
 	}
+	
+	/**
+	 * This class simply re-requests data from the server every time it ticks.
+	 * @author Hack
+	 *
+	 */
+	public class NetworkTimer implements ActionListener {
+
+		public NetworkTimer() {
+			RequestList();
+		}
+		
+		@Override
+		public void actionPerformed(ActionEvent arg0) {
+			UpdateLists();
+			RequestList();
+		}
+		
+		/**
+		 * Requests the master lists from the server. You can easily add more requests here, for additional serializable data fields.
+		 */
+		public void RequestList() {
+			//We need to serialize all data over to us, so let's add these requests to the master query...
+			//Log("Querying server for new data...");
+			client.SetRefCode("Dates", client.RemoteRequest("$GET DATES"));
+			client.SetRefCode("Pilots", client.RemoteRequest("$GET PILOTS"));
+			client.SetRefCode("Aircrafts", client.RemoteRequest("$GET AIRCRAFTS"));
+			client.SetRefCode("Training", client.RemoteRequest("$GET TRAINING"));
+			client.SetRefCode("Maintinence", client.RemoteRequest("$GET MAINTINENCE"));
+			client.SetRefCode("Flight", client.RemoteRequest("$GET FLIGHT"));
+		}
+		
+		/**
+		 * Updates the UI from here, by feeding the UpdateListsWithArray method.
+		 */
+		public void UpdateLists() {
+			//Read over each reference code, and the values, and prepare to parse.
+			for (int i = 0; i < refCodes.size(); i++) {
+				StringPoint value = refCodes.get(i);
+				
+				//Since each data type has different rules, we must differentiate each type.
+				int index = value.GetIndex();
+				
+				if (value.GetValue().equals("Dates")) {
+					//Date, so the format is: 05192015;182436
+					//Example Date: 05/19/2015, at 18:24:36 (Global Time, so 6:24:36 PM). Indicates the last use date.
+					
+					String[] unformatted = data.get(index);
+					String[] dates = new String[unformatted.length];
+					
+					for (int j = 0; j < unformatted.length; j++) {
+						String[] split = unformatted[j].split(";");
+						
+						String month = split[0].substring(0, 2);
+						String day = split[0].substring(2, 4);
+						String year = split[0].substring(4, 8);
+						
+						String hour = split[1].substring(0, 2);
+						String minute = split[1].substring(2, 4);
+						String seconds = split[1].substring(4, 6);
+						String suffix = "XX";
+						if (Integer.parseInt(hour) > 12) {
+							suffix = "PM";
+						}else {
+							suffix = "AM";
+						}
+						
+						String out = month + "/" + day + "/" + year + " at " + hour + ":" + minute + ":" + seconds + " " + suffix;
+						dates[j] = out;
+					}
+					//We've converted them all to coherent values, now apply them through the UpdateListsWithArray method
+					ui.eventHandler.UpdateListWithArray(ui.listDate, dates);
+				}else if (value.GetValue().equals("Pilots")) {
+					//Pilots, so format is: Jad Aboulhosn;Andreas Anderson
+					//Supports multiple pilots, in this case both Jad and Andy.
+					String[] unformatted = data.get(index);
+					String[] names = new String[unformatted.length];
+					
+					for (int j = 0; j < unformatted.length; j++) {
+						String[] split = unformatted[j].split(";");
+						String out = "";
+						for (int k = 0; k < split.length; k++) {
+							out += split[k] + ",";
+						}
+						if (out.length() > 0) {
+							out = out.substring(0, out.length() - 1);
+						}else {
+							out = "No Recorded Pilots";
+						}
+						names[j] = out;
+					}
+					ui.eventHandler.UpdateListWithArray(ui.listPilot, names);
+				}else if (value.GetValue().equals("Aircrafts")) {
+					//Aircrafts, which is technically a single field. So let's literally copy, paste.
+					String[] unformatted = data.get(index);
+					ui.eventHandler.UpdateListWithArray(ui.listName, unformatted);
+				}else if (value.GetValue().equals("Training")) {
+					
+				}else if (value.GetValue().equals("Maintinence")) {
+					
+				}else if (value.GetValue().equals("Flight")) {
+					
+				}
+			}
+		}
+	}
 
 	/**
 	 * This class is the Thread that will run inside the client to establish the connection to the client, and download all relevant
@@ -103,7 +221,11 @@ public class ClientMain {
 
 		DataInputStream in;
 		DataOutputStream out;
+
+		ArrayList<String> query;
 		
+		int QUERY_ID = 0;
+
 		JLoginDialog callback;
 
 		/**
@@ -115,8 +237,31 @@ public class ClientMain {
 			username = user;
 			password = pass;
 			callback = cback;
+
+			query = new ArrayList<String>();
+			data = new ArrayList<String[]>();
 		}
 		
+		/**
+		 * Sets a reference code for the stored data type
+		 * @param value The type of the data: Name, Airplane, etc
+		 * @param index The location in the data superarray.
+		 */
+		public void SetRefCode(String value, int index) {
+			for (int i = 0; i < refCodes.size(); i++) {
+				StringPoint v = refCodes.get(i);
+				if (v.GetValue().equals(value)) {
+					v.SetIndex(index);
+					//System.out.println("Overwriting " + value + " in " + index);
+					return;
+				}
+			}
+			//System.out.println("Storing " + value + " in " + index);
+			//Data point doesnt exist, lets create it
+			refCodes.add(new StringPoint(index, value));
+		}
+		
+
 		@Override
 		public void run() {
 			try {
@@ -180,7 +325,7 @@ public class ClientMain {
 					//Again, the server will terminate the connection here if we don't respond correctly above.
 
 					String ident = in.readUTF();
-					
+
 					if (ident.equals("$IDENTIFY")) {	//The server wants us to send our login information
 						String identification = "$IDENTIFY " + username + " " + password;
 						out.writeUTF(identification);
@@ -195,13 +340,61 @@ public class ClientMain {
 							 */
 							validated = true;		//We set this flag so the client doesn't terminate automatically.
 							authenticated = true;
-							
+
 							//Let's show the controls on the applet.
 							ui.showControls();
 							ui.username = username;
-							
+
 							//Tell the dialog we're good, so it can hide itself.
 							callback.AuthSucess();
+							
+							netTicker = new NetworkTimer();
+							ticker = new Timer(2000, netTicker);
+							ticker.start();
+							
+							//This means that our data array will look like this in a bit:
+							//ID	DATA
+							// 0	List of Dates
+							// 1 	List of Pilots
+							// 2 	List of Aircrafts
+							// 3 	List of Training Logs
+							// 4	List of Maintinence Logs
+							// 5 	List of Flight Logs
+							
+							while (true) {
+								if (query.size() > 0) {
+									String request = query.get(0);
+									String[] split = request.split(";");
+									int id = Integer.parseInt(split[0]);
+									request = split[1];
+									query.remove(0);
+									try {
+										//Log("Requesting Query " + QUERY_ID + "...");
+										out.writeUTF(request);
+										response = in.readUTF();
+									} catch (IOException e) {
+										e.printStackTrace();
+									}
+									if (response.equals("$INVALID")) {
+										//This isn't a valid request.
+										//Log("Invalid Request.");
+									}else if (response.equals("$NODATA")) {
+										//There was no data returned by the server.
+										//Log("No data was returned by the server.");
+									}else {
+										String[] recv = null;
+										if (response.startsWith("$LIST")) {
+											recv = response.substring("$LIST ".length(), response.length()).split("$");
+											//Log("Receiving data (" + recv.length + " bytes).");
+											//Log("Writing to " + id);
+											data.add(id, recv);		//We RECV the list, and put it at the Query ID so we can fetch it by ID later.
+										}
+									}
+								}else {
+									out.writeUTF("$NOREQUEST");
+								}
+								
+							}
 						}else if (ret.equals("$INVALID")) {
 							/* The server is written to handle repeated login attempts. However, we can also just tell the server
 							 * to forget about it, so if a user stays on the log-in page, they don't hold a slot forever.
@@ -230,32 +423,47 @@ public class ClientMain {
 			}
 		}
 
-		public String RemoteRequest(String request) {
-			Log("Requesting data from the server...");
+		public int RemoteRequest(String request) {
+			//Log("Sending '" + request + "' to the server...");
 			if (validated) {
-				String response = "$NODATA";
-				try {
-					out.writeUTF(request);
-					Log("Requesting...");
-					response = in.readUTF();
-				} catch (IOException e) {
-					e.printStackTrace();
+				query.add(QUERY_ID + ";" + request);
+				
+				int num = QUERY_ID; 
+				QUERY_ID++;
+				if (QUERY_ID > 1000) {	//We store our IDs recursively, but at 1000 entries, i think it's safe to reset and delete old data
+					QUERY_ID = 0;
 				}
-				if (response.equals("$INVALID")) {
-					//This isn't a valid request.
-					Log("Invalid Request.");
-					return null;
-				}else if (response.equals("$NODATA")) {
-					//There was no data returned by the server.
-					Log("No data was returned by the server.");
-					return null;
-				}else {
-					return response;
-				}
+				return num;
 			}else {
-				Log("Please wait until the server is fully initialized before requesting data!");
+				//Log("Please wait until the server is fully initialized before requesting data!");
 			}
-			return null;
+			return -1;
+		}
+	}
+	
+	public class StringPoint {
+		int num;
+		String string;
+		
+		public StringPoint(int index, String val) {
+			num = index;
+			string = val;
+		}
+		
+		public int GetIndex() {
+			return num;
+		}
+		
+		public String GetValue() {
+			return string;
+		}
+		
+		public void SetIndex(int i) {
+			num = i;
+		}
+		
+		public void SetValue(String s) {
+			string = s;
 		}
 	}
 }

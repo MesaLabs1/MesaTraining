@@ -1,7 +1,7 @@
 <Database Header="com.mesalabs1.xml.database">
 	<!--Database contains all USER and AIRCRAFT information.--><Data>
 		<!--Contains Date, Pilot, Aircraft, and Logs for Maintinence, Training, Flight, and Administration--><Date Entry1="05192015;182436"><!--Example Date: 05/19/2015, at 18:24:36 (Global Time, so 6:24:36 PM). Indicates the last use date.--></Date>
-		<Pilot Entry1="Andreas Anderson; Jad Aboulhosn"><!--Supports multiple pilots, in this case both Jad and Andy.-->
+		<Pilot Entry1="Andreas Anderson;Jad Aboulhosn"><!--Supports multiple pilots, in this case both Jad and Andy.-->
 		</Pilot><Aircraft Entry1="Bixler"><!--Can support multiple aircraft, but recommend making another entry-->
 </Aircraft><Logs><Maintinence>
 	<Entry1 M05192015="Repair of left wing, modification of landing gear."><!--Designate M05192015 indicates Maintinence 05/19/2015. The contents indicate the repair in verbose text.--></Entry1></Maintinence><Training>
@@ -17,5 +17,5 @@
 	</Data>
 	
 	<Users>
-		<jaboulhosn Rank="superadmin" Password="testpassword" LastLogin="05192015;201036"><!--User: jaboulhosn, with password "testpassword" was last logged in on 05/19/2015, 8:10:36 PM--></jaboulhosn></Users>
+		<jaboulhosn Rank="superadmin" Password="1" LastLogin="05192015;201036"><!--User: jaboulhosn, with password "testpassword" was last logged in on 05/19/2015, 8:10:36 PM--></jaboulhosn></Users>
 	<Permissions superadmin="create;delete;modify" admin="modify" user=""></Permissions></Database>
