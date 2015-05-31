@@ -452,18 +452,32 @@ public class Backend {
 												if (request.startsWith("$GET")) {
 													//$GET PILOTS,AIRCRAFTS,DATES,TRAINING,FLIGHT,MAINTINENCE,
 													//$GET RANK JABOULHOSN
-													
+													//$GET RANKLIST
 													
 													String cmd = request.substring("$GET ".length(), request.length());
-													if (cmd.startsWith("RANK")) {
+													if (cmd.startsWith("RANK ")) {
 														String user = cmd.substring("RANK ".length(), cmd.length());
 														//util.Log("RECV remote request for " + user + "'s rank...");
 														String rank = dbMan.RequestRank(user.toLowerCase());
 														if (rank != null) {
 															//util.Log("Transmitting rank...");
-															out.writeUTF(rank);
+															out.writeUTF("$RANK " + user.toLowerCase() + "$" + rank);
 														}else {
 															//util.Log("Could not locate user by ID, sending error...");
+															out.writeUTF("$ERROR");
+														}
+													}else if (cmd.equals("RANKLIST")) {
+														String[] ranklist = dbMan.RequestRankList();
+														if (ranklist.length > 0) {
+															String resp = "$RANKLIST ";
+															for (String s : ranklist) {
+																resp += s + "$";
+															}
+															if (resp.endsWith("$")) {
+																resp = resp.substring(0, resp.length() - 1);
+															}
+															out.writeUTF(resp);
+														}else {
 															out.writeUTF("$ERROR");
 														}
 													}else {
@@ -514,7 +528,7 @@ public class Backend {
 					break;
 				}catch(IOException e) {
 					util.Log("[" + name + "] has been terminated by the remote client.");
-					e.printStackTrace();
+					//e.printStackTrace();
 					break;
 				}
 			}

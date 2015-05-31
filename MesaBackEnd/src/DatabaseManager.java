@@ -163,7 +163,7 @@ public class DatabaseManager {
 
 	public String RequestRank(String username) {
 		NodeList nList = doc.getElementsByTagName(username);
-		util.Log("Checking " + username + " against " + nList.getLength() + " users.");
+		//util.Log("Checking " + username + " against " + nList.getLength() + " users.");
 		for (int i = 0; i < nList.getLength(); i++) {
 			Node nNode = nList.item(i);
 			if (nNode.getNodeType() == Node.ELEMENT_NODE) {
@@ -176,6 +176,37 @@ public class DatabaseManager {
 		}
 		ui.accessCount++;
 		return null;
+	}
+	
+	public String[] RequestRankList() {
+		ArrayList<String> list = new ArrayList<String>();
+		
+		NodeList nList = doc.getElementsByTagName("Users");
+		//util.Log("Checking " + username + " against " + nList.getLength() + " users.");
+		for (int i = 0; i < nList.getLength(); i++) {
+			Node nNode = nList.item(i);
+			NodeList subList = nNode.getChildNodes();
+			for (int j = 0; j < subList.getLength(); j++) {
+				Node subNode = subList.item(j);
+				if (subNode.getNodeType() == Node.ELEMENT_NODE) {
+					Element subElement = (Element)subNode;
+					if (subElement.hasAttributes()) {
+						Element eElement = (Element) subNode;
+						String username = subNode.getNodeName().toLowerCase();
+						String rank = eElement.getAttribute("Rank");
+						
+						String entry = username + ";" + rank;
+						list.add(entry);
+						ui.accessCount++;
+					}
+				}
+			}
+		}
+		String[] output = new String[list.size()];
+		for (int i = 0; i < list.size(); i++) {
+			output[i] = list.get(i);
+		}
+		return output;
 	}
 
 	public String[] RequestField(String fieldname) {

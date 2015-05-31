@@ -25,6 +25,8 @@ import java.awt.Color;
 
 import javax.swing.border.LineBorder;
 import javax.swing.border.EtchedBorder;
+import java.awt.Component;
+import javax.swing.Box;
 
 /**
  * This class outlines the JLoginDialog. This login dialog extends JDialog (meaning it behaves as a popup). It is
@@ -40,7 +42,6 @@ public class JLoginDialog extends JDialog{
 	private static final long serialVersionUID = 8224336328398525415L;
 	private JTextField usernameField;
 	private JPasswordField passwordField;
-	JLabel lblHelptext;
 	JLabel lblHelptext_1;
 	
 	ClientMain superInstance;
@@ -52,7 +53,7 @@ public class JLoginDialog extends JDialog{
 		superInstance = instance;
 		
 		//Set Size of Dialog to something smaller than 640x480, preferably in multiples of 8 or 16.
-		this.setSize(new Dimension(512, 256));
+		this.setSize(new Dimension(445, 189));
 		
 		//A Java toolkit that provides us with information about the target system.
 		Toolkit toolkit = Toolkit.getDefaultToolkit();
@@ -64,42 +65,47 @@ public class JLoginDialog extends JDialog{
 		JPanel panel = new JPanel();
 		panel.setBorder(new LineBorder(new Color(0, 0, 0)));
 		getContentPane().add(panel, BorderLayout.NORTH);
-		panel.setLayout(new MigLayout("", "[][]", "[]"));
-		
-		Canvas mesaIcon = new Canvas();
-		panel.add(mesaIcon, "cell 0 0");
+		panel.setLayout(new MigLayout("", "[][][]", "[]"));
 		
 		JLabel lblWelcomeToMesalabs = new JLabel("Welcome to MesaLabs WebConnect! Please enter your credentials below to authenticate.");
 		lblWelcomeToMesalabs.setFont(new Font("Lucida Grande", Font.PLAIN, 10));
-		panel.add(lblWelcomeToMesalabs, "cell 1 0");
+		panel.add(lblWelcomeToMesalabs, "cell 0 0");
+		
+		Canvas mesaIcon = new Canvas();
+		panel.add(mesaIcon, "cell 1 0");
 		
 		JPanel panel_1 = new JPanel();
 		panel_1.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
 		getContentPane().add(panel_1, BorderLayout.CENTER);
-		panel_1.setLayout(new MigLayout("", "[][grow][][][]", "[][][][][][][][]"));
+		panel_1.setLayout(new MigLayout("", "[grow][][]", "[][][2px:n:2px][][][][]"));
 		
-		lblHelptext = new JLabel("Enter your credentials below.");
+		JLabel lblHelptext = new JLabel("Enter your credentials below.");
 		lblHelptext.setFont(new Font("Lucida Grande", Font.ITALIC, 10));
-		panel_1.add(lblHelptext, "cell 1 0");
+		panel_1.add(lblHelptext, "flowx,cell 0 1");
 		
 		JLabel lblid = new JLabel("UCMNetID (Username)");
 		lblid.setFont(new Font("Lucida Grande", Font.BOLD, 11));
-		panel_1.add(lblid, "cell 1 2");
+		panel_1.add(lblid, "flowx,cell 0 3");
+		
+		lblHelptext_1 = new JLabel("Invalid Username or Password.");
+		lblHelptext_1.setFont(new Font("Tahoma", Font.ITALIC, 10));
+		lblHelptext_1.setForeground(Color.RED);
+		panel_1.add(lblHelptext_1, "cell 1 3 2 1");
 		
 		usernameField = new JTextField();
-		panel_1.add(usernameField, "cell 1 3 3 1,growx");
+		panel_1.add(usernameField, "cell 0 4,growx");
 		usernameField.setColumns(10);
 		
 		JLabel lblExampleJsmith = new JLabel("Example: JSmith");
 		lblExampleJsmith.setFont(new Font("Lucida Grande", Font.ITALIC, 10));
-		panel_1.add(lblExampleJsmith, "cell 4 3");
+		panel_1.add(lblExampleJsmith, "cell 1 4");
 		
 		JLabel lblPassword = new JLabel("Password");
 		lblPassword.setFont(new Font("Lucida Grande", Font.BOLD, 11));
-		panel_1.add(lblPassword, "cell 1 4");
+		panel_1.add(lblPassword, "cell 0 5");
 		
 		passwordField = new JPasswordField();
-		panel_1.add(passwordField, "cell 1 5 3 1,growx");
+		panel_1.add(passwordField, "cell 0 6,growx");
 		
 		JButton btnAuthenticate = new JButton("Authenticate");
 		btnAuthenticate.addActionListener(new ActionListener() {
@@ -115,12 +121,7 @@ public class JLoginDialog extends JDialog{
 				superInstance.Authenticate(usernameField.getText(), new String(passwordField.getPassword()), JLoginDialog.this);
 			}
 		});
-		
-		lblHelptext_1 = new JLabel("");
-		lblHelptext_1.setFont(new Font("Lucida Grande", Font.BOLD | Font.ITALIC, 11));
-		lblHelptext_1.setForeground(Color.RED);
-		panel_1.add(lblHelptext_1, "cell 1 7");
-		panel_1.add(btnAuthenticate, "cell 3 7");
+		panel_1.add(btnAuthenticate, "cell 1 6");
 		
 		JButton btnCancel = new JButton("Cancel");
 		btnCancel.addActionListener(new ActionListener() {
@@ -132,7 +133,8 @@ public class JLoginDialog extends JDialog{
 				//Terminate the Applet, we might even want to have the web-page redirect to home when this happens.
 			}
 		});
-		panel_1.add(btnCancel, "cell 4 7");
+		panel_1.add(btnCancel, "cell 2 6,growx");
+		lblHelptext_1.setText("");
 		
 		this.setVisible(true);
 	}

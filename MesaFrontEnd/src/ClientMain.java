@@ -108,6 +108,7 @@ public class ClientMain {
 
 		public NetworkTimer() {
 			RequestList();
+			Log("Receiving serialized objects...");
 		}
 		
 		@Override
@@ -128,6 +129,7 @@ public class ClientMain {
 			client.SetRefCode("Training", client.RemoteRequest("$GET TRAINING"));
 			client.SetRefCode("Maintinence", client.RemoteRequest("$GET MAINTINENCE"));
 			client.SetRefCode("Flight", client.RemoteRequest("$GET FLIGHT"));
+			client.SetRefCode("Ranklist", client.RemoteRequest("$GET RANKLIST"));
 		}
 		
 		/**
@@ -169,7 +171,7 @@ public class ClientMain {
 						dates[j] = out;
 					}
 					//We've converted them all to coherent values, now apply them through the UpdateListsWithArray method
-					ui.eventHandler.UpdateListWithArray(ui.listDate, dates);
+					ui.eventHandler.UpdateListWithArray(ui.dateModel, dates);
 				}else if (value.GetValue().equals("Pilots")) {
 					//Pilots, so format is: Jad Aboulhosn;Andreas Anderson
 					//Supports multiple pilots, in this case both Jad and Andy.
@@ -189,19 +191,33 @@ public class ClientMain {
 						}
 						names[j] = out;
 					}
-					ui.eventHandler.UpdateListWithArray(ui.listPilot, names);
+					ui.eventHandler.UpdateListWithArray(ui.pilotModel, names);
 				}else if (value.GetValue().equals("Aircrafts")) {
 					//Aircrafts, which is technically a single field. So let's literally copy, paste.
 					String[] unformatted = data.get(index);
-					ui.eventHandler.UpdateListWithArray(ui.listName, unformatted);
+					ui.eventHandler.UpdateListWithArray(ui.nameModel, unformatted);
 				}else if (value.GetValue().equals("Training")) {
 					
 				}else if (value.GetValue().equals("Maintinence")) {
 					
 				}else if (value.GetValue().equals("Flight")) {
 					
-				}
+				}else if (value.GetValue().equals("Ranklist")) {
+					ui.rankModel.clear();
+					ui.userModel.clear();
+					//This array contains a string system where each entry is as follows FLASTNAME;RANK, so lets split, and add them to the userlist.
+					for (String s : data.get(index)) {
+						String[] split = s.split(";");
+						String user = split[0];
+						String rank = split[1];
+						
+						//Lets add them to the user list.
+						ui.rankModel.addElement(rank);
+						ui.userModel.addElement(user);
+					}
+				}			
 			}
+			refCodes = new ArrayList<StringPoint>();	//Clear the refCodes, when we're done.
 		}
 	}
 
@@ -389,6 +405,21 @@ public class ClientMain {
 											//Log("Writing to " + id);
 											data.add(id, recv);		//We RECV the list, and put it at the Query ID so we can fetch it by ID later.
 										}
+										if (response.startsWith("$RANK ")) {
+											recv = response.substring("$RANK ".length(), response.length()).split("$");
+											//This is a single rank, so $RANK JABOULHOSN SUPERCOOL, is an example
+											//Log("Receiving data (" + recv.length + " bytes).");
+											//Log("Writing to " + id);
+											data.add(id, recv);		//We RECV the list, and put it at the Query ID so we can fetch it by ID later.
+										}
+										if (response.startsWith("$RANKLIST ")) {
+											recv = response.substring("$RANKLIST ".length(), response.length()).split("$");
+											//This is all ranks, so $RANKLIST JABOULHOSN;SUPERCOOL$JCLOW;NOTASCOOL is an example
+											//Log("Receiving data (" + recv.length + " bytes).");
+											//Log("Writing to " + id);
+											//The recv list is a list where each entry is FLASTNAME;RANK.
+											data.add(id, recv);		//We RECV the list, and put it at the Query ID so we can fetch it by ID later.
+										}
 									}
 								}else {
 									out.writeUTF("$NOREQUEST");
@@ -411,10 +442,12 @@ public class ClientMain {
 				}
 			}catch(SocketTimeoutException s) {
 				Log("The socket has timed out and been reset.");
+				callback.ShowHelpText("Call the Pope, all hell just broke loose.");
 				active = false;
 				s.printStackTrace();
 			}catch(ConnectException c) {
 				Log("Connection Refused.. is the server running?");
+				callback.ShowHelpText("Connection refused. Is the server running?");
 				active = false;
 			}catch(IOException e) {
 				Log("IOException!");

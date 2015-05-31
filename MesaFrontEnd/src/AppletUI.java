@@ -50,6 +50,7 @@ import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.layout.ColumnSpec;
 import com.jgoodies.forms.layout.RowSpec;
 
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Button;
 import java.awt.Font;
@@ -67,6 +68,10 @@ import javax.swing.LayoutStyle.ComponentPlacement;
 
 import com.jgoodies.forms.factories.FormFactory;
 
+import javax.swing.ListSelectionModel;
+import javax.swing.AbstractListModel;
+import javax.swing.JTextField;
+
 /**
  * This is the Visual Applet that the web browser will display.
  * 
@@ -82,7 +87,7 @@ public class AppletUI extends Applet{
 	int SCREEN_SIZE_Y;
 
 	//Applet Resources
-	ImageIcon mesaIcon;
+	Image mesaIcon;
 
 	ImageIcon tab1Icon;
 	ImageIcon tab2Icon;
@@ -104,27 +109,42 @@ public class AppletUI extends Applet{
 
 	Timer eventTicker;
 	EventHandler eventHandler;
+	ClientMain clientMain;
 
+	//UI Stuffs
 	JLabel lblUsername;
 	JLabel lblTime;
+	JLabel lblUserPermissions;
+	JLabel lblMode;
 	JPanel pnlNotification1;
 	JPanel pnlNotification2;
 	JPanel pnlNotification3;
-
-	JList<String> listDate;
-	JList<String> listPilot;
-	JList<String> listName;
-	
 	JPanel pnlDate;
-	boolean sortByDate;
+	JPanel pnlMesaIcon;
 
-	JPanel pnlPilot;
-	boolean sortByPilot;
+	JList<String> listData;
+	JList<String> fLogsList;
+	JList<String> tLogsList;
+	JList<String> mLogsList;
+	JList<String> userList;
+	JList<String> rankList;
 
-	JPanel pnlAircraftName;
-	boolean sortByName;
+	DefaultListModel<String> dateModel;
+	DefaultListModel<String> pilotModel;
+	DefaultListModel<String> nameModel;
+	DefaultListModel<String> flightModel;
+	DefaultListModel<String> trainingModel;
+	DefaultListModel<String> maintinenceModel;
+	DefaultListModel<String> userModel;
+	DefaultListModel<String> rankModel;
 
-	ClientMain clientMain;
+	DATA_MODE dataMode;
+	private JTextField inputField;
+
+	//Enumerators
+	enum DATA_MODE {
+		MODE_DATE, MODE_PILOT, MODE_AIRCRAFT
+	}
 
 	public static void main(String[] args) {
 		new AppletUI();
@@ -144,7 +164,7 @@ public class AppletUI extends Applet{
 
 		if (verified) {
 			//Let's allocate all the ImageIcons
-			mesaIcon = new ImageIcon(appletRes.getPath() + "/mesa.png");
+			mesaIcon = Toolkit.getDefaultToolkit().getImage(appletRes.getPath() + "/mesa.png");
 			tab1Icon = new ImageIcon(appletRes.getPath() + "/flight.png");
 			tab2Icon = new ImageIcon(appletRes.getPath() + "/maintinence.png");
 			tab3Icon = new ImageIcon(appletRes.getPath() + "/training1.png");
@@ -157,8 +177,12 @@ public class AppletUI extends Applet{
 	}
 
 	public AppletUI() {
+		setBackground(Color.BLACK);
+		//We auto-set the default data modality to date-sorted.
+		dataMode = DATA_MODE.MODE_DATE;
+
 		clientMain = new ClientMain(this);
-		
+
 		//Allocate all Resources, make sure they're there, etc etc
 		AllocateResources();
 
@@ -170,30 +194,34 @@ public class AppletUI extends Applet{
 		 * large as possible, as assume it can shrink it for us if necessary. In this case, I have chosen the size of my desktop's
 		 * monitor in Eclipse (to avoid scrolling around). In the future, another developer could set it to something even larger if they wanted to.
 		 */
-		this.setSize(1024,  512);
+		this.setMinimumSize(new Dimension(896, 606));
+		this.setSize(896, 606);
 		setLayout(new BorderLayout(0, 0));
 
-		JPanel pnlHeader = new JPanel();
-		pnlHeader.setBorder(new LineBorder(new Color(0, 0, 0)));
-		add(pnlHeader, BorderLayout.NORTH);
-		pnlHeader.setLayout(new MigLayout("", "[][][][][][][][][][][][][][][grow][32px:n:32px,grow][32px:n:32px,grow][32px:n:32px,grow][::8px][]", "[32px:n:32px,grow]"));
+		Component horizontalStrut_1 = Box.createHorizontalStrut(8);
+		horizontalStrut_1.setBackground(Color.BLACK);
+		add(horizontalStrut_1, BorderLayout.WEST);
 
-		Canvas MesaIcon = new Canvas();
-		pnlHeader.add(MesaIcon, "cell 0 0");
+		JPanel pnlHeader = new JPanel();
+		pnlHeader.setBackground(Color.DARK_GRAY);
+		pnlHeader.setBorder(new EtchedBorder(EtchedBorder.RAISED, null, null));
+		add(pnlHeader, BorderLayout.NORTH);
+		pnlHeader.setLayout(new MigLayout("", "[32px:n:32px,grow][][][][][][][][][][][][][][][grow][][grow][32px:n:32px,grow][32px:n:32px,grow][32px:n:32px,grow][::8px][]", "[32px:n:32px,grow]"));
+		
+		pnlMesaIcon = new JPanel();
+		pnlMesaIcon.setBackground(Color.DARK_GRAY);
+		pnlHeader.add(pnlMesaIcon, "cell 0 0,grow");
 
 		JLabel lblWelcomeToMesa = new JLabel("Welcome to Mesa Labs WebConnect, ");
+		lblWelcomeToMesa.setForeground(Color.WHITE);
 		pnlHeader.add(lblWelcomeToMesa, "cell 1 0");
 
 		lblUsername = new JLabel("USERNAME (ID)");
-		pnlHeader.add(lblUsername, "cell 2 0");
-
-		JLabel lblConnectionTime = new JLabel("Connection Time:");
-		pnlHeader.add(lblConnectionTime, "cell 5 0");
-
-		lblTime = new JLabel("XX:XX:XX");
-		pnlHeader.add(lblTime, "cell 6 0");
+		lblUsername.setForeground(Color.WHITE);
+		pnlHeader.add(lblUsername, "cell 2 0,alignx left");
 
 		pnlNotification1 = new JPanel();
+		pnlNotification1.setBackground(Color.GRAY);
 		pnlNotification1.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseEntered(MouseEvent arg0) {
@@ -212,10 +240,49 @@ public class AppletUI extends Applet{
 				pnlNotification1.setBorder(BorderFactory.createEtchedBorder());
 			}
 		});
+
+		JButton btnPilotMode = new JButton("Pilot Mode");
+		btnPilotMode.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent arg0) {
+				dataMode = DATA_MODE.MODE_PILOT;
+			}
+		});
+		btnPilotMode.setBackground(Color.GRAY);
+		btnPilotMode.setForeground(Color.WHITE);
+		pnlHeader.add(btnPilotMode, "cell 8 0");
+
+		JButton btnAircraftMode = new JButton("Aircraft Mode");
+		btnAircraftMode.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				dataMode = DATA_MODE.MODE_AIRCRAFT;
+			}
+		});
+		btnAircraftMode.setBackground(Color.GRAY);
+		btnAircraftMode.setForeground(Color.WHITE);
+		pnlHeader.add(btnAircraftMode, "cell 9 0");
+
+		JButton btnDateMode = new JButton("Date Mode");
+		btnDateMode.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				dataMode = DATA_MODE.MODE_DATE;
+			}
+		});
+		btnDateMode.setBackground(Color.GRAY);
+		btnDateMode.setForeground(Color.WHITE);
+		pnlHeader.add(btnDateMode, "cell 10 0");
+
+		lblTime = new JLabel("XX:XX:XX");
+		lblTime.setForeground(Color.WHITE);
+		pnlHeader.add(lblTime, "cell 16 0");
 		pnlNotification1.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
-		pnlHeader.add(pnlNotification1, "cell 15 0,grow");
+		pnlHeader.add(pnlNotification1, "cell 18 0,grow");
 
 		pnlNotification2 = new JPanel();
+		pnlNotification2.setBackground(Color.GRAY);
+		pnlNotification2.setForeground(Color.GRAY);
 		pnlNotification2.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseEntered(MouseEvent arg0) {
@@ -235,9 +302,11 @@ public class AppletUI extends Applet{
 			}
 		});
 		pnlNotification2.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
-		pnlHeader.add(pnlNotification2, "cell 16 0,grow");
+		pnlHeader.add(pnlNotification2, "cell 19 0,grow");
 
 		pnlNotification3 = new JPanel();
+		pnlNotification3.setBackground(Color.GRAY);
+		pnlNotification3.setForeground(Color.GRAY);
 		pnlNotification3.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseEntered(MouseEvent arg0) {
@@ -257,187 +326,235 @@ public class AppletUI extends Applet{
 			}
 		});
 		pnlNotification3.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
-		pnlHeader.add(pnlNotification3, "cell 17 0,grow");
+		pnlHeader.add(pnlNotification3, "cell 20 0,grow");
 
 		JButton btnLogout = new JButton("Logout");
-		pnlHeader.add(btnLogout, "cell 19 0,aligny baseline");
+		btnLogout.setForeground(Color.WHITE);
+		btnLogout.setBackground(Color.GRAY);
+		pnlHeader.add(btnLogout, "cell 22 0,aligny baseline");
 
-		JPanel pnlMain = new JPanel();
-		add(pnlMain, BorderLayout.CENTER);
-		pnlMain.setBorder(new LineBorder(new Color(0, 0, 0)));
-		pnlMain.setLayout(new MigLayout("", "[grow][256px:n:256px,grow][]", "[grow][32px:n:32px][]"));
+		JPanel pnlFooter = new JPanel();
+		add(pnlFooter, BorderLayout.SOUTH);
+		pnlFooter.setBackground(Color.DARK_GRAY);
+		pnlFooter.setBorder(new EtchedBorder(EtchedBorder.RAISED, null, null));
+		pnlFooter.setLayout(new MigLayout("", "[256px:n:256px][][][][grow][][][][][][][][grow][][][][]", "[]"));
+
+		JProgressBar progressBar = new JProgressBar();
+		progressBar.setForeground(Color.RED);
+		progressBar.setBackground(Color.GRAY);
+		progressBar.setStringPainted(true);
+		pnlFooter.add(progressBar, "cell 0 0,growx");
+
+		JLabel lblStatus = new JLabel("Idle.");
+		lblStatus.setForeground(Color.WHITE);
+		pnlFooter.add(lblStatus, "cell 1 0");
+
+		JLabel lblUserStatus = new JLabel("User Status:");
+		lblUserStatus.setForeground(Color.WHITE);
+		pnlFooter.add(lblUserStatus, "cell 15 0");
+
+		lblUserPermissions = new JLabel("XXXXXXXXXXXXX");
+		lblUserPermissions.setForeground(Color.WHITE);
+		pnlFooter.add(lblUserPermissions, "cell 16 0");
 
 		JPanel pnlInternalPane = new JPanel();
-		pnlInternalPane.setBorder(new SoftBevelBorder(BevelBorder.RAISED, null, null, null, null));
-		pnlMain.add(pnlInternalPane, "cell 0 0 1 2,grow");
-		pnlInternalPane.setLayout(new MigLayout("", "[196px:n:196px,grow][256px:n:256px,grow][grow]", "[grow]"));
-
-		JPanel pnlDateHolder = new JPanel();
-		pnlDateHolder.setBorder(new LineBorder(new Color(0, 0, 0)));
-		pnlInternalPane.add(pnlDateHolder, "cell 0 0,grow");
-		pnlDateHolder.setLayout(new BorderLayout(0, 0));
-
-		pnlDate = new JPanel();
-		pnlDate.setBorder(new SoftBevelBorder(BevelBorder.RAISED, null, null, null, null));
-		pnlDateHolder.add(pnlDate, BorderLayout.NORTH);
-		pnlDate.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
-
-		JLabel lblDate = new JLabel("Date");
-		pnlDate.add(lblDate);
-
-		listDate = new JList<String>();
-		pnlDateHolder.add(listDate, BorderLayout.CENTER);
-
-		JPanel pnlPilotHolder = new JPanel();
-		pnlPilotHolder.setBorder(new LineBorder(new Color(0, 0, 0)));
-		pnlInternalPane.add(pnlPilotHolder, "cell 1 0,grow");
-		pnlPilotHolder.setLayout(new BorderLayout(0, 0));
-
-		pnlPilot = new JPanel();
-		pnlPilot.setBorder(new SoftBevelBorder(BevelBorder.RAISED, null, null, null, null));
-		pnlPilotHolder.add(pnlPilot, BorderLayout.NORTH);
-
-		JLabel lblPilot = new JLabel("Pilot");
-		pnlPilot.add(lblPilot);
-
-		listPilot = new JList<String>();
-		pnlPilotHolder.add(listPilot, BorderLayout.CENTER);
-
-		JPanel pnlAircraftHolder = new JPanel();
-		pnlAircraftHolder.setBorder(new LineBorder(new Color(0, 0, 0)));
-		pnlInternalPane.add(pnlAircraftHolder, "cell 2 0,grow");
-		pnlAircraftHolder.setLayout(new BorderLayout(0, 0));
-
-		pnlAircraftName = new JPanel();
-		pnlAircraftName.setBorder(new SoftBevelBorder(BevelBorder.RAISED, null, null, null, null));
-		pnlAircraftHolder.add(pnlAircraftName, BorderLayout.NORTH);
-
-		JLabel lblAircraftName = new JLabel("Aircraft Name");
-		pnlAircraftName.add(lblAircraftName);
-
-		listName = new JList<String>();
-		pnlAircraftHolder.add(listName, BorderLayout.CENTER);
+		add(pnlInternalPane, BorderLayout.CENTER);
+		pnlInternalPane.setBorder(new EtchedBorder(EtchedBorder.RAISED, null, null));
+		pnlInternalPane.setBackground(Color.BLACK);
 
 		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
-		pnlMain.add(tabbedPane, "cell 1 0 2 3,grow");
+		tabbedPane.setBorder(null);
+		tabbedPane.setBackground(Color.LIGHT_GRAY);
 		tabbedPane.setSelectedIndex(-1);
-		tabbedPane.setBorder(new LineBorder(new Color(0, 0, 0)));
 
-		JPanel pnlMaintinenceLogsHolder = new JPanel();
-		tabbedPane.addTab("Maintinence Logs", null, pnlMaintinenceLogsHolder, null);
-		pnlMaintinenceLogsHolder.setLayout(new MigLayout("", "[grow]", "[grow][]"));
+		JPanel pnlTrainingLogsHolder = new JPanel();
+		pnlTrainingLogsHolder.setBackground(Color.BLACK);
+		tabbedPane.addTab("Training Logs", tab3Icon, pnlTrainingLogsHolder, null);
+
+		JLabel lblTrainingLogs = new JLabel("Training Logs");
+		lblTrainingLogs.setForeground(Color.WHITE);
+		pnlTrainingLogsHolder.setLayout(new MigLayout("", "[63px,grow][78px][42px][::18px][53px]", "[14px][340px,grow][24px:n:24px]"));
+
+		tLogsList = new JList<String>();
+		tLogsList.setBackground(Color.DARK_GRAY);
+		tLogsList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		tLogsList.setLayoutOrientation(JList.VERTICAL_WRAP);
+		tLogsList.setBorder(new LineBorder(Color.WHITE));
+		pnlTrainingLogsHolder.add(tLogsList, "cell 0 1 5 1,grow");
+		pnlTrainingLogsHolder.add(lblTrainingLogs, "cell 0 0,alignx left,aligny top");
+
+		JPanel panel_2 = new JPanel();
+		panel_2.setBackground(Color.BLACK);
+		pnlTrainingLogsHolder.add(panel_2, "cell 0 2 5 1,grow");
+
+		JButton btnAdd_2 = new JButton("Add");
+		btnAdd_2.setForeground(Color.WHITE);
+		btnAdd_2.setBackground(Color.GRAY);
+
+		JButton btnChange_2 = new JButton("Change");
+		btnChange_2.setForeground(Color.WHITE);
+		btnChange_2.setBackground(Color.GRAY);
+
+		JButton btnRemove_2 = new JButton("Remove");
+		btnRemove_2.setForeground(Color.WHITE);
+		btnRemove_2.setBackground(Color.GRAY);
+		GroupLayout gl_panel_2 = new GroupLayout(panel_2);
+		gl_panel_2.setHorizontalGroup(
+				gl_panel_2.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_panel_2.createSequentialGroup()
+						.addComponent(btnAdd_2, GroupLayout.PREFERRED_SIZE, 63, GroupLayout.PREFERRED_SIZE)
+						.addPreferredGap(ComponentPlacement.RELATED)
+						.addComponent(btnChange_2)
+						.addPreferredGap(ComponentPlacement.RELATED, 49, Short.MAX_VALUE)
+						.addComponent(btnRemove_2))
+				);
+		gl_panel_2.setVerticalGroup(
+				gl_panel_2.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_panel_2.createSequentialGroup()
+						.addGroup(gl_panel_2.createParallelGroup(Alignment.BASELINE)
+								.addComponent(btnAdd_2)
+								.addComponent(btnChange_2)
+								.addComponent(btnRemove_2))
+								.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+				);
+		panel_2.setLayout(gl_panel_2);
 
 		JPanel pnlFlightLogsHolder = new JPanel();
+		pnlFlightLogsHolder.setForeground(Color.WHITE);
+		pnlFlightLogsHolder.setBackground(Color.BLACK);
 		tabbedPane.addTab("Flight Logs", tab1Icon, pnlFlightLogsHolder, null);
-		pnlFlightLogsHolder.setLayout(new MigLayout("", "[grow][][][][][10px:n][]", "[][grow][30px:n]"));
+		pnlFlightLogsHolder.setLayout(new MigLayout("", "[grow][][][grow][][::18px][]", "[][grow][24px:n:24px]"));
 
 		JLabel lblFlightLogs = new JLabel("Flight Logs");
+		lblFlightLogs.setForeground(Color.WHITE);
 		pnlFlightLogsHolder.add(lblFlightLogs, "cell 0 0");
 
-		JLabel lblByName = new JLabel("By Name");
-		lblByName.setForeground(Color.BLACK);
-		pnlFlightLogsHolder.add(lblByName, "cell 4 0");
-
-		JLabel lblByAircraft = new JLabel("By Aircraft");
-		lblByAircraft.setForeground(Color.BLACK);
-		lblByAircraft.setBackground(Color.ORANGE);
-		pnlFlightLogsHolder.add(lblByAircraft, "cell 6 0");
-
-		JList logsList = new JList();
-		logsList.setBorder(new LineBorder(new Color(0, 0, 0)));
-		pnlFlightLogsHolder.add(logsList, "cell 0 1 7 1,grow");
+		fLogsList = new JList<String>();
+		fLogsList.setForeground(Color.GREEN);
+		fLogsList.setBackground(Color.DARK_GRAY);
+		fLogsList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		fLogsList.setLayoutOrientation(JList.VERTICAL_WRAP);
+		fLogsList.setBorder(new LineBorder(Color.WHITE));
+		pnlFlightLogsHolder.add(fLogsList, "cell 0 1 7 1,grow");
 
 		JPanel panel = new JPanel();
-		panel.setBorder(new LineBorder(new Color(0, 0, 0)));
+		panel.setBackground(Color.BLACK);
+		panel.setBorder(null);
 		pnlFlightLogsHolder.add(panel, "cell 0 2 7 1,grow");
 
 		JButton btnAdd = new JButton("Add");
+		btnAdd.setForeground(Color.WHITE);
+		btnAdd.setBackground(Color.GRAY);
 
 		JButton btnChange = new JButton("Change");
+		btnChange.setForeground(Color.WHITE);
+		btnChange.setBackground(Color.GRAY);
 
 		JButton btnRemove = new JButton("Remove");
+		btnRemove.setForeground(Color.WHITE);
+		btnRemove.setBackground(Color.GRAY);
 		GroupLayout gl_panel = new GroupLayout(panel);
 		gl_panel.setHorizontalGroup(
 				gl_panel.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_panel.createSequentialGroup()
-						.addContainerGap()
+						.addGap(1)
 						.addComponent(btnAdd, GroupLayout.PREFERRED_SIZE, 61, GroupLayout.PREFERRED_SIZE)
-						.addGap(5)
+						.addPreferredGap(ComponentPlacement.RELATED)
 						.addComponent(btnChange)
-						.addPreferredGap(ComponentPlacement.RELATED, 24, Short.MAX_VALUE)
-						.addComponent(btnRemove)
-						.addContainerGap())
+						.addPreferredGap(ComponentPlacement.RELATED, 49, Short.MAX_VALUE)
+						.addComponent(btnRemove))
 				);
 		gl_panel.setVerticalGroup(
 				gl_panel.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_panel.createSequentialGroup()
-						.addGap(6)
-						.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
-								.addComponent(btnRemove)
-								.addGroup(gl_panel.createParallelGroup(Alignment.BASELINE)
-										.addComponent(btnAdd)
-										.addComponent(btnChange)))
-										.addContainerGap())
+						.addGroup(gl_panel.createParallelGroup(Alignment.BASELINE)
+								.addComponent(btnAdd)
+								.addComponent(btnChange)
+								.addComponent(btnRemove))
+								.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
 				);
 		panel.setLayout(gl_panel);
 
-		JPanel pnlTrainingLogsHolder = new JPanel();
-		tabbedPane.addTab("Training Logs", tab3Icon, pnlTrainingLogsHolder, null);
+		JPanel pnlMaintinenceLogsHolder = new JPanel();
+		pnlMaintinenceLogsHolder.setBackground(Color.BLACK);
+		tabbedPane.addTab("Maintinence Logs", null, pnlMaintinenceLogsHolder, null);
+		pnlMaintinenceLogsHolder.setLayout(new MigLayout("", "[grow][][][][][10px:n][]", "[][grow][24px:n:24px,grow]"));
 
-		JLabel lblTrainingLogs = new JLabel("Training Logs");
+		JLabel lblMaintinenceLogs = new JLabel("Maintinence Logs");
+		lblMaintinenceLogs.setForeground(Color.WHITE);
+		pnlMaintinenceLogsHolder.add(lblMaintinenceLogs, "cell 0 0");
 
-		JLabel lblNewLabel = new JLabel("By Name");
+		mLogsList = new JList<String>();
+		mLogsList.setBackground(Color.DARK_GRAY);
+		mLogsList.setForeground(Color.GREEN);
+		mLogsList.setLayoutOrientation(JList.VERTICAL_WRAP);
+		mLogsList.setBorder(new LineBorder(Color.WHITE));
+		mLogsList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		pnlMaintinenceLogsHolder.add(mLogsList, "cell 0 1 7 1,grow");
 
-		JLabel lblNewLabel_1 = new JLabel("By Aircraft");
+		JPanel panel_1 = new JPanel();
+		panel_1.setBackground(Color.BLACK);
+		pnlMaintinenceLogsHolder.add(panel_1, "cell 0 2 7 1,grow");
 
-		JList list = new JList();
-		list.setBorder(new LineBorder(new Color(0, 0, 0)));
-		GroupLayout gl_pnlTrainingLogsHolder = new GroupLayout(pnlTrainingLogsHolder);
-		gl_pnlTrainingLogsHolder.setHorizontalGroup(
-				gl_pnlTrainingLogsHolder.createParallelGroup(Alignment.TRAILING)
-				.addGroup(Alignment.LEADING, gl_pnlTrainingLogsHolder.createSequentialGroup()
-						.addGap(7)
-						.addGroup(gl_pnlTrainingLogsHolder.createParallelGroup(Alignment.LEADING)
-								.addComponent(list, GroupLayout.DEFAULT_SIZE, 254, Short.MAX_VALUE)
-								.addGroup(gl_pnlTrainingLogsHolder.createSequentialGroup()
-										.addComponent(lblTrainingLogs)
-										.addGap(78)
-										.addComponent(lblNewLabel)
-										.addGap(18)
-										.addComponent(lblNewLabel_1)))
-										.addContainerGap())
+		JButton btnAdd_1 = new JButton("Add");
+		btnAdd_1.setForeground(Color.WHITE);
+		btnAdd_1.setBackground(Color.GRAY);
+
+		JButton btnChange_1 = new JButton("Change");
+		btnChange_1.setForeground(Color.WHITE);
+		btnChange_1.setBackground(Color.GRAY);
+
+		JButton btnRemove_1 = new JButton("Remove");
+		btnRemove_1.setForeground(Color.WHITE);
+		btnRemove_1.setBackground(Color.GRAY);
+		GroupLayout gl_panel_1 = new GroupLayout(panel_1);
+		gl_panel_1.setHorizontalGroup(
+				gl_panel_1.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_panel_1.createSequentialGroup()
+						.addComponent(btnAdd_1, GroupLayout.PREFERRED_SIZE, 60, GroupLayout.PREFERRED_SIZE)
+						.addPreferredGap(ComponentPlacement.RELATED)
+						.addComponent(btnChange_1)
+						.addPreferredGap(ComponentPlacement.RELATED, 37, Short.MAX_VALUE)
+						.addComponent(btnRemove_1))
 				);
-		gl_pnlTrainingLogsHolder.setVerticalGroup(
-				gl_pnlTrainingLogsHolder.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_pnlTrainingLogsHolder.createSequentialGroup()
-						.addGap(7)
-						.addGroup(gl_pnlTrainingLogsHolder.createParallelGroup(Alignment.LEADING)
-								.addComponent(lblTrainingLogs)
-								.addComponent(lblNewLabel)
-								.addComponent(lblNewLabel_1))
-								.addGap(4)
-								.addComponent(list, GroupLayout.PREFERRED_SIZE, 340, GroupLayout.PREFERRED_SIZE)
-								.addContainerGap(40, Short.MAX_VALUE))
+		gl_panel_1.setVerticalGroup(
+				gl_panel_1.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_panel_1.createSequentialGroup()
+						.addGroup(gl_panel_1.createParallelGroup(Alignment.BASELINE)
+								.addComponent(btnAdd_1)
+								.addComponent(btnChange_1)
+								.addComponent(btnRemove_1))
+								.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
 				);
-		pnlTrainingLogsHolder.setLayout(gl_pnlTrainingLogsHolder);
+		panel_1.setLayout(gl_panel_1);
 
 		JPanel pnlAdministrationHolder = new JPanel();
+		pnlAdministrationHolder.setBackground(Color.BLACK);
 		tabbedPane.addTab("Administration", tab4Icon, pnlAdministrationHolder, null);
 
 		JPanel pnlAdmin = new JPanel();
-		pnlAdmin.setBorder(new LineBorder(new Color(0, 0, 0)));
+		pnlAdmin.setBackground(Color.DARK_GRAY);
+		pnlAdmin.setBorder(new LineBorder(new Color(255, 255, 255)));
 
 		JButton btnNew = new JButton("Create a New User");
+		btnNew.setForeground(Color.WHITE);
+		btnNew.setBackground(Color.GRAY);
 
 		JLabel lblAdministrativeTasks = new JLabel("Administrative Tasks");
+		lblAdministrativeTasks.setForeground(Color.LIGHT_GRAY);
+
+		JButton btnNewButton = new JButton("SERVER FACTORY RESET");
+		btnNewButton.setBackground(Color.GRAY);
+		btnNewButton.setForeground(Color.RED);
 		GroupLayout gl_pnlAdmin = new GroupLayout(pnlAdmin);
 		gl_pnlAdmin.setHorizontalGroup(
 				gl_pnlAdmin.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_pnlAdmin.createSequentialGroup()
 						.addContainerGap()
 						.addGroup(gl_pnlAdmin.createParallelGroup(Alignment.LEADING)
+								.addComponent(btnNewButton, GroupLayout.DEFAULT_SIZE, 233, Short.MAX_VALUE)
 								.addComponent(lblAdministrativeTasks)
-								.addComponent(btnNew, GroupLayout.DEFAULT_SIZE, 228, Short.MAX_VALUE))
+								.addComponent(btnNew, GroupLayout.DEFAULT_SIZE, 233, Short.MAX_VALUE))
 								.addContainerGap())
 				);
 		gl_pnlAdmin.setVerticalGroup(
@@ -447,99 +564,324 @@ public class AppletUI extends Applet{
 						.addComponent(lblAdministrativeTasks)
 						.addPreferredGap(ComponentPlacement.RELATED)
 						.addComponent(btnNew)
-						.addContainerGap(72, Short.MAX_VALUE))
+						.addPreferredGap(ComponentPlacement.RELATED)
+						.addComponent(btnNewButton)
+						.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
 				);
 		pnlAdmin.setLayout(gl_pnlAdmin);
+		pnlAdministrationHolder.setLayout(new MigLayout("", "[::212px,grow][252px:n:252px][grow]", "[100px:n:100px][100px:n:100px][grow]"));
+		pnlAdministrationHolder.add(pnlAdmin, "cell 0 0,grow");
 
 		JPanel pnlManagement = new JPanel();
-		pnlManagement.setBorder(new LineBorder(new Color(0, 0, 0)));
-		GroupLayout gl_pnlAdministrationHolder = new GroupLayout(pnlAdministrationHolder);
-		gl_pnlAdministrationHolder.setHorizontalGroup(
-				gl_pnlAdministrationHolder.createParallelGroup(Alignment.TRAILING)
-				.addGroup(gl_pnlAdministrationHolder.createSequentialGroup()
-						.addGap(6)
-						.addGroup(gl_pnlAdministrationHolder.createParallelGroup(Alignment.TRAILING)
-								.addComponent(pnlManagement, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 250, Short.MAX_VALUE)
-								.addComponent(pnlAdmin, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-								.addContainerGap())
-				);
-		gl_pnlAdministrationHolder.setVerticalGroup(
-				gl_pnlAdministrationHolder.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_pnlAdministrationHolder.createSequentialGroup()
-						.addContainerGap()
-						.addComponent(pnlAdmin, GroupLayout.PREFERRED_SIZE, 64, GroupLayout.PREFERRED_SIZE)
-						.addPreferredGap(ComponentPlacement.UNRELATED)
-						.addComponent(pnlManagement, GroupLayout.DEFAULT_SIZE, 308, Short.MAX_VALUE)
-						.addContainerGap())
-				);
+		pnlManagement.setBackground(Color.DARK_GRAY);
+		pnlManagement.setForeground(Color.DARK_GRAY);
+		pnlManagement.setBorder(new LineBorder(Color.WHITE));
 
 		JLabel lblUserManagement = new JLabel("User Management");
+		lblUserManagement.setForeground(Color.LIGHT_GRAY);
 
 		JButton btnPromote = new JButton("Promote");
+		btnPromote.setForeground(Color.WHITE);
+		btnPromote.setBackground(Color.GRAY);
 
 		JButton btnDemote = new JButton("Demote");
+		btnDemote.setForeground(Color.WHITE);
+		btnDemote.setBackground(Color.GRAY);
 
-		JList userList = new JList();
-		userList.setBorder(new LineBorder(new Color(0, 0, 0)));
+		userList = new JList<String>();
+		userList.setBackground(Color.GRAY);
+		userList.setForeground(Color.BLUE);
+		userList.setBorder(new LineBorder(Color.WHITE));
 
 		JButton btnDelete = new JButton("Recover User");
+		btnDelete.setForeground(Color.WHITE);
+		btnDelete.setBackground(Color.GRAY);
 
 		JButton btnModify = new JButton("Remove User");
-		GroupLayout gl_pnlManagement = new GroupLayout(pnlManagement);
-		gl_pnlManagement.setHorizontalGroup(
-				gl_pnlManagement.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_pnlManagement.createSequentialGroup()
+		btnModify.setForeground(Color.WHITE);
+		btnModify.setBackground(Color.GRAY);
+
+		rankList = new JList<String>();
+		rankList.setForeground(Color.BLUE);
+		rankList.setBorder(new LineBorder(Color.WHITE));
+		rankList.setBackground(Color.GRAY);
+
+		JLabel lblUsername_1 = new JLabel("Username");
+		lblUsername_1.setForeground(Color.WHITE);
+
+		JLabel lblRank = new JLabel("Rank");
+		lblRank.setForeground(Color.WHITE);
+		pnlAdministrationHolder.add(pnlManagement, "cell 1 0 1 3,grow");
+		pnlManagement.setLayout(new MigLayout("", "[121px][110px]", "[14px][14px][167px,grow][23px][23px]"));
+		pnlManagement.add(lblUserManagement, "cell 0 0,alignx left,aligny top");
+		pnlManagement.add(userList, "cell 0 2,grow");
+		pnlManagement.add(btnModify, "cell 0 3,growx,aligny top");
+		pnlManagement.add(btnDemote, "cell 0 4,growx,aligny top");
+		pnlManagement.add(rankList, "cell 1 2,grow");
+		pnlManagement.add(btnDelete, "cell 1 3,growx,aligny top");
+		pnlManagement.add(btnPromote, "cell 1 4,growx,aligny top");
+		pnlManagement.add(lblUsername_1, "cell 0 1,alignx center,aligny top");
+		pnlManagement.add(lblRank, "cell 1 1,alignx center,aligny top");
+
+		JPanel panel_5 = new JPanel();
+		panel_5.setBorder(new LineBorder(Color.WHITE));
+		panel_5.setBackground(Color.DARK_GRAY);
+		pnlAdministrationHolder.add(panel_5, "cell 2 0 1 3,grow");
+		panel_5.setLayout(new MigLayout("", "[grow]", "[][grow][]"));
+
+		JLabel lblConsole = new JLabel("Console");
+		lblConsole.setForeground(Color.LIGHT_GRAY);
+		panel_5.add(lblConsole, "cell 0 0");
+
+		JList listConsole = new JList();
+		listConsole.setModel(new AbstractListModel() {
+			String[] values = new String[] {};
+			public int getSize() {
+				return values.length;
+			}
+			public Object getElementAt(int index) {
+				return values[index];
+			}
+		});
+		listConsole.setFont(new Font("Consolas", Font.PLAIN, 11));
+		listConsole.setForeground(Color.GREEN);
+		listConsole.setBackground(Color.GRAY);
+		panel_5.add(listConsole, "cell 0 1,grow");
+
+		inputField = new JTextField();
+		inputField.setBackground(Color.GRAY);
+		inputField.setForeground(Color.WHITE);
+		panel_5.add(inputField, "flowx,cell 0 2,growx");
+		inputField.setColumns(10);
+
+		JButton btnExecute = new JButton("Execute");
+		btnExecute.setForeground(Color.WHITE);
+		btnExecute.setBackground(Color.GRAY);
+		panel_5.add(btnExecute, "cell 0 2");
+
+		JPanel panel_3 = new JPanel();
+		panel_3.setBorder(new LineBorder(Color.WHITE));
+		panel_3.setBackground(Color.DARK_GRAY);
+		pnlAdministrationHolder.add(panel_3, "cell 0 1,grow");
+
+		JLabel lblDataTasks = new JLabel("Data Tasks");
+		lblDataTasks.setForeground(Color.LIGHT_GRAY);
+
+		JButton btnDeleteEntries = new JButton("DELETE DATA ENTRY TREE");
+		btnDeleteEntries.setBackground(Color.GRAY);
+		btnDeleteEntries.setForeground(Color.RED);
+
+		JButton btnCreateEntry = new JButton("Create New Entry");
+		btnCreateEntry.setBackground(Color.GRAY);
+		btnCreateEntry.setForeground(Color.WHITE);
+		GroupLayout gl_panel_3 = new GroupLayout(panel_3);
+		gl_panel_3.setHorizontalGroup(
+				gl_panel_3.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_panel_3.createSequentialGroup()
 						.addContainerGap()
-						.addGroup(gl_pnlManagement.createParallelGroup(Alignment.LEADING, false)
-								.addComponent(lblUserManagement)
-								.addGroup(gl_pnlManagement.createSequentialGroup()
-										.addGroup(gl_pnlManagement.createParallelGroup(Alignment.TRAILING)
-												.addComponent(btnModify, GroupLayout.PREFERRED_SIZE, 109, GroupLayout.PREFERRED_SIZE)
-												.addComponent(btnDemote, GroupLayout.PREFERRED_SIZE, 110, GroupLayout.PREFERRED_SIZE))
-												.addPreferredGap(ComponentPlacement.RELATED)
-												.addGroup(gl_pnlManagement.createParallelGroup(Alignment.TRAILING, false)
-														.addComponent(btnDelete, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-														.addComponent(btnPromote, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 110, Short.MAX_VALUE)))
-														.addComponent(userList, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-														.addContainerGap(2, Short.MAX_VALUE))
+						.addGroup(gl_panel_3.createParallelGroup(Alignment.LEADING)
+								.addComponent(lblDataTasks)
+								.addComponent(btnCreateEntry, GroupLayout.DEFAULT_SIZE, 190, Short.MAX_VALUE)
+								.addComponent(btnDeleteEntries, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 190, Short.MAX_VALUE))
+								.addContainerGap())
 				);
-		gl_pnlManagement.setVerticalGroup(
-				gl_pnlManagement.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_pnlManagement.createSequentialGroup()
+		gl_panel_3.setVerticalGroup(
+				gl_panel_3.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_panel_3.createSequentialGroup()
 						.addContainerGap()
-						.addComponent(lblUserManagement)
+						.addComponent(lblDataTasks)
 						.addPreferredGap(ComponentPlacement.RELATED)
-						.addComponent(userList, GroupLayout.DEFAULT_SIZE, 201, Short.MAX_VALUE)
-						.addPreferredGap(ComponentPlacement.UNRELATED)
-						.addGroup(gl_pnlManagement.createParallelGroup(Alignment.BASELINE)
-								.addComponent(btnDelete)
-								.addComponent(btnModify))
-								.addPreferredGap(ComponentPlacement.RELATED)
-								.addGroup(gl_pnlManagement.createParallelGroup(Alignment.BASELINE)
-										.addComponent(btnDemote)
-										.addComponent(btnPromote))
-										.addContainerGap())
+						.addComponent(btnCreateEntry)
+						.addPreferredGap(ComponentPlacement.RELATED)
+						.addComponent(btnDeleteEntries)
+						.addContainerGap(43, Short.MAX_VALUE))
 				);
-		pnlManagement.setLayout(gl_pnlManagement);
-		pnlAdministrationHolder.setLayout(gl_pnlAdministrationHolder);
+		panel_3.setLayout(gl_panel_3);
 
-		JPanel pnlFooter = new JPanel();
-		pnlFooter.setBorder(new LineBorder(new Color(0, 0, 0), 1, true));
-		pnlMain.add(pnlFooter, "cell 0 2,grow");
-		pnlFooter.setLayout(new MigLayout("", "[256px:n:256px][][][][][][][][][][][][][][][][]", "[]"));
+		JPanel panel_4 = new JPanel();
+		panel_4.setBorder(new LineBorder(Color.WHITE));
+		panel_4.setBackground(Color.DARK_GRAY);
+		pnlAdministrationHolder.add(panel_4, "cell 0 2,grow");
 
-		JProgressBar progressBar = new JProgressBar();
-		pnlFooter.add(progressBar, "cell 0 0,growx");
+		JLabel lblStatistics = new JLabel("Statistics");
+		lblStatistics.setForeground(Color.LIGHT_GRAY);
 
-		JLabel lblStatus = new JLabel("Idle.");
-		pnlFooter.add(lblStatus, "cell 1 0");
+		JLabel lblUsersHead = new JLabel("Users:");
+		lblUsersHead.setForeground(Color.WHITE);
 
-		JLabel lblUserStatus = new JLabel("User Status:");
-		pnlFooter.add(lblUserStatus, "cell 15 0");
+		JLabel lblUsersOnlineHead = new JLabel("Users Online:");
+		lblUsersOnlineHead.setForeground(Color.WHITE);
 
-		JLabel lblUserPermissions = new JLabel("XXXXXXXXXXXXX");
-		pnlFooter.add(lblUserPermissions, "cell 16 0");
+		JLabel lblDataEntriesHead = new JLabel("Data Entries:");
+		lblDataEntriesHead.setForeground(Color.WHITE);
 
+		JLabel lblServerUptimeHead = new JLabel("Server Uptime:");
+		lblServerUptimeHead.setForeground(Color.WHITE);
+
+		JLabel lblAdministratorsHead = new JLabel("Administrators:");
+		lblAdministratorsHead.setForeground(Color.WHITE);
+
+		JLabel lblTechnicalStatistics = new JLabel("Technical Statistics");
+		lblTechnicalStatistics.setForeground(Color.LIGHT_GRAY);
+
+		JLabel lblMemoryUsageHead = new JLabel("Memory Usage:");
+		lblMemoryUsageHead.setForeground(Color.WHITE);
+
+		JLabel lblNetworkOverheadHead = new JLabel("Network Overhead:");
+		lblNetworkOverheadHead.setForeground(Color.WHITE);
+
+		JLabel lblNetworkIpHead = new JLabel("Network IP:");
+		lblNetworkIpHead.setForeground(Color.WHITE);
+
+		JLabel lblUsers = new JLabel("XXX");
+		lblUsers.setFont(new Font("Tahoma", Font.BOLD, 11));
+		lblUsers.setForeground(Color.WHITE);
+
+		JLabel lblUsersOnline = new JLabel("XXX");
+		lblUsersOnline.setFont(new Font("Tahoma", Font.BOLD, 11));
+		lblUsersOnline.setForeground(Color.WHITE);
+
+		JLabel lblDataEntries = new JLabel("XXX");
+		lblDataEntries.setFont(new Font("Tahoma", Font.BOLD, 11));
+		lblDataEntries.setForeground(Color.WHITE);
+
+		JLabel lblServerUptime = new JLabel("XXX");
+		lblServerUptime.setFont(new Font("Tahoma", Font.BOLD, 11));
+		lblServerUptime.setForeground(Color.WHITE);
+
+		JLabel lblAdministrators = new JLabel("XXX");
+		lblAdministrators.setFont(new Font("Tahoma", Font.BOLD, 11));
+		lblAdministrators.setForeground(Color.WHITE);
+
+		JLabel lblMemoryUsage = new JLabel("XXX");
+		lblMemoryUsage.setFont(new Font("Tahoma", Font.BOLD, 11));
+		lblMemoryUsage.setForeground(Color.WHITE);
+
+		JLabel lblNetworkOverhead = new JLabel("XXX");
+		lblNetworkOverhead.setFont(new Font("Tahoma", Font.BOLD, 11));
+		lblNetworkOverhead.setForeground(Color.WHITE);
+
+		JLabel lblNetworkIP = new JLabel("XXX");
+		lblNetworkIP.setFont(new Font("Tahoma", Font.BOLD, 11));
+		lblNetworkIP.setForeground(Color.WHITE);
+		GroupLayout gl_panel_4 = new GroupLayout(panel_4);
+		gl_panel_4.setHorizontalGroup(
+				gl_panel_4.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_panel_4.createSequentialGroup()
+						.addContainerGap()
+						.addGroup(gl_panel_4.createParallelGroup(Alignment.LEADING)
+								.addGroup(gl_panel_4.createSequentialGroup()
+										.addGap(10)
+										.addGroup(gl_panel_4.createParallelGroup(Alignment.LEADING)
+												.addComponent(lblUsersHead)
+												.addComponent(lblUsersOnlineHead)
+												.addComponent(lblDataEntriesHead)
+												.addComponent(lblServerUptimeHead)
+												.addComponent(lblAdministratorsHead)))
+												.addComponent(lblStatistics)
+												.addComponent(lblTechnicalStatistics)
+												.addGroup(gl_panel_4.createSequentialGroup()
+														.addGap(10)
+														.addGroup(gl_panel_4.createParallelGroup(Alignment.LEADING)
+																.addComponent(lblNetworkOverheadHead)
+																.addComponent(lblMemoryUsageHead)
+																.addComponent(lblNetworkIpHead))))
+																.addPreferredGap(ComponentPlacement.RELATED, 42, Short.MAX_VALUE)
+																.addGroup(gl_panel_4.createParallelGroup(Alignment.LEADING, false)
+																		.addComponent(lblUsers, GroupLayout.DEFAULT_SIZE, 26, Short.MAX_VALUE)
+																		.addComponent(lblUsersOnline, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+																		.addComponent(lblDataEntries, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+																		.addComponent(lblServerUptime, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+																		.addComponent(lblAdministrators, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+																		.addComponent(lblMemoryUsage, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+																		.addComponent(lblNetworkOverhead, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+																		.addComponent(lblNetworkIP, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+																		.addContainerGap(28, Short.MAX_VALUE))
+				);
+		gl_panel_4.setVerticalGroup(
+				gl_panel_4.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_panel_4.createSequentialGroup()
+						.addContainerGap()
+						.addComponent(lblStatistics)
+						.addPreferredGap(ComponentPlacement.RELATED)
+						.addGroup(gl_panel_4.createParallelGroup(Alignment.BASELINE)
+								.addComponent(lblUsersHead)
+								.addComponent(lblUsers))
+								.addPreferredGap(ComponentPlacement.RELATED)
+								.addGroup(gl_panel_4.createParallelGroup(Alignment.BASELINE)
+										.addComponent(lblUsersOnlineHead)
+										.addComponent(lblUsersOnline))
+										.addPreferredGap(ComponentPlacement.RELATED)
+										.addGroup(gl_panel_4.createParallelGroup(Alignment.BASELINE)
+												.addComponent(lblDataEntriesHead)
+												.addComponent(lblDataEntries))
+												.addPreferredGap(ComponentPlacement.RELATED)
+												.addGroup(gl_panel_4.createParallelGroup(Alignment.BASELINE)
+														.addComponent(lblServerUptimeHead)
+														.addComponent(lblServerUptime))
+														.addPreferredGap(ComponentPlacement.RELATED)
+														.addGroup(gl_panel_4.createParallelGroup(Alignment.BASELINE)
+																.addComponent(lblAdministratorsHead)
+																.addComponent(lblAdministrators))
+																.addPreferredGap(ComponentPlacement.UNRELATED)
+																.addComponent(lblTechnicalStatistics)
+																.addPreferredGap(ComponentPlacement.RELATED)
+																.addGroup(gl_panel_4.createParallelGroup(Alignment.BASELINE)
+																		.addComponent(lblMemoryUsageHead)
+																		.addComponent(lblMemoryUsage))
+																		.addPreferredGap(ComponentPlacement.RELATED)
+																		.addGroup(gl_panel_4.createParallelGroup(Alignment.BASELINE)
+																				.addComponent(lblNetworkOverheadHead)
+																				.addComponent(lblNetworkOverhead))
+																				.addPreferredGap(ComponentPlacement.RELATED)
+																				.addGroup(gl_panel_4.createParallelGroup(Alignment.BASELINE)
+																						.addComponent(lblNetworkIpHead)
+																						.addComponent(lblNetworkIP))
+																						.addContainerGap(13, Short.MAX_VALUE))
+				);
+		panel_4.setLayout(gl_panel_4);
+		pnlInternalPane.setLayout(new BorderLayout(0, 0));
+
+		JPanel pnlDateSuper = new JPanel();
+		pnlDateSuper.setBackground(Color.BLACK);
+		pnlInternalPane.add(pnlDateSuper, BorderLayout.WEST);
+		pnlDateSuper.setLayout(new BoxLayout(pnlDateSuper, BoxLayout.X_AXIS));
+
+		JPanel pnlDateHolder = new JPanel();
+		pnlDateSuper.add(pnlDateHolder);
+		pnlDateHolder.setBorder(new BevelBorder(BevelBorder.RAISED, null, null, null, null));
+		pnlDateHolder.setLayout(new BorderLayout(0, 0));
+
+		pnlDate = new JPanel();
+		pnlDate.setForeground(Color.DARK_GRAY);
+		pnlDate.setBackground(Color.GRAY);
+		pnlDate.setBorder(new LineBorder(new Color(0, 0, 0)));
+		pnlDateHolder.add(pnlDate, BorderLayout.NORTH);
+		pnlDate.setLayout(new MigLayout("", "[][grow][][grow][]", "[14px]"));
+
+		lblMode = new JLabel("DATA_MODE");
+		lblMode.setForeground(Color.ORANGE);
+		pnlDate.add(lblMode, "cell 2 0,alignx left,aligny top");
+
+		listData = new JList<String>();
+		listData.setBackground(Color.DARK_GRAY);
+		listData.setForeground(Color.GREEN);
+		listData.setLayoutOrientation(JList.VERTICAL_WRAP);
+		pnlDateHolder.add(listData, BorderLayout.CENTER);
+		
+		Component horizontalStrut_2 = Box.createHorizontalStrut(8);
+		pnlDateSuper.add(horizontalStrut_2);
+		pnlInternalPane.add(tabbedPane);
+
+		Component verticalStrut = Box.createVerticalStrut(8);
+		pnlInternalPane.add(verticalStrut, BorderLayout.NORTH);
+
+		Component verticalStrut_1 = Box.createVerticalStrut(8);
+		pnlInternalPane.add(verticalStrut_1, BorderLayout.SOUTH);
+
+		Component horizontalStrut = Box.createHorizontalStrut(8);
+		pnlInternalPane.add(horizontalStrut, BorderLayout.EAST);
+		
 		hideControls();
 
 		eventHandler = new EventHandler();
@@ -550,6 +892,22 @@ public class AppletUI extends Applet{
 		JLoginDialog dialog = new JLoginDialog(clientMain);
 
 		eventTicker.start();
+
+		dateModel = new DefaultListModel<String>();
+		pilotModel = new DefaultListModel<String>();
+		nameModel = new DefaultListModel<String>();
+		flightModel = new DefaultListModel<String>();
+		trainingModel = new DefaultListModel<String>();
+		maintinenceModel = new DefaultListModel<String>();
+		userModel = new DefaultListModel<String>();
+		rankModel = new DefaultListModel<String>();
+		
+		tLogsList.setModel(trainingModel);
+		mLogsList.setModel(maintinenceModel);
+		listData.setModel(dateModel);
+		userList.setModel(userModel);
+		rankList.setModel(rankModel);
+		fLogsList.setModel(flightModel);
 	}
 
 
@@ -578,15 +936,7 @@ public class AppletUI extends Applet{
 		 * @param list JList.
 		 * @param data Any data set of String[].
 		 */
-		public void UpdateListWithArray(JList<String> list, String[] data) {
-			ListModel<String> model = list.getModel();
-			
-			DefaultListModel<String> defaultModel = new DefaultListModel<String>();
-			
-			for (int i = 0; i < model.getSize(); i++) { 
-				defaultModel.addElement(model.getElementAt(i));
-			}
-			
+		public void UpdateListWithArray(DefaultListModel<String> defaultModel, String[] data) {
 			//Search the List and check for extra values, remove them.
 			for(int i = 0; i < defaultModel.getSize(); i++){
 				Object o =  defaultModel.getElementAt(i);  
@@ -615,8 +965,6 @@ public class AppletUI extends Applet{
 					defaultModel.addElement(data[i]);
 				}
 			}
-			
-			list.setModel(defaultModel);
 		}
 
 		@Override
@@ -628,7 +976,10 @@ public class AppletUI extends Applet{
 				secondsTicker = 0;
 				uptime++;
 			}
-
+			
+			//Mesa Icon
+			pnlMesaIcon.getGraphics().drawImage(mesaIcon, 1, 1, 30, 30, superInstance);
+			
 			//Draw the Icon
 			pnlNotification1.getGraphics().drawImage(notify1Icon, 8, 8, pnlNotification1.getSize().width - 16, pnlNotification1.getSize().height - 16, superInstance);
 			pnlNotification2.getGraphics().drawImage(notify2Icon, 8, 8, pnlNotification2.getSize().width - 16, pnlNotification2.getSize().height - 16, superInstance);
@@ -642,20 +993,17 @@ public class AppletUI extends Applet{
 
 			lblTime.setText(convertUptime());
 
-			//Sort Visual Element
-			if (sortByDate) {
-				pnlDate.setBorder(BorderFactory.createLoweredBevelBorder());
-				pnlPilot.setBorder(new SoftBevelBorder(BevelBorder.RAISED, null, null, null, null));
-				pnlAircraftName.setBorder(new SoftBevelBorder(BevelBorder.RAISED, null, null, null, null));
-			}else if (sortByPilot) {
-				pnlPilot.setBorder(BorderFactory.createLoweredBevelBorder());
-				pnlDate.setBorder(new SoftBevelBorder(BevelBorder.RAISED, null, null, null, null));
-				pnlAircraftName.setBorder(new SoftBevelBorder(BevelBorder.RAISED, null, null, null, null));
-			}else if (sortByName) {
-				pnlAircraftName.setBorder(BorderFactory.createLoweredBevelBorder());
-				pnlDate.setBorder(new SoftBevelBorder(BevelBorder.RAISED, null, null, null, null));
-				pnlPilot.setBorder(new SoftBevelBorder(BevelBorder.RAISED, null, null, null, null));
-			}
+			//Set the JList modality based on the Mode, and the JLabel
+			if (dataMode.equals(DATA_MODE.MODE_AIRCRAFT)) {
+				lblMode.setText("Aircraft");
+				listData.setModel(nameModel);
+			}else if (dataMode.equals(DATA_MODE.MODE_DATE)) {
+				lblMode.setText("Date");
+				listData.setModel(dateModel);
+			}else if (dataMode.equals(DATA_MODE.MODE_PILOT)) {
+				lblMode.setText("Pilot");
+				listData.setModel(pilotModel);
+			} 
 		}
 
 		public String convertUptime() {
