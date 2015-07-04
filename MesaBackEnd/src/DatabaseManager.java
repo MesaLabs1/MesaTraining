@@ -55,17 +55,45 @@ public class DatabaseManager {
 	Document doc;
 
 	public enum FieldType {
-		Pilots, 
-		Aircrafts, 
-		Dates, 
-		Logs
+		PILOTS ("Pilots"), 
+		AIRCRAFTS ("Aircrafts"), 
+		DATES ("Dates"), 
+		LOGS ("Logs");
+		
+		private final String name;       
+
+	    private FieldType(String s) {
+	        name = s;
+	    }
+
+	    public boolean equalsName(String otherName){
+	        return (otherName == null)? false:name.equals(otherName);
+	    }
+
+	    public String toString(){
+	       return name;
+	    }
 	}
 
 	public enum FieldSubType {
-		None, 
-		Training, 
-		Flight, 
-		Maintinence
+		NONE ("None"), 
+		TRAINING ("Training"), 
+		FLIGHT ("Flight"), 
+		MAINTINENCE ("Maintinence");
+		
+		private final String name;       
+
+	    private FieldSubType(String s) {
+	        name = s;
+	    }
+
+	    public boolean equalsName(String otherName){
+	        return (otherName == null)? false:name.equals(otherName);
+	    }
+
+	    public String toString(){
+	       return name;
+	    }
 	}
 
 	public DatabaseManager(Utils ut, UI u) {
@@ -269,7 +297,7 @@ public class DatabaseManager {
 
 	synchronized public String[] RequestField(FieldType type, FieldSubType subtype) {
 		NodeList nList = null;
-		if (type.equals(FieldType.Logs)) {		//Let's access by the tag we want, not the superlevel.
+		if (type.equals(FieldType.LOGS)) {		//Let's access by the tag we want, not the superlevel.
 			nList = doc.getElementsByTagName(subtype.toString());
 		}else {
 			nList = doc.getElementsByTagName(type.toString());

@@ -286,12 +286,12 @@ public class Backend {
 		}
 		
 		public void UpdatePayload() {
-			payload.setDateModel(ConvertArrayToModel(dbMan.RequestField(DatabaseManager.FieldType.Dates, DatabaseManager.FieldSubType.None)));
-			payload.setPilotModel(ConvertArrayToModel(dbMan.RequestField(DatabaseManager.FieldType.Pilots, DatabaseManager.FieldSubType.None)));
-			payload.setNameModel(ConvertArrayToModel(dbMan.RequestField(DatabaseManager.FieldType.Aircrafts, DatabaseManager.FieldSubType.None)));
-			payload.setFlightModel(ConvertArrayToModel(dbMan.RequestField(DatabaseManager.FieldType.Logs, DatabaseManager.FieldSubType.Flight)));
-			payload.setMaintinenceModel(ConvertArrayToModel(dbMan.RequestField(DatabaseManager.FieldType.Logs, DatabaseManager.FieldSubType.Maintinence)));
-			payload.setTrainingModel(ConvertArrayToModel(dbMan.RequestField(DatabaseManager.FieldType.Logs, DatabaseManager.FieldSubType.Training)));
+			payload.setDateModel(ConvertArrayToModel(dbMan.RequestField(DatabaseManager.FieldType.DATES, DatabaseManager.FieldSubType.NONE)));
+			payload.setPilotModel(ConvertArrayToModel(dbMan.RequestField(DatabaseManager.FieldType.PILOTS, DatabaseManager.FieldSubType.NONE)));
+			payload.setNameModel(ConvertArrayToModel(dbMan.RequestField(DatabaseManager.FieldType.AIRCRAFTS, DatabaseManager.FieldSubType.NONE)));
+			payload.setFlightModel(ConvertArrayToModel(dbMan.RequestField(DatabaseManager.FieldType.LOGS, DatabaseManager.FieldSubType.FLIGHT)));
+			payload.setMaintinenceModel(ConvertArrayToModel(dbMan.RequestField(DatabaseManager.FieldType.LOGS, DatabaseManager.FieldSubType.MAINTINENCE)));
+			payload.setTrainingModel(ConvertArrayToModel(dbMan.RequestField(DatabaseManager.FieldType.LOGS, DatabaseManager.FieldSubType.TRAINING)));
 		}
 		
 		public DefaultListModel<String> ConvertArrayToModel(String[] in) {
@@ -478,7 +478,12 @@ public class Backend {
 
 										String request = in.readUTF();
 										if (request.equals("$NOREQUEST")) {
-											//No request at this time, reparse.
+											/*
+											 * The below code handles primitive commands for data manipulations, so lets serialize the class object on our downtime.
+											 * Bear in mind that since our client is read only, and we handle our transforms above, we do not need to read
+											 * in from the client. This is a one way conversation.
+											 */
+											oos.writeObject(payload);	
 										}else {
 											if (request.startsWith("$MSG")) {					//We can use MSG to send information from the client directly to the console, here. This is for debugging.
 												String msg = request.substring("$MSG ".length(), request.length());
@@ -552,13 +557,6 @@ public class Backend {
 												}
 											}
 										}
-										/*
-										 * The above code handles primitive commands for data manipulations, now lets serialize the class object.
-										 * Bear in mind that since our client is read only, and we handle our transforms above, we do not need to read
-										 * in from the client. This is a one way conversation.
-										 */
-										oos.writeObject(payload);	
-										
 										
 										ui.progressBar.setValue(100);
 										ui.numOverhead--;

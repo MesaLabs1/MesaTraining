@@ -97,7 +97,7 @@ public class AppletUI extends Applet{
 	JLabel lblTime;
 	JLabel lblUserPermissions;
 	JLabel lblMode;
-	
+
 	JLabel lblUsers;
 	JLabel lblUsersOnline;
 	JLabel lblNetworkOverhead;
@@ -105,13 +105,13 @@ public class AppletUI extends Applet{
 	JLabel lblBufferSize;
 	JLabel lblNetworkIP;
 	JLabel lblMemoryUsage;
-	
+
 	JPanel pnlNotification1;
 	JPanel pnlNotification2;
 	JPanel pnlNotification3;
 	JPanel pnlDate;
 	JPanel pnlMesaIcon;
-	
+
 
 	JList<String> listData;
 	JList<String> fLogsList;
@@ -124,14 +124,6 @@ public class AppletUI extends Applet{
 	ArrayList<Component> adminElements;
 	ArrayList<Component> superadminElements;
 
-	DefaultListModel<String> dateModel;
-	DefaultListModel<String> pilotModel;
-	DefaultListModel<String> nameModel;
-	DefaultListModel<String> flightModel;
-	DefaultListModel<String> trainingModel;
-	DefaultListModel<String> maintinenceModel;
-	DefaultListModel<String> userModel;
-	DefaultListModel<String> rankModel;
 	DefaultListModel<String> consoleModel;
 
 	DATA_MODE dataMode;
@@ -176,7 +168,7 @@ public class AppletUI extends Applet{
 		setBackground(Color.BLACK);
 		//We auto-set the default data modality to date-sorted.
 		dataMode = DATA_MODE.MODE_DATE;
-		
+
 		consoleModel = new DefaultListModel<String>();
 		client = new Client(this);
 
@@ -349,16 +341,16 @@ public class AppletUI extends Applet{
 		lblStatus.setForeground(Color.WHITE);
 		pnlFooter.add(lblStatus, "cell 1 0");
 
-//		JButton btnRefresh = new JButton("Refresh");
-//		btnRefresh.addMouseListener(new MouseAdapter() {
-//			@Override
-//			public void mouseClicked(MouseEvent arg0) {
-//				client.netTicker.Refresh();
-//			}
-//		});
-//		btnRefresh.setBackground(Color.GRAY);
-//		btnRefresh.setForeground(Color.WHITE);
-//		pnlFooter.add(btnRefresh, "cell 4 0");
+		//		JButton btnRefresh = new JButton("Refresh");
+		//		btnRefresh.addMouseListener(new MouseAdapter() {
+		//			@Override
+		//			public void mouseClicked(MouseEvent arg0) {
+		//				client.netTicker.Refresh();
+		//			}
+		//		});
+		//		btnRefresh.setBackground(Color.GRAY);
+		//		btnRefresh.setForeground(Color.WHITE);
+		//		pnlFooter.add(btnRefresh, "cell 4 0");
 
 		JLabel lblUserStatus = new JLabel("User Status:");
 		lblUserStatus.setForeground(Color.WHITE);
@@ -406,8 +398,6 @@ public class AppletUI extends Applet{
 		JButton btnChange_2 = new JButton("Change");
 		btnChange_2.setForeground(Color.WHITE);
 		btnChange_2.setBackground(Color.GRAY);
-
-
 
 		JButton btnRemove_2 = new JButton("Remove");
 		btnRemove_2.setForeground(Color.WHITE);
@@ -690,7 +680,7 @@ public class AppletUI extends Applet{
 		listConsole.setForeground(Color.GREEN);
 		listConsole.setBackground(Color.GRAY);
 		panel_5.add(listConsole, "cell 0 1,grow");
-		
+
 		listConsole.setModel(consoleModel);
 
 		inputField = new JTextField();
@@ -811,73 +801,73 @@ public class AppletUI extends Applet{
 		lblNetworkIP.setForeground(Color.WHITE);
 		GroupLayout gl_panel_4 = new GroupLayout(panel_4);
 		gl_panel_4.setHorizontalGroup(
-			gl_panel_4.createParallelGroup(Alignment.LEADING)
+				gl_panel_4.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_panel_4.createSequentialGroup()
-					.addContainerGap()
-					.addGroup(gl_panel_4.createParallelGroup(Alignment.LEADING)
-						.addGroup(gl_panel_4.createSequentialGroup()
-							.addGap(10)
-							.addGroup(gl_panel_4.createParallelGroup(Alignment.LEADING)
-								.addComponent(lblUsersHead)
-								.addComponent(lblUsersOnlineHead)
-								.addComponent(lblLocalSize)
-								.addComponent(lblServerUptimeHead)))
-						.addComponent(lblStatistics)
-						.addComponent(lblTechnicalStatistics)
-						.addGroup(gl_panel_4.createSequentialGroup()
-							.addGap(10)
-							.addGroup(gl_panel_4.createParallelGroup(Alignment.LEADING)
-								.addComponent(lblNetworkOverheadHead)
-								.addComponent(lblMemoryUsageHead)
-								.addComponent(lblNetworkIpHead))))
-					.addPreferredGap(ComponentPlacement.RELATED, 41, Short.MAX_VALUE)
-					.addGroup(gl_panel_4.createParallelGroup(Alignment.LEADING, false)
-						.addComponent(lblUsers, GroupLayout.DEFAULT_SIZE, 26, Short.MAX_VALUE)
-						.addComponent(lblUsersOnline, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-						.addComponent(lblBufferSize, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-						.addComponent(lblServerUptime, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-						.addComponent(lblMemoryUsage, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-						.addComponent(lblNetworkOverhead, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-						.addComponent(lblNetworkIP, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-					.addContainerGap(28, Short.MAX_VALUE))
-		);
+						.addContainerGap()
+						.addGroup(gl_panel_4.createParallelGroup(Alignment.LEADING)
+								.addGroup(gl_panel_4.createSequentialGroup()
+										.addGap(10)
+										.addGroup(gl_panel_4.createParallelGroup(Alignment.LEADING)
+												.addComponent(lblUsersHead)
+												.addComponent(lblUsersOnlineHead)
+												.addComponent(lblLocalSize)
+												.addComponent(lblServerUptimeHead)))
+												.addComponent(lblStatistics)
+												.addComponent(lblTechnicalStatistics)
+												.addGroup(gl_panel_4.createSequentialGroup()
+														.addGap(10)
+														.addGroup(gl_panel_4.createParallelGroup(Alignment.LEADING)
+																.addComponent(lblNetworkOverheadHead)
+																.addComponent(lblMemoryUsageHead)
+																.addComponent(lblNetworkIpHead))))
+																.addPreferredGap(ComponentPlacement.RELATED, 41, Short.MAX_VALUE)
+																.addGroup(gl_panel_4.createParallelGroup(Alignment.LEADING, false)
+																		.addComponent(lblUsers, GroupLayout.DEFAULT_SIZE, 26, Short.MAX_VALUE)
+																		.addComponent(lblUsersOnline, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+																		.addComponent(lblBufferSize, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+																		.addComponent(lblServerUptime, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+																		.addComponent(lblMemoryUsage, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+																		.addComponent(lblNetworkOverhead, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+																		.addComponent(lblNetworkIP, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+																		.addContainerGap(28, Short.MAX_VALUE))
+				);
 		gl_panel_4.setVerticalGroup(
-			gl_panel_4.createParallelGroup(Alignment.LEADING)
+				gl_panel_4.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_panel_4.createSequentialGroup()
-					.addContainerGap()
-					.addComponent(lblStatistics)
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addGroup(gl_panel_4.createParallelGroup(Alignment.BASELINE)
-						.addComponent(lblUsersHead)
-						.addComponent(lblUsers))
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addGroup(gl_panel_4.createParallelGroup(Alignment.BASELINE)
-						.addComponent(lblUsersOnlineHead)
-						.addComponent(lblUsersOnline))
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addGroup(gl_panel_4.createParallelGroup(Alignment.BASELINE)
-						.addComponent(lblLocalSize)
-						.addComponent(lblBufferSize))
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addGroup(gl_panel_4.createParallelGroup(Alignment.BASELINE)
-						.addComponent(lblServerUptimeHead)
-						.addComponent(lblServerUptime))
-					.addGap(31)
-					.addComponent(lblTechnicalStatistics)
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addGroup(gl_panel_4.createParallelGroup(Alignment.BASELINE)
-						.addComponent(lblMemoryUsageHead)
-						.addComponent(lblMemoryUsage))
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addGroup(gl_panel_4.createParallelGroup(Alignment.BASELINE)
-						.addComponent(lblNetworkOverheadHead)
-						.addComponent(lblNetworkOverhead))
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addGroup(gl_panel_4.createParallelGroup(Alignment.BASELINE)
-						.addComponent(lblNetworkIpHead)
-						.addComponent(lblNetworkIP))
-					.addContainerGap(39, Short.MAX_VALUE))
-		);
+						.addContainerGap()
+						.addComponent(lblStatistics)
+						.addPreferredGap(ComponentPlacement.RELATED)
+						.addGroup(gl_panel_4.createParallelGroup(Alignment.BASELINE)
+								.addComponent(lblUsersHead)
+								.addComponent(lblUsers))
+								.addPreferredGap(ComponentPlacement.RELATED)
+								.addGroup(gl_panel_4.createParallelGroup(Alignment.BASELINE)
+										.addComponent(lblUsersOnlineHead)
+										.addComponent(lblUsersOnline))
+										.addPreferredGap(ComponentPlacement.RELATED)
+										.addGroup(gl_panel_4.createParallelGroup(Alignment.BASELINE)
+												.addComponent(lblLocalSize)
+												.addComponent(lblBufferSize))
+												.addPreferredGap(ComponentPlacement.RELATED)
+												.addGroup(gl_panel_4.createParallelGroup(Alignment.BASELINE)
+														.addComponent(lblServerUptimeHead)
+														.addComponent(lblServerUptime))
+														.addGap(31)
+														.addComponent(lblTechnicalStatistics)
+														.addPreferredGap(ComponentPlacement.RELATED)
+														.addGroup(gl_panel_4.createParallelGroup(Alignment.BASELINE)
+																.addComponent(lblMemoryUsageHead)
+																.addComponent(lblMemoryUsage))
+																.addPreferredGap(ComponentPlacement.RELATED)
+																.addGroup(gl_panel_4.createParallelGroup(Alignment.BASELINE)
+																		.addComponent(lblNetworkOverheadHead)
+																		.addComponent(lblNetworkOverhead))
+																		.addPreferredGap(ComponentPlacement.RELATED)
+																		.addGroup(gl_panel_4.createParallelGroup(Alignment.BASELINE)
+																				.addComponent(lblNetworkIpHead)
+																				.addComponent(lblNetworkIP))
+																				.addContainerGap(39, Short.MAX_VALUE))
+				);
 		panel_4.setLayout(gl_panel_4);
 		pnlInternalPane.setLayout(new BorderLayout(0, 0));
 
@@ -906,30 +896,7 @@ public class AppletUI extends Applet{
 		listData = new JList<String>();
 		listData.addListSelectionListener(new ListSelectionListener() {
 			public void valueChanged(ListSelectionEvent arg0) {
-				//The value in the main list was changed, we need to do a search for the data we need. First, what sort mode are we?
-				String[][] logs = null;
-				if (dataMode.equals(DATA_MODE.MODE_AIRCRAFT)) {
-					logs = client.dataManager.GetLogsByAircraft(listData.getSelectedValue());
-				}else if (dataMode.equals(DATA_MODE.MODE_DATE)) {
-					logs = client.dataManager.GetLogsByDate(listData.getSelectedValue());
-				}else if (dataMode.equals(DATA_MODE.MODE_PILOT)) {
-					logs = client.dataManager.GetLogsByPilot(listData.getSelectedValue());
-				} 
-				if (logs != null) {
-					if (logs[0] != null) {
-						eventHandler.UpdateListWithArray(flightModel, logs[0]);
-					}
-					if (logs[1] != null) {
-						eventHandler.UpdateListWithArray(trainingModel, logs[1]);
-					}
-					if (logs[2] != null) {
-						eventHandler.UpdateListWithArray(maintinenceModel, logs[2]);
-					}
-				}else {
-					flightModel.clear();
-					trainingModel.clear();
-					maintinenceModel.clear();
-				}
+
 			}
 		});
 		listData.setBackground(Color.DARK_GRAY);
@@ -960,22 +927,6 @@ public class AppletUI extends Applet{
 		JLoginDialog dialog = new JLoginDialog(client);
 
 		eventTicker.start();
-
-		dateModel = new DefaultListModel<String>();
-		pilotModel = new DefaultListModel<String>();
-		nameModel = new DefaultListModel<String>();
-		flightModel = new DefaultListModel<String>();
-		trainingModel = new DefaultListModel<String>();
-		maintinenceModel = new DefaultListModel<String>();
-		userModel = new DefaultListModel<String>();
-		rankModel = new DefaultListModel<String>();
-		
-		tLogsList.setModel(trainingModel);
-		mLogsList.setModel(maintinenceModel);
-		listData.setModel(dateModel);
-		userList.setModel(userModel);
-		rankList.setModel(rankModel);
-		fLogsList.setModel(flightModel);
 	}
 
 
@@ -1047,31 +998,32 @@ public class AppletUI extends Applet{
 
 			//Mesa Icon
 			pnlMesaIcon.getGraphics().drawImage(mesaIcon, 1, 1, 30, 30, superInstance);
-
-			//			//Draw the Icon
-			//			pnlNotification1.getGraphics().drawImage(notify1Icon, 8, 8, pnlNotification1.getSize().width - 16, pnlNotification1.getSize().height - 16, superInstance);
-			//			pnlNotification2.getGraphics().drawImage(notify2Icon, 8, 8, pnlNotification2.getSize().width - 16, pnlNotification2.getSize().height - 16, superInstance);
-			//			pnlNotification3.getGraphics().drawImage(notify3Icon, 8, 8, pnlNotification3.getSize().width - 16, pnlNotification3.getSize().height - 16, superInstance);
-			//
-			//			//Draw the Blip
-			//			superInstance.getGraphics().drawImage(notifyPop, pnlNotification1.getLocation().x + pnlNotification1.getSize().width - 16, pnlNotification1.getLocation().y + pnlNotification1.getSize().height - 18, 24, 24, superInstance);
-
-			//Fill the Blip with a number
-			//			superInstance.getGraphics().drawString("0", pnlNotification1.getLocation().x + pnlNotification1.getSize().width - 8, pnlNotification1.getLocation().y + 30);
-
 			lblTime.setText(convertUptime());
 
-			//Set the JList modality based on the Mode, and the JLabel
-			if (dataMode.equals(DATA_MODE.MODE_AIRCRAFT)) {
-				lblMode.setText("Aircraft");
-				listData.setModel(nameModel);
-			}else if (dataMode.equals(DATA_MODE.MODE_DATE)) {
-				lblMode.setText("Date");
-				listData.setModel(dateModel);
-			}else if (dataMode.equals(DATA_MODE.MODE_PILOT)) {
-				lblMode.setText("Pilot");
-				listData.setModel(pilotModel);
-			} 
+			if (client.payload != null && client.authenticated == true) {
+				try {
+					tLogsList.setModel(client.payload.getTrainingModel());
+					mLogsList.setModel(client.payload.getMaintinenceModel());
+					listData.setModel(client.payload.getDateModel());
+					userList.setModel(client.payload.getUserModel());
+					rankList.setModel(client.payload.getRankModel());
+					fLogsList.setModel(client.payload.getFlightModel());
+
+					//Set the JList modality based on the Mode, and the JLabel
+					if (dataMode.equals(DATA_MODE.MODE_AIRCRAFT)) {
+						lblMode.setText("Aircraft");
+						listData.setModel(client.payload.getNameModel());
+					}else if (dataMode.equals(DATA_MODE.MODE_DATE)) {
+						lblMode.setText("Date");
+						listData.setModel(client.payload.getDateModel());
+					}else if (dataMode.equals(DATA_MODE.MODE_PILOT)) {
+						lblMode.setText("Pilot");
+						listData.setModel(client.payload.getPilotModel());
+					}
+				}catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
 
 			//Show/Hide controls based on rank
 			if (client != null && client.connection != null) {
