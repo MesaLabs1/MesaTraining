@@ -34,7 +34,7 @@ public class Backend {
 
 	//DatabaseRunner -- something witty
 	DatabaseManager dbMan;
-	
+
 	//Payload -- Gold!
 	Payload payload;
 
@@ -76,7 +76,7 @@ public class Backend {
 		Backend backend;
 		UI ui;
 		NetworkMaster netMaster;
-		
+
 		int second = 10;
 
 		public EventHandler() {
@@ -115,13 +115,13 @@ public class Backend {
 			}
 
 			netMaster.UpdateUI();
-			
+
 			//We call this to reload the payload class data for its sync.
 			netMaster.UpdatePayload();
-		
+
 			if (second == 0) {
 				second = 10;
-				
+
 				ui.opsCount = ui.accessCount;
 				ui.accessCount = 0;
 			}else {
@@ -294,26 +294,55 @@ public class Backend {
 				}
 			}
 		}
-		
+
 		public void UpdatePayload() {
 			payload.setDateModel(ConvertArrayToModel(dbMan.RequestField(DatabaseManager.FieldType.DATES, DatabaseManager.FieldSubType.NONE)));
 			payload.setPilotModel(ConvertArrayToModel(dbMan.RequestField(DatabaseManager.FieldType.PILOTS, DatabaseManager.FieldSubType.NONE)));
 			payload.setNameModel(ConvertArrayToModel(dbMan.RequestField(DatabaseManager.FieldType.AIRCRAFTS, DatabaseManager.FieldSubType.NONE)));
-			payload.setFlightModel(ConvertArrayToModel(dbMan.RequestField(DatabaseManager.FieldType.LOGS, DatabaseManager.FieldSubType.FLIGHT)));
-			payload.setMaintinenceModel(ConvertArrayToModel(dbMan.RequestField(DatabaseManager.FieldType.LOGS, DatabaseManager.FieldSubType.MAINTINENCE)));
-			payload.setTrainingModel(ConvertArrayToModel(dbMan.RequestField(DatabaseManager.FieldType.LOGS, DatabaseManager.FieldSubType.TRAINING)));
-		
-			payload.setNumUsers(dbMan.GetUserCount());
+			payload.setFlightLogs(dbMan.RequestField(DatabaseManager.FieldType.LOGS, DatabaseManager.FieldSubType.FLIGHT));
+			payload.setMaintinenceLogs(dbMan.RequestField(DatabaseManager.FieldType.LOGS, DatabaseManager.FieldSubType.MAINTINENCE));
+			payload.setTrainingLogs(dbMan.RequestField(DatabaseManager.FieldType.LOGS, DatabaseManager.FieldSubType.TRAINING));
+			
+			String[] ranklist = dbMan.RequestRankList();
+			DefaultListModel<String> userModel = new DefaultListModel<String>();
+			DefaultListModel<String> rankModel = new DefaultListModel<String>();
+			if (ranklist != null) {
+				for (String s : ranklist) {
+					String username = s.split(";")[0];
+					String rank = s.split(";")[1];
+					userModel.addElement(username);
+					rankModel.addElement(rank);
+				}
+				payload.setUserModel(userModel);
+				payload.setRankModel(rankModel);
+			}
+			
+			int count = dbMan.GetUserCount();
+			if (count > 0) {
+				payload.setNumUsers(count);
+			}
+
 			payload.setNumOnline(ui.numClients);
-			payload.setNetIP(netMaster.GetCurrentSocket().getInetAddress().toString());
-			payload.setNumOverhead(ui.numOverall);
+			if (netMaster != null && netMaster.socket != null) {
+				payload.setNetIP(netMaster.socket.getInetAddress().toString());
+			}
+			payload.setNumOverhead(ui.opsCount);
 			payload.setUptime(ui.lblUptime.getText());
+			payload.setMemUsage(ui.lblMemUsage.getText());
 		}
-		
+
 		public DefaultListModel<String> ConvertArrayToModel(String[] in) {
 			DefaultListModel<String> model = new DefaultListModel<String>();
 			for (String s : in) {
-				model.addElement(s);
+				boolean found = false;
+				for (int i = 0; i < model.size(); i++) {
+					if (s.equals(model.elementAt(i))) {
+						found = true;
+					}
+				}
+				if (!found) {
+					model.addElement(s);
+				}
 			}
 			return model;
 		}
@@ -372,9 +401,9 @@ public class Backend {
 
 					in = new DataInputStream(server.getInputStream());
 					out = new DataOutputStream(server.getOutputStream());
-					
+
 					oos = new ObjectOutputStream(server.getOutputStream());
-		           
+
 					util.Log("You've awoken " + name + " on port " + server.getLocalPort() + ".");
 					util.Log("[" + name + "] Authorizing " + server.getRemoteSocketAddress() + "...");
 
@@ -502,6 +531,7 @@ public class Backend {
 											 * Bear in mind that since our client is read only, and we handle our transforms above, we do not need to read
 											 * in from the client. This is a one way conversation.
 											 */
+											oos.reset();
 											oos.writeObject(payload);	
 										}else {
 											if (request.startsWith("$MSG")) {					//We can use MSG to send information from the client directly to the console, here. This is for debugging.
@@ -563,7 +593,7 @@ public class Backend {
 												}
 											}
 										}
-										
+
 										ui.progressBar.setValue(100);
 										ui.numOverhead--;
 									}
@@ -590,7 +620,7 @@ public class Backend {
 					//e.printStackTrace();
 					break;
 				}
-				
+
 				try {
 					oos.close();
 					in.close();
@@ -599,7 +629,7 @@ public class Backend {
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
-				
+
 				ui.numOverhead--;
 				active = false;
 			}

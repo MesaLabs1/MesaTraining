@@ -177,7 +177,7 @@ public class AppletUI extends Applet{
 		 */
 		try {
 			UIManager.setLookAndFeel("com.sun.java.swing.plaf.gtk.GTKLookAndFeel");
-			
+
 			/**
 			 * A Button Mnemonic is the key a user has to press to activate that button automatically.
 			 * Since we want the program to display them, when the user hits ALT, the mnemonic will display.
@@ -186,13 +186,13 @@ public class AppletUI extends Applet{
 		}catch (UnsupportedLookAndFeelException e) {
 			e.printStackTrace();
 		}catch (ClassNotFoundException e) {
-			
+
 		}catch (InstantiationException e) {
 			e.printStackTrace();
 		}catch (IllegalAccessException e) {
 			e.printStackTrace();
 		}
-		
+
 		setBackground(Color.BLACK);
 		//We auto-set the default data modality to date-sorted.
 		dataMode = DATA_MODE.MODE_DATE;
@@ -266,6 +266,7 @@ public class AppletUI extends Applet{
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
 				dataMode = DATA_MODE.MODE_PILOT;
+				client.Log("Switching to Pilot Mode...");
 			}
 		});
 		btnPilotMode.setBackground(Color.GRAY);
@@ -277,6 +278,7 @@ public class AppletUI extends Applet{
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				dataMode = DATA_MODE.MODE_AIRCRAFT;
+				client.Log("Switching to Aircraft Mode...");
 			}
 		});
 		btnAircraftMode.setBackground(Color.GRAY);
@@ -288,6 +290,7 @@ public class AppletUI extends Applet{
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				dataMode = DATA_MODE.MODE_DATE;
+				client.Log("Switching to Date Mode...");
 			}
 		});
 		btnDateMode.setBackground(Color.GRAY);
@@ -368,17 +371,6 @@ public class AppletUI extends Applet{
 		JLabel lblStatus = new JLabel("Idle.");
 		lblStatus.setForeground(Color.WHITE);
 		pnlFooter.add(lblStatus, "cell 1 0");
-
-		//		JButton btnRefresh = new JButton("Refresh");
-		//		btnRefresh.addMouseListener(new MouseAdapter() {
-		//			@Override
-		//			public void mouseClicked(MouseEvent arg0) {
-		//				client.netTicker.Refresh();
-		//			}
-		//		});
-		//		btnRefresh.setBackground(Color.GRAY);
-		//		btnRefresh.setForeground(Color.WHITE);
-		//		pnlFooter.add(btnRefresh, "cell 4 0");
 
 		JLabel lblUserStatus = new JLabel("User Status:");
 		lblUserStatus.setForeground(Color.WHITE);
@@ -634,8 +626,8 @@ public class AppletUI extends Applet{
 		btnPromote.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
-				client.Log("Sending PROMOTE request...");
-				client.connection.RemoteRequest("$PROMOTE " + userList.getSelectedValue());
+				client.Log("Sending PROMOTE request for '" + userList.getSelectedValue() + "'...");
+				client.instance.RemoteRequest("$PROMOTE " + userList.getSelectedValue());
 			}
 		});
 		btnPromote.setForeground(Color.WHITE);
@@ -645,8 +637,8 @@ public class AppletUI extends Applet{
 		btnDemote.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
-				client.Log("Sending DEMOTE request...");
-				client.connection.RemoteRequest("$DEMOTE " + userList.getSelectedValue());
+				client.Log("Sending DEMOTE request for '" + userList.getSelectedValue() + "'...");
+				client.instance.RemoteRequest("$DEMOTE " + userList.getSelectedValue());
 			}
 		});
 		btnDemote.setForeground(Color.WHITE);
@@ -771,7 +763,7 @@ public class AppletUI extends Applet{
 		JPanel panel_4 = new JPanel();
 		panel_4.setBorder(new LineBorder(Color.WHITE));
 		panel_4.setBackground(Color.DARK_GRAY);
-		pnlAdministrationHolder.add(panel_4, "cell 0 2,grow");
+		pnlAdministrationHolder.add(panel_4, "cell 0 2,growx,aligny top");
 
 		JLabel lblStatistics = new JLabel("Statistics");
 		lblStatistics.setForeground(Color.LIGHT_GRAY);
@@ -794,7 +786,7 @@ public class AppletUI extends Applet{
 		JLabel lblMemoryUsageHead = new JLabel("Memory Usage:");
 		lblMemoryUsageHead.setForeground(Color.WHITE);
 
-		JLabel lblNetworkOverheadHead = new JLabel("Network ops/second:");
+		JLabel lblNetworkOverheadHead = new JLabel("Ops/second:");
 		lblNetworkOverheadHead.setForeground(Color.WHITE);
 
 		JLabel lblNetworkIpHead = new JLabel("Network IP:");
@@ -922,9 +914,39 @@ public class AppletUI extends Applet{
 		pnlDate.add(lblMode, "cell 2 0,alignx left,aligny top");
 
 		listData = new JList<String>();
+		listData.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		listData.addListSelectionListener(new ListSelectionListener() {
 			public void valueChanged(ListSelectionEvent arg0) {
+				if (client.payload != null && listData.getSelectedValue() != null) {
+					String selection = listData.getSelectedValue();
+					ArrayList<Payload.Entry> entries = null;
+					if (dataMode.equals(DATA_MODE.MODE_AIRCRAFT)) {
+						entries = client.payload.getDataByAircraft(selection);
+					}else if (dataMode.equals(DATA_MODE.MODE_PILOT)) {
 
+					}else if (dataMode.equals(DATA_MODE.MODE_AIRCRAFT)) {
+
+					} 
+					if (entries != null) {
+						ArrayList<String> training = new ArrayList<String>();
+						ArrayList<String> flight = new ArrayList<String>();
+						ArrayList<String> maintinence = new ArrayList<String>();
+						for (Payload.Entry entry : entries) {
+							for (String s : entry.getTrainingData()) {
+								training.add(s);
+							}
+							for (String s : entry.getFlightData()) {
+								flight.add(s);
+							}
+							for (String s : entry.getMaintinenceData()) {
+								maintinence.add(s);
+							}
+						}
+						tLogsList.setModel(ConvertArrayToModel(training));
+						fLogsList.setModel(ConvertArrayToModel(flight));
+						mLogsList.setModel(ConvertArrayToModel(maintinence));
+					}
+				}
 			}
 		});
 		listData.setBackground(Color.DARK_GRAY);
@@ -956,6 +978,14 @@ public class AppletUI extends Applet{
 
 		eventTicker.start();
 	}
+	
+	public DefaultListModel<String> ConvertArrayToModel(ArrayList<String> s) {
+		DefaultListModel<String> out = new DefaultListModel<String>();
+		for (String a : s) {
+			out.addElement(a);
+		}
+		return out;
+	}
 
 
 	public void hideControls() {
@@ -978,42 +1008,6 @@ public class AppletUI extends Applet{
 			superInstance = AppletUI.this;
 		}
 
-		/**
-		 * You can feed this method a JList and String[] to update that JList with the contents of the Array.
-		 * @param list JList.
-		 * @param data Any data set of String[].
-		 */
-		public void UpdateListWithArray(DefaultListModel<String> defaultModel, String[] data) {
-			//Search the List and check for extra values, remove them.
-			for(int i = 0; i < defaultModel.getSize(); i++){
-				Object o =  defaultModel.getElementAt(i);  
-				String entry = (String)o;
-				boolean found = false;
-				for (int k = 0; k < data.length; k++) {
-					if (entry.equals(data[k])) {
-						found = true;
-					}
-				}
-				if (!found) {
-					defaultModel.remove(i);
-				}
-			}
-
-			//Search the Array for new values, add them.
-			for(int i = 0; i < data.length; i++){
-				String entry = data[i];
-				boolean found = false;
-				for (int k = 0; k <  defaultModel.getSize(); k++) {
-					if (entry.equals(defaultModel.getElementAt(k))) {
-						found = true;
-					}
-				}
-				if (!found) {
-					defaultModel.addElement(data[i]);
-				}
-			}
-		}
-
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
 			lblUsername.setText(username + "!");
@@ -1030,23 +1024,28 @@ public class AppletUI extends Applet{
 
 			if (client.payload != null && client.authenticated == true) {
 				try {
-					tLogsList.setModel(client.payload.getTrainingModel());
-					mLogsList.setModel(client.payload.getMaintinenceModel());
-					listData.setModel(client.payload.getDateModel());
-					userList.setModel(client.payload.getUserModel());
-					rankList.setModel(client.payload.getRankModel());
-					fLogsList.setModel(client.payload.getFlightModel());
-
+					if (!userList.getModel().equals(client.payload.getUserModel())) {
+						userList.setModel(client.payload.getUserModel());
+					}
+					if (!rankList.getModel().equals(client.payload.getRankModel())) {
+						rankList.setModel(client.payload.getRankModel());
+					}
 					//Set the JList modality based on the Mode, and the JLabel
 					if (dataMode.equals(DATA_MODE.MODE_AIRCRAFT)) {
-						lblMode.setText("Aircraft");
-						listData.setModel(client.payload.getNameModel());
+						if (client.payload.getNameModel().getSize() > 0 && !client.payload.getNameModel().elementAt(0).equals("")) {
+							lblMode.setText("Aircraft");
+							listData.setModel(client.payload.getNameModel());
+						}
 					}else if (dataMode.equals(DATA_MODE.MODE_DATE)) {
-						lblMode.setText("Date");
-						listData.setModel(client.payload.getDateModel());
+						if (client.payload.getDateModel().getSize() > 0 && !client.payload.getDateModel().elementAt(0).equals("")) {
+							lblMode.setText("Date");
+							listData.setModel(client.payload.getDateModel());
+						}
 					}else if (dataMode.equals(DATA_MODE.MODE_PILOT)) {
-						lblMode.setText("Pilot");
-						listData.setModel(client.payload.getPilotModel());
+						if (client.payload.getPilotModel().getSize() > 0 && !client.payload.getPilotModel().elementAt(0).equals("")) {
+							lblMode.setText("Pilot");
+							listData.setModel(client.payload.getPilotModel());
+						}
 					}
 				}catch (Exception e) {
 					e.printStackTrace();
@@ -1054,8 +1053,8 @@ public class AppletUI extends Applet{
 			}
 
 			//Show/Hide controls based on rank
-			if (client != null && client.connection != null) {
-				String rank = client.connection.GetRank();
+			if (client != null && client.instance != null) {
+				String rank = client.instance.GetRank();
 				lblUserPermissions.setText(rank);
 				if (rank.equals("user")) {
 					for (Component o : adminElements) {
@@ -1064,14 +1063,14 @@ public class AppletUI extends Applet{
 					for (Component o : superadminElements) {
 						o.setEnabled(false);
 					}
-				}else if (client.connection.GetRank().equals("admin")) {
+				}else if (client.instance.GetRank().equals("admin")) {
 					for (Component o : adminElements) {
 						o.setEnabled(true);
 					}
 					for (Component o : superadminElements) {
 						o.setEnabled(false);
 					}
-				}else if (client.connection.GetRank().equals("superadmin")) {
+				}else if (client.instance.GetRank().equals("superadmin")) {
 					for (Component o : adminElements) {
 						o.setEnabled(true);
 					}
@@ -1145,28 +1144,7 @@ public class AppletUI extends Applet{
 
 		@Override
 		public void mousePressed(MouseEvent e) {
-			//			System.out.println("Mouse_Press event at " + e.getPoint());
-			//			Rectangle rect = new Rectangle(pnlDateX, pnlDateY, AppletUI.this.pnlDate.getWidth(), AppletUI.this.pnlDate.getHeight());
-			//			System.out.println("Date panel at " + rect);
-			//			if (rect.contains(e.getPoint())) {
-			//				sortByDate = true;
-			//				sortByPilot = false;
-			//				sortByName = false;
-			//			}
-			//			
-			//			Rectangle rect2 = AppletUI.this.pnlPilot.getBounds(); 
-			//			if (rect2.contains(e.getPoint())) {
-			//				sortByDate = false; 
-			//				sortByPilot = true; 
-			//				sortByName = false;
-			//			}
-			//			
-			//			Rectangle rect3 = AppletUI.this.pnlAircraftName.getBounds(); 
-			//			if (rect3.contains(e.getPoint())) {
-			//				sortByDate = false;
-			//				sortByPilot = false;
-			//				sortByName = true;
-			//			}
+
 		}
 
 		@Override

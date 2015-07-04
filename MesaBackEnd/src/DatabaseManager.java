@@ -222,7 +222,7 @@ public class DatabaseManager {
 					String localPass = eElement.getAttribute("Password");
 					if (password.equals(localPass)) {
 						//We can now set the last login time to the dateformat for this moment, just for tracking's sake.
-						final String DATE_FORMAT_NOW = "MMddyyyy;HHmmss";
+						final String DATE_FORMAT_NOW = "ddMMyyyy;HHmmss";
 						Calendar cal = Calendar.getInstance();
 						SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT_NOW);
 						eElement.setAttribute("LastLogin", sdf.format(cal.getTime()));
@@ -239,56 +239,66 @@ public class DatabaseManager {
 	}
 
 	synchronized public int GetUserCount() {
-		NodeList nList = doc.getElementsByTagName("Users");
-		return nList.getLength();
+		try {
+			NodeList nList = doc.getElementsByTagName("Users");
+			return nList.getLength();
+		}catch (Exception e) {
+			return -1;
+		}
 	}
 
 	synchronized public String RequestRank(String username) {
-		NodeList nList = doc.getElementsByTagName(username);
-		//util.Log("Checking " + username + " against " + nList.getLength() + " users.");
-		for (int i = 0; i < nList.getLength(); i++) {
-			Node nNode = nList.item(i);
-			if (nNode.getNodeType() == Node.ELEMENT_NODE) {
-				Element eElement = (Element) nNode;
-				if (nNode.getNodeName().toLowerCase().equals(username.toLowerCase())) {
-					String rank = eElement.getAttribute("Rank");
-					return rank;
+		try {
+			NodeList nList = doc.getElementsByTagName(username);
+			for (int i = 0; i < nList.getLength(); i++) {
+				Node nNode = nList.item(i);
+				if (nNode.getNodeType() == Node.ELEMENT_NODE) {
+					Element eElement = (Element) nNode;
+					if (nNode.getNodeName().toLowerCase().equals(username.toLowerCase())) {
+						String rank = eElement.getAttribute("Rank");
+						return rank;
+					}
 				}
 			}
+			ui.accessCount++;
+		}catch (Exception e) {
+			return null;
 		}
-		ui.accessCount++;
 		return null;
 	}
 
 	synchronized public String[] RequestRankList() {
-		ArrayList<String> list = new ArrayList<String>();
+		try {
+			ArrayList<String> list = new ArrayList<String>();
 
-		NodeList nList = doc.getElementsByTagName("Users");
-		//util.Log("Checking " + username + " against " + nList.getLength() + " users.");
-		for (int i = 0; i < nList.getLength(); i++) {
-			Node nNode = nList.item(i);
-			NodeList subList = nNode.getChildNodes();
-			for (int j = 0; j < subList.getLength(); j++) {
-				Node subNode = subList.item(j);
-				if (subNode.getNodeType() == Node.ELEMENT_NODE) {
-					Element subElement = (Element)subNode;
-					if (subElement.hasAttributes()) {
-						Element eElement = (Element) subNode;
-						String username = subNode.getNodeName().toLowerCase();
-						String rank = eElement.getAttribute("Rank");
+			NodeList nList = doc.getElementsByTagName("Users");
+			for (int i = 0; i < nList.getLength(); i++) {
+				Node nNode = nList.item(i);
+				NodeList subList = nNode.getChildNodes();
+				for (int j = 0; j < subList.getLength(); j++) {
+					Node subNode = subList.item(j);
+					if (subNode.getNodeType() == Node.ELEMENT_NODE) {
+						Element subElement = (Element)subNode;
+						if (subElement.hasAttributes()) {
+							Element eElement = (Element) subNode;
+							String username = subNode.getNodeName().toLowerCase();
+							String rank = eElement.getAttribute("Rank");
 
-						String entry = username + ";" + rank;
-						list.add(entry);
-						ui.accessCount++;
+							String entry = username + ";" + rank;
+							list.add(entry);
+							ui.accessCount++;
+						}
 					}
 				}
 			}
+			String[] output = new String[list.size()];
+			for (int i = 0; i < list.size(); i++) {
+				output[i] = list.get(i);
+			}
+			return output;
+		}catch (Exception e) {
+			return null;
 		}
-		String[] output = new String[list.size()];
-		for (int i = 0; i < list.size(); i++) {
-			output[i] = list.get(i);
-		}
-		return output;
 	}
 
 	synchronized public String[] RequestField(FieldType type, FieldSubType subtype) {

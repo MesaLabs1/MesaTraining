@@ -22,7 +22,7 @@ public class Client {
 
 	AppletUI ui;
 	Thread networkClient;
-	NetworkLayer connection;
+	NetworkLayer instance;
 
 	Payload payload;
 
@@ -82,8 +82,8 @@ public class Client {
 		 *	"call-back" the super class and let it know when we're done, since our operation is a BDO...
 		 *	(background data operation), otherwise known as an ADO (asynchronous data operation).
 		 */
-		connection = new NetworkLayer(username, password, callback);
-		networkClient = new Thread(connection);
+		instance = new NetworkLayer(username, password, callback);
+		networkClient = new Thread(instance);
 		Log("Authenticating '" + username + "' with the remote server... (this process may hang)");
 		networkClient.start();
 	}
@@ -266,7 +266,7 @@ public class Client {
 									ui.lblNetworkOverhead.setText("" + payload.getNumOverhead());
 									ui.lblNetworkIP.setText("" + payload.getNetIP());
 									ui.lblBufferSize.setText("INACTIVE");
-									connection.RemoteRequest("$GET RANK " + connection.username);
+									instance.RemoteRequest("$GET RANK " + instance.username);
 								}
 							}
 						}else if (ret.equals("$INVALID")) {
