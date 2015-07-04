@@ -3,11 +3,13 @@ import java.awt.event.ActionListener;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.util.Random;
 
+import javax.swing.DefaultListModel;
 import javax.swing.Timer;
 
 /**
@@ -29,26 +31,32 @@ public class Backend {
 	//Network Master -- all hail
 	NetworkMaster netMaster;
 	Thread netMasterThread;
-	
+
 	//DatabaseRunner -- something witty
 	DatabaseManager dbMan;
+	
+	//Payload -- Gold!
+	Payload payload;
 
 	//Timer
 	Timer eventTicker;
 	EventHandler eventHandler;
 
+	/**
+	 * @wbp.parser.entryPoint
+	 */
 	public Backend(Init.PropertyMaster prop) {
 		properties = prop;
 		util = properties.util;
 
 		util.Log("Backend main program is initializing...");
-		
+
 		//Create a new NetworkMaster
 		netMaster = new NetworkMaster();
-		
+
 		//Initialize the DBManager and point it to the shared resources
 		dbMan = new DatabaseManager(util, netMaster.ui);
-		
+
 		//Create a wrapper thread
 		netMasterThread = new Thread(netMaster);
 
@@ -71,6 +79,7 @@ public class Backend {
 
 		public EventHandler() {
 			backend = Backend.this;
+			payload = new Payload();
 			netMaster = backend.netMaster;
 			ui = netMaster.ui;
 		}
@@ -102,8 +111,11 @@ public class Backend {
 					}
 				}
 			}
-			
+
 			netMaster.UpdateUI();
+			
+			//We call this to reload the payload class data for its sync.
+			netMaster.UpdatePayload();
 		}
 	}
 
@@ -147,9 +159,7 @@ public class Backend {
 
 		//Network Variables
 		Thread[] networkThreads;
-
 		NetworkSocket[] networkSockets;
-
 		Socket socket;
 
 		public NetworkMaster() {
@@ -263,7 +273,6 @@ public class Backend {
 					}
 					ui.accessCount++;
 					UpdateUI();
-
 				}
 			} catch (IOException e1) {
 				e1.printStackTrace();
@@ -274,6 +283,23 @@ public class Backend {
 
 				}
 			}
+		}
+		
+		public void UpdatePayload() {
+			payload.setDateModel(ConvertArrayToModel(dbMan.RequestField(DatabaseManager.FieldType.Dates, DatabaseManager.FieldSubType.None)));
+			payload.setPilotModel(ConvertArrayToModel(dbMan.RequestField(DatabaseManager.FieldType.Pilots, DatabaseManager.FieldSubType.None)));
+			payload.setNameModel(ConvertArrayToModel(dbMan.RequestField(DatabaseManager.FieldType.Aircrafts, DatabaseManager.FieldSubType.None)));
+			payload.setFlightModel(ConvertArrayToModel(dbMan.RequestField(DatabaseManager.FieldType.Logs, DatabaseManager.FieldSubType.Flight)));
+			payload.setMaintinenceModel(ConvertArrayToModel(dbMan.RequestField(DatabaseManager.FieldType.Logs, DatabaseManager.FieldSubType.Maintinence)));
+			payload.setTrainingModel(ConvertArrayToModel(dbMan.RequestField(DatabaseManager.FieldType.Logs, DatabaseManager.FieldSubType.Training)));
+		}
+		
+		public DefaultListModel<String> ConvertArrayToModel(String[] in) {
+			DefaultListModel<String> model = new DefaultListModel<String>();
+			for (String s : in) {
+				model.addElement(s);
+			}
+			return model;
 		}
 
 		/**
@@ -304,6 +330,8 @@ public class Backend {
 		private String username;
 		private String password;
 
+		private String rank = "user";
+
 		public NetworkSocket(Socket socket, String threadName) {
 			ui = instance.properties.ui;
 			active = true;
@@ -325,7 +353,9 @@ public class Backend {
 
 					DataInputStream in = new DataInputStream(server.getInputStream());
 					DataOutputStream out = new DataOutputStream(server.getOutputStream());
-
+					
+					ObjectOutputStream  oos = new ObjectOutputStream(server.getOutputStream());
+		           
 					util.Log("You've awoken " + name + " on port " + server.getLocalPort() + ".");
 					util.Log("[" + name + "] Authorizing " + server.getRemoteSocketAddress() + "...");
 
@@ -440,7 +470,12 @@ public class Backend {
 									boolean done = false;
 
 									while (!done) {
+										ui.numOverhead++;
+										dbMan.Refresh();
+
 										ui.progressBar.setValue(99);
+										rank = dbMan.RequestRank(username.toLowerCase());
+
 										String request = in.readUTF();
 										if (request.equals("$NOREQUEST")) {
 											//No request at this time, reparse.
@@ -449,11 +484,7 @@ public class Backend {
 												String msg = request.substring("$MSG ".length(), request.length());
 												util.Log("[MSG] " + msg);
 											}else {
-												if (request.startsWith("$GET")) {
-													//$GET PILOTS,AIRCRAFTS,DATES,TRAINING,FLIGHT,MAINTINENCE,
-													//$GET RANK JABOULHOSN
-													//$GET RANKLIST
-													
+												if (request.startsWith("$GET")) {				//We serialize our major data classes, but we can send and recv commands like this.
 													String cmd = request.substring("$GET ".length(), request.length());
 													if (cmd.startsWith("RANK ")) {
 														String user = cmd.substring("RANK ".length(), cmd.length());
@@ -461,47 +492,76 @@ public class Backend {
 														String rank = dbMan.RequestRank(user.toLowerCase());
 														if (rank != null) {
 															//util.Log("Transmitting rank...");
-															out.writeUTF("$RANK " + user.toLowerCase() + "$" + rank);
+															out.writeUTF("$RANK " + user.toLowerCase() + ";" + rank);
 														}else {
 															//util.Log("Could not locate user by ID, sending error...");
 															out.writeUTF("$ERROR");
 														}
-													}else if (cmd.equals("RANKLIST")) {
-														String[] ranklist = dbMan.RequestRankList();
-														if (ranklist.length > 0) {
-															String resp = "$RANKLIST ";
-															for (String s : ranklist) {
-																resp += s + "$";
-															}
-															if (resp.endsWith("$")) {
-																resp = resp.substring(0, resp.length() - 1);
-															}
-															out.writeUTF(resp);
-														}else {
-															out.writeUTF("$ERROR");
-														}
 													}else {
-														//util.Log("RECV remote request for datalist " + cmd + "...");
-														String[] respArr = dbMan.RequestField(cmd);	//We have an array from the DB, let's stringify this.
-														String resp = "";
-														for (int i = 0; i < respArr.length; i++) {
-															resp += respArr[i] + "$";
-														}
-														if (resp.length() > 0) {
-															resp = resp.substring(0, resp.length() - 1);
-														}
-														//We now have a string separated like this Jad;Andy;Jacqueline;Tebiao, so lets send it.
-														//util.Log("Transmitting " + respArr.length + " bytes to client...");
-														out.writeUTF("$LIST " + resp);
+//														//util.Log("RECV remote request for datalist " + cmd + "...");
+//														String[] respArr = dbMan.RequestField(cmd);	//We have an array from the DB, let's stringify this.
+//														String resp = "";
+//														for (int i = 0; i < respArr.length; i++) {
+//															resp += respArr[i] + "$";
+//														}
+//														if (resp.length() > 0) {
+//															resp = resp.substring(0, resp.length() - 1);
+//														}
+//														//We now have a string separated like this Jad;Andy;Jacqueline;Tebiao, so lets send it.
+//														//util.Log("Transmitting " + respArr.length + " bytes to client...");
+//														out.writeUTF("$LIST " + resp);
 													}
-												}else if (request.startsWith("$SET")) {
-													
 												}else if (request.equals("$ABORT")) {
 													done = true;
 												}
+
+												//In this case, we've restricted certain commands to superadmins
+												if (rank.equals("admin") || rank.equals("superadmin")) {
+													if (request.startsWith("$CREATE")) {
+														//Create command, allows for anything from a user to a log or entry.
+														String cmd = request.substring("$CREATE ".length(), request.length());
+														if (cmd.startsWith("USER") && rank.equals("superadmin")) {
+															String start = cmd.substring("$CREATE USER ".length(), cmd.length());
+															String user = start.split(" ")[0];
+															String password = start.split(" ")[1];
+															String localrank = start.split(" ")[2];
+
+															dbMan.CreateUser(username, user, password, localrank);
+														}
+
+														if (cmd.startsWith("ENTRY")) {
+
+														}else if (cmd.startsWith("LOG")) {
+
+														}
+													}else if (request.startsWith("$RECOVER") && rank.equals("superadmin")) {
+
+													}else if (request.startsWith("$CHANGE")) {
+
+													}else if (request.startsWith("$REMOVE") && rank.equals("superadmin")) {
+
+													}else if (request.startsWith("$PROMOTE") && rank.equals("superadmin")) {
+														String user = request.substring("$PROMOTE ".length(), request.length());
+														dbMan.PromoteUser(user);
+													}else if (request.startsWith("$DEMOTE") && rank.equals("superadmin")) {
+														String user = request.substring("$DEMOTE ".length(), request.length());
+														dbMan.DemoteUser(user);
+													}
+												}else {
+													out.writeUTF("$PERMS");
+												}
 											}
 										}
+										/*
+										 * The above code handles primitive commands for data manipulations, now lets serialize the class object.
+										 * Bear in mind that since our client is read only, and we handle our transforms above, we do not need to read
+										 * in from the client. This is a one way conversation.
+										 */
+										oos.writeObject(payload);	
+										
+										
 										ui.progressBar.setValue(100);
+										ui.numOverhead--;
 									}
 								}else {
 									util.Log("Remote Client failed to identify themselves. This is not malicious, they simply failed to log in.");
@@ -518,9 +578,11 @@ public class Backend {
 						out.writeUTF("$ERROR, VERSION");
 						util.Log("MISMATCH! Client is version " + remoteVersion + " but we are version " + propMaster.BACKEND_VERSION + "! Closing the Server!");
 						server.close();
+						oos.close();
 						active = false;
 					}
 
+					ui.numOverhead--;
 					server.close();
 					active = false;
 				}catch(SocketTimeoutException s) {

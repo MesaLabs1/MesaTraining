@@ -7,6 +7,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Random;
 
+import javax.swing.DefaultListModel;
+
 /**
  * Utils contains static functions that are specific to the back-end. This entails methods such as logging, debugging, etc.
  * @author hackjunky, jacrin
@@ -22,13 +24,13 @@ public class Utils {
 	BufferedWriter logWriter;
 	
 	//The logs, posted to this array for usage by the UI.
-	ArrayList logs;
+	DefaultListModel<String> logs;
 	
 	/**
 	 * The constructor of this class initializes a unique numeric identifier that attaches to the log output.
 	 */
 	public Utils() {
-		logs = new ArrayList<String>();
+		logs = new DefaultListModel<String>();
 		
 		Random random = new Random();
 		LOG_NAME = "output";
@@ -91,7 +93,7 @@ public class Utils {
 		}
 		
 		//Save it
-		logs.add(log);
+		logs.addElement(log);
 	}
 }
 

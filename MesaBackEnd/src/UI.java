@@ -1,5 +1,9 @@
-import java.awt.Dialog;
 import java.awt.Dimension;
+import java.awt.FontMetrics;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Point;
+import java.awt.Rectangle;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -10,7 +14,6 @@ import javax.swing.border.LineBorder;
 
 import java.awt.Color;
 
-import javax.swing.DefaultListModel;
 import javax.swing.JLabel;
 import javax.swing.JMenuBar;
 import javax.swing.JOptionPane;
@@ -22,7 +25,6 @@ import javax.swing.Timer;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -32,8 +34,8 @@ import javax.swing.JMenuItem;
 import javax.swing.ListSelectionModel;
 
 import java.awt.Font;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+
+import javax.swing.border.BevelBorder;
 
 /**
  * This class is a simple GUI for this backend. You can disable it from appearing by adding the tag -nogui to
@@ -54,7 +56,6 @@ public class UI extends JFrame{
 	JLabel lblOverall;
 	JLabel lblThreads;
 	JLabel lblHandles;
-	JLabel lblGC;
 	JLabel lblErrors;
 	JLabel lblMemUsage;
 	JLabel lblAccessCount;
@@ -67,8 +68,7 @@ public class UI extends JFrame{
 	JPanel pnlGreen;
 
 	JScrollPane scrollPane;
-	JList consoleList;
-	DefaultListModel listModel;
+	JList<String> consoleList;
 
 	JProgressBar progressBar;
 
@@ -111,14 +111,14 @@ public class UI extends JFrame{
 	boolean activate = false;
 	boolean deactivate = false;
 
-	ArrayList logs;
-
 	//Indicator
 	enum ServerStatus {
 		Active, Inactive, Busy
 	}
 
 	ServerStatus status;
+	
+	ActivityMonitor mon0;
 
 	/*
 	 * The constructor here will simply define the GUI components, make sure the style is visually neutral (to avoid random UI inconsistencies),
@@ -141,7 +141,6 @@ public class UI extends JFrame{
 
 	public UI(Utils u) {
 		util = u;
-		logs = new ArrayList<String>();
 
 		//setType(Type.UTILITY);
 
@@ -151,7 +150,7 @@ public class UI extends JFrame{
 		//We chose 640x480 because this is the default minimum resolution support ratio for non-graphically enabled systems.
 		this.setSize(new Dimension(640, 480));
 
-		//Make sure that when the user terminates the UI, we don't leave our socket running in the background.
+		//Make sure that when the user terminates the UI, we don't leave our socket(s) running in the background.
 		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
 		getContentPane().setLayout(new BorderLayout(0, 0));
 
@@ -211,7 +210,7 @@ public class UI extends JFrame{
 		lblErrorsH.setFont(new Font("Lucida Grande", Font.PLAIN, 10));
 
 		JPanel pnlOutput = new JPanel();
-		pnlOutput.setBounds(6, 108, 628, 309);
+		pnlOutput.setBounds(6, 108, 622, 309);
 		pnlHolder.add(pnlOutput);
 		pnlOutput.setBorder(new LineBorder(new Color(0, 0, 0), 1, true));
 		pnlOutput.setLayout(null);
@@ -222,11 +221,10 @@ public class UI extends JFrame{
 		pnlOutput.add(lblOutputH);
 
 		scrollPane = new JScrollPane();
-		scrollPane.setBounds(6, 30, 616, 254);
+		scrollPane.setBounds(6, 30, 610, 254);
 		pnlOutput.add(scrollPane);
-
-		listModel = new DefaultListModel();
-		consoleList = new JList(listModel);
+		
+		consoleList = new JList<String>(util.logs);
 		consoleList.setFont(new Font("Lucida Grande", Font.PLAIN, 10));
 		consoleList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
@@ -235,31 +233,30 @@ public class UI extends JFrame{
 		pnlRed = new JPanel();
 		pnlRed.setBackground(Color.RED);
 		pnlRed.setBorder(new LineBorder(new Color(0, 0, 0)));
-		pnlRed.setBounds(606, 287, 16, 16);
+		pnlRed.setBounds(600, 288, 16, 16);
 		pnlOutput.add(pnlRed);
 
 		pnlYellow = new JPanel();
 		pnlYellow.setBackground(Color.YELLOW);
 		pnlYellow.setBorder(new LineBorder(new Color(0, 0, 0)));
-		pnlYellow.setBounds(606, 287, 16, 16);
+		pnlYellow.setBounds(600, 288, 16, 16);
 		pnlOutput.add(pnlYellow);
 
 		pnlGreen = new JPanel();
 		pnlGreen.setBackground(Color.GREEN);
 		pnlGreen.setBorder(new LineBorder(new Color(0, 0, 0)));
-		pnlGreen.setBounds(606, 287, 16, 16);
+		pnlGreen.setBounds(600, 288, 16, 16);
 		pnlOutput.add(pnlGreen);
 
 		JButton btnClear = new JButton("Clear");
 		btnClear.setFont(new Font("Lucida Grande", Font.PLAIN, 10));
 		btnClear.setMnemonic('c');
-		btnClear.setBounds(561, 5, 61, 21);
+		btnClear.setBounds(555, 5, 61, 21);
 		btnClear.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				util.logs = new ArrayList();
-				listModel.clear();
+				util.logs.clear();
 			}
 		});
 		pnlOutput.add(btnClear);
@@ -270,18 +267,13 @@ public class UI extends JFrame{
 
 		lblRunning = new JLabel("Running... (XXX%)");
 		lblRunning.setFont(new Font("Lucida Grande", Font.PLAIN, 10));
-		lblRunning.setBounds(238, 287, 359, 16);
+		lblRunning.setBounds(238, 287, 252, 16);
 		pnlOutput.add(lblRunning);
-
-		JLabel lblGCH = new JLabel("Garbage Collections:");
-		lblGCH.setBounds(159, 6, 111, 16);
-		pnlOutput.add(lblGCH);
-		lblGCH.setFont(new Font("Lucida Grande", Font.PLAIN, 10));
-
-		lblGC = new JLabel("XXXXXXX");
-		lblGC.setBounds(266, 6, 111, 16);
-		pnlOutput.add(lblGC);
-		lblGC.setFont(new Font("Lucida Grande", Font.PLAIN, 10));
+		
+				lblUptime = new JLabel("Uptime: XXX:XXX:XXX");
+				lblUptime.setBounds(495, 290, 101, 13);
+				pnlOutput.add(lblUptime);
+				lblUptime.setFont(new Font("Lucida Grande", Font.PLAIN, 10));
 
 		JPanel pnlSystem = new JPanel();
 		pnlSystem.setBounds(150, 6, 223, 96);
@@ -336,14 +328,9 @@ public class UI extends JFrame{
 
 		JPanel panel = new JPanel();
 		panel.setBorder(new LineBorder(new Color(0, 0, 0)));
-		panel.setBounds(379, 6, 255, 96);
+		panel.setBounds(379, 6, 249, 96);
 		pnlHolder.add(panel);
 		panel.setLayout(null);
-
-		lblUptime = new JLabel("Uptime: XXX:XXX:XXX");
-		lblUptime.setBounds(6, 6, 101, 13);
-		panel.add(lblUptime);
-		lblUptime.setFont(new Font("Lucida Grande", Font.PLAIN, 10));
 
 		JLabel lblByMOI = new JLabel("By Jad Aboulhosn and Jacqueline Clow");
 		lblByMOI.setBounds(460, 416, 184, 16);
@@ -437,7 +424,9 @@ public class UI extends JFrame{
 		SetUpInterface();	//Anything that needs to be done, should get done here.
 
 		this.setVisible(true);
-
+		
+		mon0 = new ActivityMonitor(panel);
+		
 		util.Log("User Interface successfully initialized. Standby for Network Layer...");
 	}
 
@@ -474,7 +463,6 @@ public class UI extends JFrame{
 			ui.lblAccessCount.setText("" + ui.accessCount);
 			ui.lblClients.setText("" + ui.numClients);
 			ui.lblErrors.setText("" + ui.numErrors);
-			ui.lblGC.setText("" + ui.numGCs);
 			ui.lblHandles.setText("" + ui.numHandles);
 			ui.lblOverall.setText("" + ui.numOverall);
 			ui.lblThreads.setText("" + ui.numThreads);
@@ -485,22 +473,12 @@ public class UI extends JFrame{
 			ui.lblUptime.setText(convertUpTime());
 			ui.lblMemUsage.setText(getMemoryStatistics());
 
-			//Update console
-			int currSize = consoleList.getModel().getSize();
-			int totalSize = util.logs.size();
-			if (currSize != totalSize) {
-				int net = totalSize - currSize;
-				if (net > 0) {
-					for (int i = totalSize - net; i < totalSize; i++) {
-						listModel.addElement(util.logs.get(i));
-					}
-				}
-			}
-
 			if (internalTicks == 10) {	//1 second has passed
 				ui.uptime++;
 				internalTicks = 0;
 			}
+			
+			consoleList.ensureIndexIsVisible(util.logs.size() - 1);
 
 			if (status.equals(ServerStatus.Inactive)) {
 				lblRunning.setText("Inactive... (" + progressBar.getValue() + "%)");
@@ -550,18 +528,22 @@ public class UI extends JFrame{
 				double temp = bytes / 1024 / 1024 / 1024;
 				temp = Double.valueOf(df.format(temp));
 				memory = temp + " GB";
+				//memUsage = (int)temp;
 			}else {
 				if (mBytes > 0) {
 					double temp = bytes / 1024 / 1024;
 					temp = Double.valueOf(df.format(temp));
 					memory = temp + " MB";
+					memUsage = (int)temp;
 				}else {
 					if (kBytes > 0) {
 						double temp = bytes / 1024;
 						temp = Double.valueOf(df.format(temp));
 						memory = temp + " KB";
+						//memUsage = (int)temp;
 					}else {
 						memory = bytes + " B";
+						//memUsage = (int)bytes;
 					}
 				}
 			}
@@ -619,6 +601,174 @@ public class UI extends JFrame{
 			sUptime = "Uptime: " + sHours + ":" + sMinutes + ":" + sSeconds;
 
 			return sUptime;
+		}
+	}
+	
+	/**
+	 * This class converts any JPanel into an activity monitor for this application.
+	 * author hackjunky
+	 *
+	 */
+	public class ActivityMonitor implements ActionListener{
+		JPanel target;
+		
+		Timer timer;
+		Graphics g;
+		Graphics2D g2d;
+		FontMetrics fm;
+		
+		Rectangle mon0Area;
+		Rectangle mon1Area;
+		
+		//Monitor vars
+		int mon0YCap = 1;
+		int mon1YCap = 1;
+		
+		int incrementMon0 = 0;
+		int incrementMon1 = 0;
+		
+		int mon0XValue = 2;
+		int mon1XValue = 2;
+		
+		boolean clearMon0 = true;
+		boolean clearMon1 = true;
+		
+		Point mon0temp = new Point(0, 0);
+		Point mon1temp = new Point(0, 0);
+		
+		public ActivityMonitor (JPanel t) {
+			target = t;
+			timer = new Timer(100, this);
+			g = target.getGraphics();
+			g2d = (Graphics2D) g;
+			fm = g2d.getFontMetrics();
+			
+			g2d.setFont(target.getFont().deriveFont(10.0f));
+			
+			Activate();
+		}
+		
+		public void Activate() {
+			timer.start();
+		}
+		
+		public void Deactivate() {
+			timer.stop();
+		}
+		
+		private void DrawRect(Color color, Rectangle r) {
+			Color c = g2d.getColor();
+			
+			g2d.setColor(Color.GRAY);
+			g2d.fillRect(r.x, r.y, r.width, r.height);
+			
+			DrawGrid(true, Color.GREEN, mon0Area, 10, 2);
+			DrawGrid(false, Color.RED, mon1Area, 5, 2);
+			
+			g2d.setColor(color);
+			g2d.drawRect(r.x, r.y, r.width, r.height);
+			
+			g2d.setColor(c);
+		}
+		
+		private void DrawGrid(boolean toggle, Color color, Rectangle r, int rowX, int rowY) {
+			Color c = g2d.getColor();
+			g2d.setColor(color);
+			//Draw the vertical lines
+			int xGap = r.width / rowX;
+			for (int i = r.x + xGap; i < r.width; i += xGap) {
+				g2d.drawLine(i, r.y, i, r.height + r.y);
+			}
+			
+			if (toggle) {
+				incrementMon0 = xGap;
+			}else {
+				incrementMon1 = xGap;
+			}
+			
+			//Draw the horizontal lines
+			int yGap = r.height / rowY;
+			for (int i = r.y + yGap; i < r.height; i += yGap) {
+				g2d.drawLine(r.x, i, r.width + r.x, i);
+			}
+			g2d.setColor(c);
+		}
+		
+		private void UpdateStatsCap() {
+//			if (numOverhead > mon0YCap) {
+//				mon0YCap = numOverhead;
+//			}
+//			if (memUsage > mon1YCap) {
+//				mon1YCap = memUsage;
+//			}
+			//Network Overhead Cap
+			mon0YCap = 50;
+			
+			//Max System Memory
+			long allocatedMemory = (Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory());
+			long presumableFreeMemory = Runtime.getRuntime().maxMemory() - allocatedMemory;
+			double temp = presumableFreeMemory / 1024 / 1024;
+			mon1YCap = (int)temp;
+		}
+		
+		private void DrawValues() {
+			//Mon0
+			g2d.setFont(target.getFont().deriveFont(10.0f));
+			double height = ((double)numOverhead / (double)mon0YCap) * mon0Area.height;
+			Point p = new Point(mon0XValue, (mon0Area.y + mon0Area.height - 4 - (int)height));
+			g2d.fillRect(p.x, p.y, 3, 3);
+			String overhead = String.valueOf(numOverhead);
+			g2d.drawString(overhead, p.x - (fm.stringWidth(overhead) / 2), p.y - 2);
+			mon0XValue += incrementMon0;
+			if (mon0XValue > incrementMon0) {
+				g2d.drawLine(mon0temp.x, mon0temp.y + 1, p.x, p.y + 1);
+			}
+			mon0temp = p;
+			if (mon0XValue >= mon0Area.width) {
+				mon0XValue = incrementMon0;
+				mon0temp = new Point(2, p.y);
+				clearMon0 = true;
+			}
+			
+			//Mon1
+			g2d.setFont(target.getFont().deriveFont(10.0f));
+			height = ((double)memUsage / (double)mon1YCap) * mon1Area.height;
+			p = new Point(mon1XValue, (mon1Area.y + mon1Area.height - 4 - (int)height));
+			g2d.fillRect(p.x, p.y, 3, 3);
+			String memory = lblMemUsage.getText();
+			g2d.drawString(memory, p.x - (fm.stringWidth(memory) / 2) + 2, p.y - 2);
+			mon1XValue += incrementMon1;
+			if (mon1XValue > incrementMon1) {
+				g2d.drawLine(mon1temp.x, mon1temp.y + 1, p.x, p.y + 1);
+			}
+			mon1temp = p;
+			if (mon1XValue >= mon1Area.width) {
+				mon1XValue = incrementMon1;
+				mon1temp = new Point(2, p.y);
+				clearMon1 = true;
+			}
+		}
+		
+		@Override
+		public void actionPerformed(ActionEvent arg0) {
+			g2d.drawString("Network Activity", 4, fm.getAscent());
+			g2d.drawString("Disk Activity", 4, target.getHeight() / 2 + fm.getAscent() - 4);
+			
+			mon0Area = new Rectangle(4, fm.getHeight() + 1, target.getWidth() - 8, target.getHeight() / 2 - fm.getHeight() - 4);
+			mon1Area = new Rectangle(4, target.getHeight() / 2 + fm.getHeight() - 4, target.getWidth() - 8, target.getHeight() / 2 - fm.getHeight() - 1);
+		
+			if (clearMon0) {
+				DrawRect(Color.BLACK, mon0Area);
+				clearMon0 = false;
+			}
+			
+			if (clearMon1) {
+				DrawRect(Color.BLACK, mon1Area);
+				clearMon1 = false;
+			}
+			
+			UpdateStatsCap();
+			DrawValues();
 		}
 	}
 }

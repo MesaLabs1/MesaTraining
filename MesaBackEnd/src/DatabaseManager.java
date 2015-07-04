@@ -4,12 +4,22 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 
+import org.w3c.dom.Comment;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.NodeList;
@@ -43,7 +53,21 @@ public class DatabaseManager {
 	File dbFile;
 	DocumentBuilder dbBuilder;
 	Document doc;
-	
+
+	public enum FieldType {
+		Pilots, 
+		Aircrafts, 
+		Dates, 
+		Logs
+	}
+
+	public enum FieldSubType {
+		None, 
+		Training, 
+		Flight, 
+		Maintinence
+	}
+
 	public DatabaseManager(Utils ut, UI u) {
 		util = ut;
 		ui = u;
@@ -81,7 +105,13 @@ public class DatabaseManager {
 				util.Log("Database checks out okay. Continuing...");
 			}
 		}
+		Refresh();
 
+		//Delete the lockfile since we're done for now.
+		lockFile.delete();
+	}
+
+	public void Refresh() {		
 		dbFile = new File("db.xml");
 		dbFactory = DocumentBuilderFactory.newInstance();
 		dbBuilder = null;
@@ -99,9 +129,24 @@ public class DatabaseManager {
 			e.printStackTrace();
 		}
 		doc.getDocumentElement().normalize();
+	}
 
-		//Delete the lockfile since we're done for now.
-		lockFile.delete();
+	public void Save() {
+		TransformerFactory transformerFactory = TransformerFactory.newInstance();
+		Transformer transformer = null;
+		try {
+			transformer = transformerFactory.newTransformer();
+		} catch (TransformerConfigurationException e) {
+			e.printStackTrace();
+		}
+		DOMSource source = new DOMSource(doc);
+		StreamResult result = new StreamResult(dbFile);
+		try {
+			transformer.transform(source, result);
+		} catch (TransformerException e) {
+			e.printStackTrace();
+		}
+		Refresh();
 	}
 
 	/**
@@ -116,8 +161,8 @@ public class DatabaseManager {
 	}
 
 	/**
-	 * MakeFS creates a database w/ all tables and subsequent entries for the first-run. Do not
-	 * call this more than once, as it may obfuscate the entry permissions.
+	 * MakeFS creates an XML database based on a template provided to it initially in the FS. If the db is broken or MIA,
+	 * it can repair it automatically.
 	 * @return True/False depending on if the make is successful.
 	 */
 	public boolean MakeFS() {
@@ -142,7 +187,7 @@ public class DatabaseManager {
 
 	}
 
-	public boolean ParseUser(String username, String password) {
+	synchronized public boolean ParseUser(String username, String password) {
 		NodeList nList = doc.getElementsByTagName(username);
 		util.Log("Checking " + username + " against " + nList.getLength() + " users.");
 		for (int i = 0; i < nList.getLength(); i++) {
@@ -152,6 +197,14 @@ public class DatabaseManager {
 				if (nNode.getNodeName().toLowerCase().equals(username.toLowerCase())) {
 					String localPass = eElement.getAttribute("Password");
 					if (password.equals(localPass)) {
+						//We can now set the last login time to the dateformat for this moment, just for tracking's sake.
+						final String DATE_FORMAT_NOW = "MMddyyyy;HHmmss";
+						Calendar cal = Calendar.getInstance();
+						SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT_NOW);
+						eElement.setAttribute("LastLogin", sdf.format(cal.getTime()));
+
+						Save();
+
 						return true;
 					}
 				}
@@ -161,7 +214,12 @@ public class DatabaseManager {
 		return false;
 	}
 
-	public String RequestRank(String username) {
+	synchronized public int GetUserCount() {
+		NodeList nList = doc.getElementsByTagName("Users");
+		return nList.getLength();
+	}
+
+	synchronized public String RequestRank(String username) {
 		NodeList nList = doc.getElementsByTagName(username);
 		//util.Log("Checking " + username + " against " + nList.getLength() + " users.");
 		for (int i = 0; i < nList.getLength(); i++) {
@@ -177,10 +235,10 @@ public class DatabaseManager {
 		ui.accessCount++;
 		return null;
 	}
-	
-	public String[] RequestRankList() {
+
+	synchronized public String[] RequestRankList() {
 		ArrayList<String> list = new ArrayList<String>();
-		
+
 		NodeList nList = doc.getElementsByTagName("Users");
 		//util.Log("Checking " + username + " against " + nList.getLength() + " users.");
 		for (int i = 0; i < nList.getLength(); i++) {
@@ -194,7 +252,7 @@ public class DatabaseManager {
 						Element eElement = (Element) subNode;
 						String username = subNode.getNodeName().toLowerCase();
 						String rank = eElement.getAttribute("Rank");
-						
+
 						String entry = username + ";" + rank;
 						list.add(entry);
 						ui.accessCount++;
@@ -209,35 +267,12 @@ public class DatabaseManager {
 		return output;
 	}
 
-	public String[] RequestField(String fieldname) {
-		//PILOTS,AIRCRAFTS,DATES,TRAINING,FLIGHT,MAINTINENCE
-
-		//Hotfix 1a for Capitalizations in XML issue
-		String subfield = "";
-		if (fieldname.equals("PILOTS")) {
-			fieldname = "Pilot";
-		}else if (fieldname.equals("AIRCRAFTS")) {
-			fieldname = "Aircraft";
-		}else if (fieldname.equals("DATES")) {
-			fieldname = "Date";
-		}else if (fieldname.equals("TRAINING")) {
-			fieldname = "Logs";
-			subfield = "Training";
-		}else if (fieldname.equals("FLIGHT")) {
-			fieldname = "Logs";
-			subfield = "Flight";
-		}else if (fieldname.equals("MAINTINENCE")) {
-			fieldname = "Logs";
-			subfield = "Maintinence";
-		} 
-
+	synchronized public String[] RequestField(FieldType type, FieldSubType subtype) {
 		NodeList nList = null;
-		if (subfield.length() > 0) {		//Let's access by the tag we want, not the superlevel.
-			nList = doc.getElementsByTagName(subfield);
-			//util.Log("Accessing logs for " + subfield);
+		if (type.equals(FieldType.Logs)) {		//Let's access by the tag we want, not the superlevel.
+			nList = doc.getElementsByTagName(subtype.toString());
 		}else {
-			nList = doc.getElementsByTagName(fieldname);
-			//util.Log("Accessing logs for " + fieldname);
+			nList = doc.getElementsByTagName(type.toString());
 		}
 
 		String values = "";
@@ -279,11 +314,82 @@ public class DatabaseManager {
 		return values.split("~");
 	}
 
-	class DatabaseRunner implements ActionListener {
+	synchronized public void CreateUser(String caller, String username, String password, String permissions) {
+		util.Log("Creating userspace for " + username  + " with permissions " + permissions + ".");
+		NodeList nList = doc.getElementsByTagName("Users");
+		Element eElement = (Element) nList;
 
-		@Override
-		public void actionPerformed(ActionEvent arg0) {
+		//Create a template entry.
+		Element node = doc.createElement(username.toLowerCase());
 
+		Attr rank = doc.createAttribute("Rank");
+		Attr pass = doc.createAttribute("Password");
+		Attr lastlog = doc.createAttribute("LastLogin");
+
+		Calendar cal = Calendar.getInstance();
+		Comment comm = doc.createComment("Auto-generated user. Created by " + caller + " on " + cal.getTime());
+
+		node.appendChild(rank);
+		node.appendChild(pass);
+		node.appendChild(lastlog);
+
+		eElement.appendChild(node);
+		ui.accessCount++;
+
+		Save();
+	}
+
+	synchronized public void PromoteUser(String username) {
+		NodeList nList = doc.getElementsByTagName(username);
+		util.Log("Promoting " + username + "...");
+		for (int i = 0; i < nList.getLength(); i++) {
+			Node nNode = nList.item(i);
+			if (nNode.getNodeType() == Node.ELEMENT_NODE) {
+				Element eElement = (Element) nNode;
+				if (nNode.getNodeName().toLowerCase().equals(username.toLowerCase())) {
+					String rank = eElement.getAttribute("Rank");
+					String newRank = rank;
+					if (rank.equals("user")) {
+						newRank = "admin";
+					}else if (rank.equals("admin")) {
+						newRank = "superadmin";
+					}else if (rank.equals("superadmin")) {
+						newRank = "superadmin";
+					}
+					eElement.setAttribute("Rank", newRank);
+					break;
+				}
+			}
 		}
+		ui.accessCount++;
+
+		Save();
+	}
+
+	synchronized public void DemoteUser(String username) {
+		NodeList nList = doc.getElementsByTagName(username);
+		util.Log("Demoting " + username + "...");
+		for (int i = 0; i < nList.getLength(); i++) {
+			Node nNode = nList.item(i);
+			if (nNode.getNodeType() == Node.ELEMENT_NODE) {
+				Element eElement = (Element) nNode;
+				if (nNode.getNodeName().toLowerCase().equals(username.toLowerCase())) {
+					String rank = eElement.getAttribute("Rank");
+					String newRank = rank;
+					if (rank.equals("user")) {
+						newRank = "user";
+					}else if (rank.equals("admin")) {
+						newRank = "user";
+					}else if (rank.equals("superadmin")) {
+						newRank = "admin";
+					}
+					eElement.setAttribute("Rank", newRank);
+					break;
+				}
+			}
+		}
+		ui.accessCount++;
+
+		Save();
 	}
 }

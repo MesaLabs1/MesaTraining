@@ -22,25 +22,28 @@ import javax.swing.Timer;
  * @author hackjunky, jacrin
  *
  */
-public class ClientMain {
+public class Client {
 	static final int FRONTEND_VERSION = 1;
 	boolean authenticated = false;
-	
+
 	AppletUI ui;
 	Thread networkClient;
-	NetworkLayer client;
+	NetworkLayer connection;
 
 	ArrayList<String[]> data;
-	
+
 	ArrayList<StringPoint> refCodes;		//refCodes are used to help us store specific data points in the array that contain networked strings
-											//We made a custom class called StringPoint that stores a String and an index, like: Names, 0
-											//This tells the program that position 0 in the data array contains the names string
+	//We made a custom class called StringPoint that stores a String and an index, like: Names, 0
+	//This tells the program that position 0 in the data array contains the names string
 	NetworkTimer netTicker;
 	Timer ticker;
-	
-	public ClientMain(AppletUI instance) {
+
+	DataEntryManager dataManager;
+
+	public Client(AppletUI instance) {
 		ui = instance;
 		refCodes = new ArrayList<StringPoint>();
+		dataManager = new DataEntryManager();
 	}
 
 	/**
@@ -59,6 +62,7 @@ public class ClientMain {
 
 		//Print it
 		System.out.println(log);
+		ui.consoleModel.addElement(log);
 	}
 
 	/**
@@ -70,7 +74,7 @@ public class ClientMain {
 		int i = 0;
 		for (StackTraceElement ste : Thread.currentThread().getStackTrace()) {
 			i++;
-			if (ste.getClassName().equals(ClientMain.class.getName())) {
+			if (ste.getClassName().equals(Client.class.getName())) {
 				break;
 			}
 		}
@@ -93,70 +97,88 @@ public class ClientMain {
 		 *	"call-back" the super class and let it know when we're done, since our operation is a BDO...
 		 *	(background data operation), otherwise known as an ADO (asynchronous data operation).
 		 */
-		client = new NetworkLayer(username, password, callback);
-		networkClient = new Thread(client);
+		connection = new NetworkLayer(username, password, callback);
+		networkClient = new Thread(connection);
 		Log("Authenticating '" + username + "' with the remote server... (this process may hang)");
 		networkClient.start();
 	}
-	
+
+	public ArrayList<DataEntry> GetData() {
+		return dataManager.GetData();
+	}
+
 	/**
 	 * This class simply re-requests data from the server every time it ticks.
 	 * @author Hack
 	 *
 	 */
 	public class NetworkTimer implements ActionListener {
+		boolean init = false;
 
 		public NetworkTimer() {
 			RequestList();
 			Log("Receiving serialized objects...");
 		}
-		
+
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
+			//We want to refresh the first time, let the user do it after that.
+			if (!init) {
+				UpdateLists();
+				init = true;
+			}
+
+			//Use last data to update
 			UpdateLists();
+
+			//Keep requesting data for the app to read, but lets not process it. This is because the data probably hasn't changed in a long time anyway.
 			RequestList();
 		}
-		
+
 		/**
 		 * Requests the master lists from the server. You can easily add more requests here, for additional serializable data fields.
 		 */
 		public void RequestList() {
 			//We need to serialize all data over to us, so let's add these requests to the master query...
-			//Log("Querying server for new data...");
-			client.SetRefCode("Dates", client.RemoteRequest("$GET DATES"));
-			client.SetRefCode("Pilots", client.RemoteRequest("$GET PILOTS"));
-			client.SetRefCode("Aircrafts", client.RemoteRequest("$GET AIRCRAFTS"));
-			client.SetRefCode("Training", client.RemoteRequest("$GET TRAINING"));
-			client.SetRefCode("Maintinence", client.RemoteRequest("$GET MAINTINENCE"));
-			client.SetRefCode("Flight", client.RemoteRequest("$GET FLIGHT"));
-			client.SetRefCode("Ranklist", client.RemoteRequest("$GET RANKLIST"));
+			//Log("[RECV] Downloading...");
+			connection.SetRefCode("Dates", connection.RemoteRequest("$GET DATES"));
+			connection.SetRefCode("Pilots", connection.RemoteRequest("$GET PILOTS"));
+			connection.SetRefCode("Aircrafts", connection.RemoteRequest("$GET AIRCRAFTS"));
+			connection.SetRefCode("Training", connection.RemoteRequest("$GET TRAINING"));
+			connection.SetRefCode("Maintinence", connection.RemoteRequest("$GET MAINTINENCE"));
+			connection.SetRefCode("Flight", connection.RemoteRequest("$GET FLIGHT"));
+			connection.SetRefCode("Ranklist", connection.RemoteRequest("$GET RANKLIST"));
+			connection.SetRefCode("Rank", connection.RemoteRequest("$GET RANK " + connection.username));
+			connection.SetRefCode("Stats", connection.RemoteRequest("$GET STATLIST"));
 		}
-		
+
 		/**
-		 * Updates the UI from here, by feeding the UpdateListsWithArray method.
+		 * Updates the UI from here, by creating DataEntries and systematically appending data to each object.
 		 */
 		public void UpdateLists() {
+			//dataManager.ClearData();
+
 			//Read over each reference code, and the values, and prepare to parse.
 			for (int i = 0; i < refCodes.size(); i++) {
 				StringPoint value = refCodes.get(i);
-				
+
 				//Since each data type has different rules, we must differentiate each type.
 				int index = value.GetIndex();
-				
+
 				if (value.GetValue().equals("Dates")) {
 					//Date, so the format is: 05192015;182436
 					//Example Date: 05/19/2015, at 18:24:36 (Global Time, so 6:24:36 PM). Indicates the last use date.
-					
+
 					String[] unformatted = data.get(index);
-					String[] dates = new String[unformatted.length];
-					
+					//String[] dates = new String[unformatted.length];
+
 					for (int j = 0; j < unformatted.length; j++) {
 						String[] split = unformatted[j].split(";");
-						
+
 						String month = split[0].substring(0, 2);
 						String day = split[0].substring(2, 4);
 						String year = split[0].substring(4, 8);
-						
+
 						String hour = split[1].substring(0, 2);
 						String minute = split[1].substring(2, 4);
 						String seconds = split[1].substring(4, 6);
@@ -166,18 +188,21 @@ public class ClientMain {
 						}else {
 							suffix = "AM";
 						}
-						
+
 						String out = month + "/" + day + "/" + year + " at " + hour + ":" + minute + ":" + seconds + " " + suffix;
-						dates[j] = out;
+
+						dataManager.GetData().add(new DataEntry(out));
+
+						//dates[j] = out;
 					}
 					//We've converted them all to coherent values, now apply them through the UpdateListsWithArray method
-					ui.eventHandler.UpdateListWithArray(ui.dateModel, dates);
+					ui.eventHandler.UpdateListWithArray(ui.dateModel, dataManager.GetDateList());
 				}else if (value.GetValue().equals("Pilots")) {
 					//Pilots, so format is: Jad Aboulhosn;Andreas Anderson
 					//Supports multiple pilots, in this case both Jad and Andy.
 					String[] unformatted = data.get(index);
-					String[] names = new String[unformatted.length];
-					
+					//String[] names = new String[unformatted.length];
+
 					for (int j = 0; j < unformatted.length; j++) {
 						String[] split = unformatted[j].split(";");
 						String out = "";
@@ -189,19 +214,46 @@ public class ClientMain {
 						}else {
 							out = "No Recorded Pilots";
 						}
-						names[j] = out;
+
+						dataManager.GetData().get(j).SetPilot(out);
+
+						//names[j] = out;
 					}
-					ui.eventHandler.UpdateListWithArray(ui.pilotModel, names);
+					try {
+						ui.eventHandler.UpdateListWithArray(ui.pilotModel, dataManager.GetPilotList());
+					}catch (Exception e) {
+
+					}
 				}else if (value.GetValue().equals("Aircrafts")) {
 					//Aircrafts, which is technically a single field. So let's literally copy, paste.
 					String[] unformatted = data.get(index);
-					ui.eventHandler.UpdateListWithArray(ui.nameModel, unformatted);
+
+					for (int j = 0; j < unformatted.length; j++) {
+						dataManager.GetData().get(j).SetAircraft(unformatted[j]);
+					}
+					try {
+						ui.eventHandler.UpdateListWithArray(ui.nameModel, dataManager.GetAircraftList());
+					}catch (Exception e) {
+
+					}
 				}else if (value.GetValue().equals("Training")) {
-					
+					String[] unformatted = data.get(index);
+
+					for (int j = 0; j < unformatted.length; j++) {
+						dataManager.GetData().get(j).AddTrainingLog(unformatted[j]);
+					}
 				}else if (value.GetValue().equals("Maintinence")) {
-					
+					String[] unformatted = data.get(index);
+
+					for (int j = 0; j < unformatted.length; j++) {
+						dataManager.GetData().get(j).AddMaintinenceLog(unformatted[j]);
+					}
 				}else if (value.GetValue().equals("Flight")) {
-					
+					String[] unformatted = data.get(index);
+
+					for (int j = 0; j < unformatted.length; j++) {
+						dataManager.GetData().get(j).AddFlightLog(unformatted[j]);
+					}
 				}else if (value.GetValue().equals("Ranklist")) {
 					ui.rankModel.clear();
 					ui.userModel.clear();
@@ -210,14 +262,36 @@ public class ClientMain {
 						String[] split = s.split(";");
 						String user = split[0];
 						String rank = split[1];
-						
+
 						//Lets add them to the user list.
 						ui.rankModel.addElement(rank);
 						ui.userModel.addElement(user);
 					}
-				}			
+				}else if (value.GetValue().equals("Rank")) {
+					if (data.get(index)[0].equals(connection.username)) {
+						connection.rank = data.get(index)[1];
+					}
+				}else if (value.GetValue().equals("Stats")) {
+					String[] stream = data.get(index);
+					//Reference Table
+					//0		User Count
+					//1		Users Online
+					//2		Uptime
+					//3		Mem Usage
+					//4 	Overhead
+					//5		Addr
+
+					ui.lblUsers.setText(stream[0]);
+					ui.lblUsersOnline.setText(stream[1]);
+					ui.lblServerUptime.setText(stream[2].substring("Uptime: ".length(), stream[2].length()));
+					ui.lblMemoryUsage.setText(stream[3]);
+					ui.lblNetworkOverhead.setText(stream[4]);
+					ui.lblNetworkIP.setText(stream[5]);
+					ui.lblBufferSize.setText(String.valueOf(data.size()));
+				}
 			}
-			refCodes = new ArrayList<StringPoint>();	//Clear the refCodes, when we're done.
+			//			refCodes = new ArrayList<StringPoint>();	//Clear the refCodes, when we're done.
+			//			connection.QUERY_ID = 0;
 		}
 	}
 
@@ -232,6 +306,8 @@ public class ClientMain {
 		private String username;
 		private String password;
 
+		private String rank = "user"; 	//Defaults to no rank.
+
 		boolean active = true;
 		boolean validated = false;
 
@@ -239,7 +315,7 @@ public class ClientMain {
 		DataOutputStream out;
 
 		ArrayList<String> query;
-		
+
 		int QUERY_ID = 0;
 
 		JLoginDialog callback;
@@ -250,14 +326,14 @@ public class ClientMain {
 		 * @param pass The client's password.
 		 */
 		public NetworkLayer(String user, String pass, JLoginDialog cback) {
-			username = user;
+			username = user.toLowerCase();
 			password = pass;
 			callback = cback;
 
 			query = new ArrayList<String>();
 			data = new ArrayList<String[]>();
 		}
-		
+
 		/**
 		 * Sets a reference code for the stored data type
 		 * @param value The type of the data: Name, Airplane, etc
@@ -276,7 +352,7 @@ public class ClientMain {
 			//Data point doesnt exist, lets create it
 			refCodes.add(new StringPoint(index, value));
 		}
-		
+
 
 		@Override
 		public void run() {
@@ -363,11 +439,11 @@ public class ClientMain {
 
 							//Tell the dialog we're good, so it can hide itself.
 							callback.AuthSucess();
-							
+
 							netTicker = new NetworkTimer();
-							ticker = new Timer(2000, netTicker);
+							ticker = new Timer(100, netTicker);
 							ticker.start();
-							
+
 							//This means that our data array will look like this in a bit:
 							//ID	DATA
 							// 0	List of Dates
@@ -376,7 +452,7 @@ public class ClientMain {
 							// 3 	List of Training Logs
 							// 4	List of Maintinence Logs
 							// 5 	List of Flight Logs
-							
+
 							while (true) {
 								if (query.size() > 0) {
 									String request = query.get(0);
@@ -385,7 +461,7 @@ public class ClientMain {
 									request = split[1];
 									query.remove(0);
 									try {
-										//Log("Requesting Query " + QUERY_ID + "...");
+										//Log("[QUERY] " + request + "; ID:" + id);
 										out.writeUTF(request);
 										response = in.readUTF();
 									} catch (IOException e) {
@@ -393,10 +469,12 @@ public class ClientMain {
 									}
 									if (response.equals("$INVALID")) {
 										//This isn't a valid request.
-										//Log("Invalid Request.");
+										Log("Invalid request.");
 									}else if (response.equals("$NODATA")) {
 										//There was no data returned by the server.
 										//Log("No data was returned by the server.");
+									}else if (response.equals("$ERROR")) {
+										Log("Invalid command.");
 									}else {
 										String[] recv = null;
 										if (response.startsWith("$LIST")) {
@@ -406,8 +484,8 @@ public class ClientMain {
 											data.add(id, recv);		//We RECV the list, and put it at the Query ID so we can fetch it by ID later.
 										}
 										if (response.startsWith("$RANK ")) {
-											recv = response.substring("$RANK ".length(), response.length()).split("$");
-											//This is a single rank, so $RANK JABOULHOSN SUPERCOOL, is an example
+											recv = response.substring("$RANK ".length(), response.length()).split(";");
+											//This is a single rank, so $RANK JABOULHOSN;SUPERCOOL, is an example
 											//Log("Receiving data (" + recv.length + " bytes).");
 											//Log("Writing to " + id);
 											data.add(id, recv);		//We RECV the list, and put it at the Query ID so we can fetch it by ID later.
@@ -420,11 +498,19 @@ public class ClientMain {
 											//The recv list is a list where each entry is FLASTNAME;RANK.
 											data.add(id, recv);		//We RECV the list, and put it at the Query ID so we can fetch it by ID later.
 										}
+										if (response.startsWith("$STATS ")) {
+											recv = response.substring("$STATS ".length(), response.length()).split(";");
+											//This is all ranks, so $STATS 0;1;10;15 is an example
+											//Log("Receiving data (" + recv.length + " bytes).");
+											//Log("Writing to " + id);
+											//The recv list is a list where each entry is FLASTNAME;RANK.
+											data.add(id, recv);		//We RECV the list, and put it at the Query ID so we can fetch it by ID later.
+										}
 									}
 								}else {
 									out.writeUTF("$NOREQUEST");
 								}
-								
+
 							}
 						}else if (ret.equals("$INVALID")) {
 							/* The server is written to handle repeated login attempts. However, we can also just tell the server
@@ -460,7 +546,7 @@ public class ClientMain {
 			//Log("Sending '" + request + "' to the server...");
 			if (validated) {
 				query.add(QUERY_ID + ";" + request);
-				
+
 				int num = QUERY_ID; 
 				QUERY_ID++;
 				if (QUERY_ID > 1000) {	//We store our IDs recursively, but at 1000 entries, i think it's safe to reset and delete old data
@@ -472,31 +558,256 @@ public class ClientMain {
 			}
 			return -1;
 		}
+
+		public String GetRank() {
+			return rank;
+		}
 	}
-	
+
 	public class StringPoint {
 		int num;
 		String string;
-		
+
 		public StringPoint(int index, String val) {
 			num = index;
 			string = val;
 		}
-		
+
 		public int GetIndex() {
 			return num;
 		}
-		
+
 		public String GetValue() {
 			return string;
 		}
-		
+
 		public void SetIndex(int i) {
 			num = i;
 		}
-		
+
 		public void SetValue(String s) {
 			string = s;
+		}
+	}
+
+	public class DataEntryManager {
+		ArrayList<DataEntry> data;
+
+		public DataEntryManager() {
+			data = new ArrayList<DataEntry>();
+		}
+
+		public void ClearData() {
+			data = new ArrayList<DataEntry>();
+		}
+
+		public ArrayList<DataEntry> GetData() {
+			return data;
+		}
+
+		public String[] GetDateList() {
+			//Populate ALL dates
+			ArrayList<String> dates = new ArrayList<String>();
+			for (int i = 0; i < data.size(); i++) {
+				dates.add(data.get(i).GetDate());
+			}
+
+			if (dates.size() > 1) {
+				//Remove duplicates
+				for (int i = 0; i < dates.size(); i++) {
+					String target = dates.get(i);
+					for (int j = i+1; j < dates.size(); j++) {
+						if (dates.get(j).equals(target)) {
+							dates.remove(j);
+						}
+					}
+				}
+			}
+
+			//ArrayList contains no duplicates, we can return this as an Array
+			String[] out = new String[dates.size()];
+			for (int i = 0; i < dates.size(); i++) {
+				out[i] = dates.get(i);
+			}
+
+			return out;
+		}
+
+		public String[] GetPilotList() {
+			//Populate ALL pilots
+			ArrayList<String> pilots = new ArrayList<String>();
+			for (int i = 0; i < data.size(); i++) {
+				pilots.add(data.get(i).GetPilot());
+			}
+
+			if (pilots.size() > 1) {
+				//Remove duplicates
+				for (int i = 0; i < pilots.size(); i++) {
+					String target = pilots.get(i);
+					for (int j = i+1; j < pilots.size(); j++) {
+						if (pilots.get(j).equals(target)) {
+							pilots.remove(j);
+						}
+					}
+				}
+			}
+
+			//ArrayList contains no duplicates, we can return this as an Array
+			String[] out = new String[pilots.size()];
+			for (int i = 0; i < pilots.size(); i++) {
+				out[i] = pilots.get(i);
+			}
+
+			return out;
+		}
+
+		public String[] GetAircraftList() {
+			//Populate ALL aircrafts
+			ArrayList<String> aircrafts = new ArrayList<String>();
+			for (int i = 0; i < data.size(); i++) {
+				aircrafts.add(data.get(i).GetAircraft());
+			}
+
+			if (aircrafts.size() > 1) {
+				//Remove duplicates
+				for (int i = 0; i < aircrafts.size(); i++) {
+					String target = aircrafts.get(i);
+					for (int j = i+1; j < aircrafts.size(); j++) {
+						if (aircrafts.get(j).equals(target)) {
+							aircrafts.remove(j);
+						}
+					}
+				}
+			}
+
+			//ArrayList contains no duplicates, we can return this as an Array
+			String[] out = new String[aircrafts.size()];
+			for (int i = 0; i < aircrafts.size(); i++) {
+				out[i] = aircrafts.get(i);
+			}
+
+			return out;
+		}
+
+		public String[][] GetLogsByDate(String d) {
+			String[][] out = new String[3][];
+
+			//Go through all data, matching this date.
+			for (int i = 0; i < data.size(); i++) {
+				if (data.get(i).GetDate().equals(d)) {
+					out[0] = data.get(i).GetFlightLogs();
+					out[1] = data.get(i).GetTrainingLogs();
+					out[2] = data.get(i).GetMaintinenceLogs();
+				}
+			}
+
+			return out;
+		}
+
+		public String[][] GetLogsByPilot(String p) { 
+			String[][] out = new String[3][];
+
+			//Go through all data, matching this date.
+			for (int i = 0; i < data.size(); i++) {
+				if (data.get(i).GetPilot().equals(p)) {
+					out[0] = data.get(i).GetFlightLogs();
+					out[1] = data.get(i).GetTrainingLogs();
+					out[2] = data.get(i).GetMaintinenceLogs();
+				}
+			}
+
+			return out;
+		}
+
+		public String[][] GetLogsByAircraft(String a) { 
+			String[][] out = new String[3][];
+
+			//Go through all data, matching this date.
+			for (int i = 0; i < data.size(); i++) {
+				if (data.get(i).GetAircraft().equals(a)) {
+					out[0] = data.get(i).GetFlightLogs();
+					out[1] = data.get(i).GetTrainingLogs();
+					out[2] = data.get(i).GetMaintinenceLogs();
+				}
+			}
+
+			return out;
+		}
+	}
+
+	public class DataEntry {
+		String date;
+		String pilot;
+		String aircraft;
+
+		ArrayList<String> flightLogs;
+		ArrayList<String> maintinenceLogs;
+		ArrayList<String> trainingLogs;
+
+		public DataEntry (String d) {
+			date = d;
+			flightLogs = new ArrayList<String>();
+			maintinenceLogs = new ArrayList<String>();
+			trainingLogs = new ArrayList<String>();
+		}
+
+		public void SetPilot (String p) {
+			pilot = p;
+		}
+
+		public void SetAircraft (String a) {
+			aircraft = a;
+		}
+
+		public void AddFlightLog(String s) {
+			flightLogs.add(s);
+		}
+
+		public void AddMaintinenceLog(String s) {
+			maintinenceLogs.add(s);
+		}
+
+		public void AddTrainingLog(String s) {
+			trainingLogs.add(s);
+		}
+
+		public String GetDate() {
+			return date;
+		}
+
+		public String GetPilot() {
+			return pilot;
+		}
+
+		public String GetAircraft() {
+			return aircraft;
+		}
+
+		public String[] GetFlightLogs() {
+			String[] out = new String[flightLogs.size()];
+			String append = pilot + "@" + date + " via " + aircraft + ": ";
+			for (int i = 0; i < flightLogs.size(); i++) {
+				out[i] = append + flightLogs.get(i);
+			}
+			return out;
+		}
+
+		public String[] GetMaintinenceLogs() {
+			String[] out = new String[maintinenceLogs.size()];
+			String append = pilot + "@" + date + " via " + aircraft + ": ";
+			for (int i = 0; i < maintinenceLogs.size(); i++) {
+				out[i] = append + maintinenceLogs.get(i);
+			}
+			return out;
+		}
+
+		public String[] GetTrainingLogs() {
+			String[] out = new String[trainingLogs.size()];
+			String append = pilot + "@" + date + " via " + aircraft + ": ";
+			for (int i = 0; i < trainingLogs.size(); i++) {
+				out[i] = append + trainingLogs.get(i);
+			}
+			return out;
 		}
 	}
 }

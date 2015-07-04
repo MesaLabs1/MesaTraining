@@ -44,9 +44,9 @@ public class JLoginDialog extends JDialog{
 	private JPasswordField passwordField;
 	JLabel lblHelptext_1;
 	
-	ClientMain superInstance;
+	Client superInstance;
 	
-	public JLoginDialog(ClientMain instance) {
+	public JLoginDialog(Client instance) {
 		setTitle("Mesa Labs WebConnect Single Sign-on");
 		setResizable(false);
 		
