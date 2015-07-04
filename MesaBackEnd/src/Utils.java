@@ -39,12 +39,6 @@ public class Utils {
 		}
 		LOG_NAME += ".log";
 		
-		try {
-			logWriter = new BufferedWriter(new FileWriter(LOG_NAME, true));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		
 		Log("Selected " + LOG_NAME + " as default logging location.");
 	}
 		
@@ -75,6 +69,12 @@ public class Utils {
 	 * 
 	 */
 	void Log(String message) {
+		try {
+			logWriter = new BufferedWriter(new FileWriter(LOG_NAME, true));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
 		Date date = new Date();
 		String sender = Thread.currentThread().getStackTrace()[CLIENT_CODE_STACK_INDEX].getMethodName();
 		String time = timeFormatter.format(date);
@@ -86,8 +86,9 @@ public class Utils {
 		
 		//Log it
 		try {
-			logWriter.write(log);;
+			logWriter.write(log);
 			logWriter.newLine();
+			logWriter.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

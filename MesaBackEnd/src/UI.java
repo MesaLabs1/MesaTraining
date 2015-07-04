@@ -98,6 +98,7 @@ public class UI extends JFrame{
 	int numErrors;
 	int memUsage;
 	int accessCount;
+	int opsCount;
 	
 	/*
 	 * Async Flags
@@ -301,7 +302,7 @@ public class UI extends JFrame{
 		lblMemoryUsageH.setBounds(16, 56, 82, 16);
 		pnlSystem.add(lblMemoryUsageH);
 
-		JLabel lblAccessCountH = new JLabel("Access Count:");
+		JLabel lblAccessCountH = new JLabel("Ops/second:");
 		lblAccessCountH.setFont(new Font("Lucida Grande", Font.PLAIN, 10));
 		lblAccessCountH.setBounds(16, 74, 82, 16);
 		pnlSystem.add(lblAccessCountH);
@@ -460,7 +461,7 @@ public class UI extends JFrame{
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
 			//Set indicator controls to representative variable
-			ui.lblAccessCount.setText("" + ui.accessCount);
+			ui.lblAccessCount.setText("" + ui.opsCount);
 			ui.lblClients.setText("" + ui.numClients);
 			ui.lblErrors.setText("" + ui.numErrors);
 			ui.lblHandles.setText("" + ui.numHandles);

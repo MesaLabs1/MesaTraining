@@ -1,5 +1,3 @@
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -7,8 +5,6 @@ import java.nio.file.StandardCopyOption;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
-
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -55,24 +51,24 @@ public class DatabaseManager {
 	Document doc;
 
 	public enum FieldType {
-		PILOTS ("Pilots"), 
-		AIRCRAFTS ("Aircrafts"), 
-		DATES ("Dates"), 
+		PILOTS ("Pilot"), 
+		AIRCRAFTS ("Aircraft"), 
+		DATES ("Date"), 
 		LOGS ("Logs");
-		
+
 		private final String name;       
 
-	    private FieldType(String s) {
-	        name = s;
-	    }
+		private FieldType(String s) {
+			name = s;
+		}
 
-	    public boolean equalsName(String otherName){
-	        return (otherName == null)? false:name.equals(otherName);
-	    }
+		public boolean equalsName(String otherName){
+			return (otherName == null)? false:name.equals(otherName);
+		}
 
-	    public String toString(){
-	       return name;
-	    }
+		public String toString(){
+			return name;
+		}
 	}
 
 	public enum FieldSubType {
@@ -80,20 +76,20 @@ public class DatabaseManager {
 		TRAINING ("Training"), 
 		FLIGHT ("Flight"), 
 		MAINTINENCE ("Maintinence");
-		
+
 		private final String name;       
 
-	    private FieldSubType(String s) {
-	        name = s;
-	    }
+		private FieldSubType(String s) {
+			name = s;
+		}
 
-	    public boolean equalsName(String otherName){
-	        return (otherName == null)? false:name.equals(otherName);
-	    }
+		public boolean equalsName(String otherName){
+			return (otherName == null)? false:name.equals(otherName);
+		}
 
-	    public String toString(){
-	       return name;
-	    }
+		public String toString(){
+			return name;
+		}
 	}
 
 	public DatabaseManager(Utils ut, UI u) {
@@ -296,50 +292,56 @@ public class DatabaseManager {
 	}
 
 	synchronized public String[] RequestField(FieldType type, FieldSubType subtype) {
-		NodeList nList = null;
-		if (type.equals(FieldType.LOGS)) {		//Let's access by the tag we want, not the superlevel.
-			nList = doc.getElementsByTagName(subtype.toString());
-		}else {
-			nList = doc.getElementsByTagName(type.toString());
-		}
+		try {
+			NodeList nList = null;
+			if (type.equals(FieldType.LOGS)) {		//Let's access by the tag we want, not the superlevel.
+				nList = doc.getElementsByTagName(subtype.toString());
+			}else {
+				nList = doc.getElementsByTagName(type.toString());
+			}
 
-		String values = "";
-		for (int i = 0; i < nList.getLength(); i++) {
-			Node nNode = nList.item(i);
-			if (nNode.getNodeType() == Node.ELEMENT_NODE) {
-				Element eElement = (Element)nNode;
-				if (eElement.hasAttributes()) {
-					NamedNodeMap map = eElement.getAttributes();
-					for (int j = 0; j < map.getLength(); j++) {
-						Node subNode = map.item(j);
-						Attr attribute = (Attr)subNode;
-						values += attribute.getValue() + "~";	
-					}
-				}else {
-					//This could be the Logs entries, since they use Elements, then attributes
-					NodeList subList = nNode.getChildNodes();
-					for (int j = 0; j < subList.getLength(); j++) {
-						Node subNode = subList.item(j);
-						if (subNode.getNodeType() == Node.ELEMENT_NODE) {
-							Element subElement = (Element)subNode;
-							if (subElement.hasAttributes()) {
-								NamedNodeMap map = subElement.getAttributes();
-								for (int k = 0; k < map.getLength(); k++) {
-									Node subSubNode = map.item(k);
-									Attr attribute = (Attr)subSubNode;
-									values += attribute.getValue() + "~";	
+			String values = "";
+			for (int i = 0; i < nList.getLength(); i++) {
+				Node nNode = nList.item(i);
+				if (nNode.getNodeType() == Node.ELEMENT_NODE) {
+					Element eElement = (Element)nNode;
+					if (eElement.hasAttributes()) {
+						NamedNodeMap map = eElement.getAttributes();
+						for (int j = 0; j < map.getLength(); j++) {
+							Node subNode = map.item(j);
+							Attr attribute = (Attr)subNode;
+							values += attribute.getValue() + "~";	
+						}
+					}else {
+						//This could be the Logs entries, since they use Elements, then attributes
+						NodeList subList = nNode.getChildNodes();
+						for (int j = 0; j < subList.getLength(); j++) {
+							Node subNode = subList.item(j);
+							if (subNode.getNodeType() == Node.ELEMENT_NODE) {
+								Element subElement = (Element)subNode;
+								if (subElement.hasAttributes()) {
+									NamedNodeMap map = subElement.getAttributes();
+									for (int k = 0; k < map.getLength(); k++) {
+										Node subSubNode = map.item(k);
+										Attr attribute = (Attr)subSubNode;
+										values += attribute.getValue() + "~";	
+									}
 								}
 							}
 						}
 					}
 				}
 			}
+			if (values.length() > 0) {
+				values = values.substring(0, values.length() - 1);
+			}
+			ui.accessCount++;
+			return values.split("~");
+		}catch (Exception e) {
+			//Return an empty array (this is a ghetto way of doing it), to keep the system up.
+			//NOTE: This error seems to occur whenever a client terminates connection due to premature thread termination in an ADO.
+			return "".split("");
 		}
-		if (values.length() > 0) {
-			values = values.substring(0, values.length() - 1);
-		}
-		ui.accessCount++;
-		return values.split("~");
 	}
 
 	synchronized public void CreateUser(String caller, String username, String password, String permissions) {

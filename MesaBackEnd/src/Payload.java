@@ -17,6 +17,14 @@ public class Payload implements Serializable {
 	private DefaultListModel<String> userModel;
 	private DefaultListModel<String> rankModel;
 	
+	private int numUsers;
+	private int numOnline;
+	private int bufferSize;
+	private String uptime;
+	private String memUsage;
+	private int numOverhead;
+	private String netIP;
+	
 	public Payload() {
 		dateModel = new DefaultListModel<String>();
 		pilotModel = new DefaultListModel<String>();
@@ -95,5 +103,62 @@ public class Payload implements Serializable {
 	public static long getSerialversionuid() {
 		return serialVersionUID;
 	}
+
+	public int getNumUsers() {
+		return numUsers;
+	}
+
+	public void setNumUsers(int numUsers) {
+		this.numUsers = numUsers;
+	}
+
+	public int getNumOnline() {
+		return numOnline;
+	}
+
+	public void setNumOnline(int numOnline) {
+		this.numOnline = numOnline;
+	}
+	
+	public int getBufferSize() {
+		return bufferSize;
+	}
+
+	public void setBufferSize(int bufferSize) {
+		this.bufferSize = bufferSize;
+	}
+
+	public String getUptime() {
+		return uptime;
+	}
+
+	public void setUptime(String uptime) {
+		this.uptime = uptime;
+	}
+
+	public String getMemUsage() {
+		return memUsage;
+	}
+
+	public void setMemUsage(String memUsage) {
+		this.memUsage = memUsage;
+	}
+
+	public int getNumOverhead() {
+		return numOverhead;
+	}
+
+	public void setNumOverhead(int numOverhead) {
+		this.numOverhead = numOverhead;
+	}
+
+	public String getNetIP() {
+		return netIP;
+	}
+
+	public void setNetIP(String netIP) {
+		this.netIP = netIP;
+	}
+
 	
 }

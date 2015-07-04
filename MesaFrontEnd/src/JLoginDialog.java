@@ -108,6 +108,7 @@ public class JLoginDialog extends JDialog{
 		panel_1.add(passwordField, "cell 0 6,growx");
 		
 		JButton btnAuthenticate = new JButton("Authenticate");
+		rootPane.setDefaultButton(btnAuthenticate);
 		btnAuthenticate.addActionListener(new ActionListener() {
 
 			/*

@@ -76,6 +76,8 @@ public class Backend {
 		Backend backend;
 		UI ui;
 		NetworkMaster netMaster;
+		
+		int second = 10;
 
 		public EventHandler() {
 			backend = Backend.this;
@@ -116,6 +118,15 @@ public class Backend {
 			
 			//We call this to reload the payload class data for its sync.
 			netMaster.UpdatePayload();
+		
+			if (second == 0) {
+				second = 10;
+				
+				ui.opsCount = ui.accessCount;
+				ui.accessCount = 0;
+			}else {
+				second--;
+			}
 		}
 	}
 
@@ -271,7 +282,6 @@ public class Backend {
 					if (!success) {
 						util.Log("CRITICAL ERROR. I DON'T HAVE ANYWHERE TO PUT MY NEXT CLIENT.");
 					}
-					ui.accessCount++;
 					UpdateUI();
 				}
 			} catch (IOException e1) {
@@ -292,6 +302,12 @@ public class Backend {
 			payload.setFlightModel(ConvertArrayToModel(dbMan.RequestField(DatabaseManager.FieldType.LOGS, DatabaseManager.FieldSubType.FLIGHT)));
 			payload.setMaintinenceModel(ConvertArrayToModel(dbMan.RequestField(DatabaseManager.FieldType.LOGS, DatabaseManager.FieldSubType.MAINTINENCE)));
 			payload.setTrainingModel(ConvertArrayToModel(dbMan.RequestField(DatabaseManager.FieldType.LOGS, DatabaseManager.FieldSubType.TRAINING)));
+		
+			payload.setNumUsers(dbMan.GetUserCount());
+			payload.setNumOnline(ui.numClients);
+			payload.setNetIP(netMaster.GetCurrentSocket().getInetAddress().toString());
+			payload.setNumOverhead(ui.numOverall);
+			payload.setUptime(ui.lblUptime.getText());
 		}
 		
 		public DefaultListModel<String> ConvertArrayToModel(String[] in) {
@@ -346,15 +362,18 @@ public class Backend {
 
 		@Override
 		public void run() {
+			DataInputStream in;
+			DataOutputStream out;
+			ObjectOutputStream  oos;
 			while(active) {
 				try {
 					ui.accessCount++;
 					ui.progressBar.setValue(10);
 
-					DataInputStream in = new DataInputStream(server.getInputStream());
-					DataOutputStream out = new DataOutputStream(server.getOutputStream());
+					in = new DataInputStream(server.getInputStream());
+					out = new DataOutputStream(server.getOutputStream());
 					
-					ObjectOutputStream  oos = new ObjectOutputStream(server.getOutputStream());
+					oos = new ObjectOutputStream(server.getOutputStream());
 		           
 					util.Log("You've awoken " + name + " on port " + server.getLocalPort() + ".");
 					util.Log("[" + name + "] Authorizing " + server.getRemoteSocketAddress() + "...");
@@ -502,19 +521,6 @@ public class Backend {
 															//util.Log("Could not locate user by ID, sending error...");
 															out.writeUTF("$ERROR");
 														}
-													}else {
-//														//util.Log("RECV remote request for datalist " + cmd + "...");
-//														String[] respArr = dbMan.RequestField(cmd);	//We have an array from the DB, let's stringify this.
-//														String resp = "";
-//														for (int i = 0; i < respArr.length; i++) {
-//															resp += respArr[i] + "$";
-//														}
-//														if (resp.length() > 0) {
-//															resp = resp.substring(0, resp.length() - 1);
-//														}
-//														//We now have a string separated like this Jad;Andy;Jacqueline;Tebiao, so lets send it.
-//														//util.Log("Transmitting " + respArr.length + " bytes to client...");
-//														out.writeUTF("$LIST " + resp);
 													}
 												}else if (request.equals("$ABORT")) {
 													done = true;
@@ -575,14 +581,7 @@ public class Backend {
 					}else {
 						out.writeUTF("$ERROR, VERSION");
 						util.Log("MISMATCH! Client is version " + remoteVersion + " but we are version " + propMaster.BACKEND_VERSION + "! Closing the Server!");
-						server.close();
-						oos.close();
-						active = false;
 					}
-
-					ui.numOverhead--;
-					server.close();
-					active = false;
 				}catch(SocketTimeoutException s) {
 					System.out.println("[" + name + "] The socket has timed out and been reset.");
 					break;
@@ -591,6 +590,18 @@ public class Backend {
 					//e.printStackTrace();
 					break;
 				}
+				
+				try {
+					oos.close();
+					in.close();
+					out.close();
+					server.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+				
+				ui.numOverhead--;
+				active = false;
 			}
 		}
 

@@ -6,6 +6,8 @@ import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
 import javax.swing.JTabbedPane;
 import javax.swing.Timer;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
 
 import net.miginfocom.swing.MigLayout;
 
@@ -165,6 +167,32 @@ public class AppletUI extends Applet{
 	}
 
 	public AppletUI() {
+		/*
+		 * Set the visual style to be Linux, since we are developing this for a Linux target. BUT WAIT.
+		 * Whoa, isn't Java supposed to be super cross compatible with everything forever? Yes. But heres the thing.
+		 * UI Look and Feel, a UI Manager derivative, tells the system how buttons, controls, and interfaces Look.
+		 * However, each systems visual interfaces take up marginally more or less pixels-per-control to display.
+		 * By setting the L&F to Windows, the display editor will show us the interface as it will appear on the 
+		 * host system, not on your specific OS.
+		 */
+		try {
+			UIManager.setLookAndFeel("com.sun.java.swing.plaf.gtk.GTKLookAndFeel");
+			
+			/**
+			 * A Button Mnemonic is the key a user has to press to activate that button automatically.
+			 * Since we want the program to display them, when the user hits ALT, the mnemonic will display.
+			 */
+			UIManager.getDefaults().put("Button.showMnemonics", Boolean.TRUE);
+		}catch (UnsupportedLookAndFeelException e) {
+			e.printStackTrace();
+		}catch (ClassNotFoundException e) {
+			
+		}catch (InstantiationException e) {
+			e.printStackTrace();
+		}catch (IllegalAccessException e) {
+			e.printStackTrace();
+		}
+		
 		setBackground(Color.BLACK);
 		//We auto-set the default data modality to date-sorted.
 		dataMode = DATA_MODE.MODE_DATE;
@@ -766,7 +794,7 @@ public class AppletUI extends Applet{
 		JLabel lblMemoryUsageHead = new JLabel("Memory Usage:");
 		lblMemoryUsageHead.setForeground(Color.WHITE);
 
-		JLabel lblNetworkOverheadHead = new JLabel("Network Overhead:");
+		JLabel lblNetworkOverheadHead = new JLabel("Network ops/second:");
 		lblNetworkOverheadHead.setForeground(Color.WHITE);
 
 		JLabel lblNetworkIpHead = new JLabel("Network IP:");
