@@ -5,6 +5,7 @@ import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
 import javax.swing.JTabbedPane;
+import javax.swing.ListModel;
 import javax.swing.Timer;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
@@ -41,6 +42,7 @@ import javax.swing.BoxLayout;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Image;
+import java.awt.Point;
 
 import javax.swing.SwingConstants;
 
@@ -54,6 +56,8 @@ import javax.swing.ListSelectionModel;
 import javax.swing.JTextField;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.event.ListSelectionEvent;
+import javax.swing.JScrollPane;
+import javax.swing.ScrollPaneConstants;
 
 /**
  * This is the Visual Applet that the web browser will display.
@@ -95,6 +99,8 @@ public class AppletUI extends Applet{
 	Client client;
 
 	//UI Stuffs
+	JScrollPane scrollPane;
+	
 	JLabel lblUsername;
 	JLabel lblTime;
 	JLabel lblUserPermissions;
@@ -121,6 +127,7 @@ public class AppletUI extends Applet{
 	JList<String> mLogsList;
 	JList<String> userList;
 	JList<String> rankList;
+	JList<String> listConsole;
 
 	//ArrayList of JObjects to be hidden/shown based on rank.
 	ArrayList<Component> adminElements;
@@ -611,7 +618,7 @@ public class AppletUI extends Applet{
 						.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
 				);
 		pnlAdmin.setLayout(gl_pnlAdmin);
-		pnlAdministrationHolder.setLayout(new MigLayout("", "[::212px,grow][252px:n:252px][grow]", "[100px:n:100px][100px:n:100px][grow]"));
+		pnlAdministrationHolder.setLayout(new MigLayout("", "[::212px,grow][252px:n:252px][grow]", "[100px:n:100px][100px:n:100px][growprio 99,grow][2px:n:2px]"));
 		pnlAdministrationHolder.add(pnlAdmin, "cell 0 0,grow");
 
 		JPanel pnlManagement = new JPanel();
@@ -694,12 +701,17 @@ public class AppletUI extends Applet{
 		JLabel lblConsole = new JLabel("Console");
 		lblConsole.setForeground(Color.LIGHT_GRAY);
 		panel_5.add(lblConsole, "cell 0 0");
+		
+		scrollPane = new JScrollPane();
+		scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+		panel_5.add(scrollPane, "cell 0 1,grow");
 
-		JList<String> listConsole = new JList<String>();
+		listConsole = new JList<String>();
+		listConsole.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		scrollPane.setViewportView(listConsole);
 		listConsole.setFont(new Font("Consolas", Font.PLAIN, 11));
 		listConsole.setForeground(Color.GREEN);
 		listConsole.setBackground(Color.GRAY);
-		panel_5.add(listConsole, "cell 0 1,grow");
 
 		listConsole.setModel(consoleModel);
 
@@ -738,26 +750,26 @@ public class AppletUI extends Applet{
 
 		GroupLayout gl_panel_3 = new GroupLayout(panel_3);
 		gl_panel_3.setHorizontalGroup(
-				gl_panel_3.createParallelGroup(Alignment.LEADING)
+			gl_panel_3.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_panel_3.createSequentialGroup()
-						.addContainerGap()
-						.addGroup(gl_panel_3.createParallelGroup(Alignment.LEADING)
-								.addComponent(lblDataTasks)
-								.addComponent(btnCreateEntry, GroupLayout.DEFAULT_SIZE, 190, Short.MAX_VALUE)
-								.addComponent(btnDeleteEntries, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 190, Short.MAX_VALUE))
-								.addContainerGap())
-				);
+					.addContainerGap()
+					.addGroup(gl_panel_3.createParallelGroup(Alignment.LEADING)
+						.addComponent(btnCreateEntry, GroupLayout.DEFAULT_SIZE, 161, Short.MAX_VALUE)
+						.addComponent(btnDeleteEntries, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+						.addComponent(lblDataTasks))
+					.addContainerGap())
+		);
 		gl_panel_3.setVerticalGroup(
-				gl_panel_3.createParallelGroup(Alignment.LEADING)
+			gl_panel_3.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_panel_3.createSequentialGroup()
-						.addContainerGap()
-						.addComponent(lblDataTasks)
-						.addPreferredGap(ComponentPlacement.RELATED)
-						.addComponent(btnCreateEntry)
-						.addPreferredGap(ComponentPlacement.RELATED)
-						.addComponent(btnDeleteEntries)
-						.addContainerGap(43, Short.MAX_VALUE))
-				);
+					.addContainerGap()
+					.addComponent(lblDataTasks)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(btnCreateEntry)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(btnDeleteEntries)
+					.addContainerGap(15, Short.MAX_VALUE))
+		);
 		panel_3.setLayout(gl_panel_3);
 
 		JPanel panel_4 = new JPanel();
@@ -821,73 +833,81 @@ public class AppletUI extends Applet{
 		lblNetworkIP.setForeground(Color.WHITE);
 		GroupLayout gl_panel_4 = new GroupLayout(panel_4);
 		gl_panel_4.setHorizontalGroup(
-				gl_panel_4.createParallelGroup(Alignment.LEADING)
+			gl_panel_4.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_panel_4.createSequentialGroup()
-						.addContainerGap()
-						.addGroup(gl_panel_4.createParallelGroup(Alignment.LEADING)
+					.addContainerGap()
+					.addGroup(gl_panel_4.createParallelGroup(Alignment.LEADING)
+						.addGroup(gl_panel_4.createSequentialGroup()
+							.addGroup(gl_panel_4.createParallelGroup(Alignment.LEADING)
 								.addGroup(gl_panel_4.createSequentialGroup()
-										.addGap(10)
-										.addGroup(gl_panel_4.createParallelGroup(Alignment.LEADING)
-												.addComponent(lblUsersHead)
-												.addComponent(lblUsersOnlineHead)
-												.addComponent(lblLocalSize)
-												.addComponent(lblServerUptimeHead)))
-												.addComponent(lblStatistics)
-												.addComponent(lblTechnicalStatistics)
-												.addGroup(gl_panel_4.createSequentialGroup()
-														.addGap(10)
-														.addGroup(gl_panel_4.createParallelGroup(Alignment.LEADING)
-																.addComponent(lblNetworkOverheadHead)
-																.addComponent(lblMemoryUsageHead)
-																.addComponent(lblNetworkIpHead))))
-																.addPreferredGap(ComponentPlacement.RELATED, 41, Short.MAX_VALUE)
-																.addGroup(gl_panel_4.createParallelGroup(Alignment.LEADING, false)
-																		.addComponent(lblUsers, GroupLayout.DEFAULT_SIZE, 26, Short.MAX_VALUE)
-																		.addComponent(lblUsersOnline, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-																		.addComponent(lblBufferSize, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-																		.addComponent(lblServerUptime, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-																		.addComponent(lblMemoryUsage, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-																		.addComponent(lblNetworkOverhead, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-																		.addComponent(lblNetworkIP, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-																		.addContainerGap(28, Short.MAX_VALUE))
-				);
-		gl_panel_4.setVerticalGroup(
-				gl_panel_4.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_panel_4.createSequentialGroup()
-						.addContainerGap()
-						.addComponent(lblStatistics)
-						.addPreferredGap(ComponentPlacement.RELATED)
-						.addGroup(gl_panel_4.createParallelGroup(Alignment.BASELINE)
-								.addComponent(lblUsersHead)
-								.addComponent(lblUsers))
-								.addPreferredGap(ComponentPlacement.RELATED)
-								.addGroup(gl_panel_4.createParallelGroup(Alignment.BASELINE)
+									.addGap(10)
+									.addGroup(gl_panel_4.createParallelGroup(Alignment.LEADING)
+										.addComponent(lblUsersHead)
 										.addComponent(lblUsersOnlineHead)
-										.addComponent(lblUsersOnline))
-										.addPreferredGap(ComponentPlacement.RELATED)
-										.addGroup(gl_panel_4.createParallelGroup(Alignment.BASELINE)
-												.addComponent(lblLocalSize)
-												.addComponent(lblBufferSize))
-												.addPreferredGap(ComponentPlacement.RELATED)
-												.addGroup(gl_panel_4.createParallelGroup(Alignment.BASELINE)
-														.addComponent(lblServerUptimeHead)
-														.addComponent(lblServerUptime))
-														.addGap(31)
-														.addComponent(lblTechnicalStatistics)
-														.addPreferredGap(ComponentPlacement.RELATED)
-														.addGroup(gl_panel_4.createParallelGroup(Alignment.BASELINE)
-																.addComponent(lblMemoryUsageHead)
-																.addComponent(lblMemoryUsage))
-																.addPreferredGap(ComponentPlacement.RELATED)
-																.addGroup(gl_panel_4.createParallelGroup(Alignment.BASELINE)
-																		.addComponent(lblNetworkOverheadHead)
-																		.addComponent(lblNetworkOverhead))
-																		.addPreferredGap(ComponentPlacement.RELATED)
-																		.addGroup(gl_panel_4.createParallelGroup(Alignment.BASELINE)
-																				.addComponent(lblNetworkIpHead)
-																				.addComponent(lblNetworkIP))
-																				.addContainerGap(39, Short.MAX_VALUE))
-				);
+										.addComponent(lblLocalSize)
+										.addComponent(lblServerUptimeHead))
+									.addPreferredGap(ComponentPlacement.RELATED, 32, Short.MAX_VALUE)
+									.addGroup(gl_panel_4.createParallelGroup(Alignment.LEADING, false)
+										.addComponent(lblUsers, GroupLayout.DEFAULT_SIZE, 26, Short.MAX_VALUE)
+										.addComponent(lblUsersOnline, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+										.addComponent(lblBufferSize, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+										.addComponent(lblServerUptime)))
+								.addGroup(gl_panel_4.createSequentialGroup()
+									.addGroup(gl_panel_4.createParallelGroup(Alignment.LEADING)
+										.addComponent(lblTechnicalStatistics)
+										.addGroup(gl_panel_4.createSequentialGroup()
+											.addGap(10)
+											.addGroup(gl_panel_4.createParallelGroup(Alignment.LEADING)
+												.addComponent(lblNetworkOverheadHead)
+												.addComponent(lblMemoryUsageHead)
+												.addComponent(lblNetworkIpHead))))
+									.addPreferredGap(ComponentPlacement.RELATED, 32, Short.MAX_VALUE)
+									.addGroup(gl_panel_4.createParallelGroup(Alignment.LEADING, false)
+										.addComponent(lblMemoryUsage, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+										.addComponent(lblNetworkOverhead, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+										.addComponent(lblNetworkIP))))
+							.addGap(20))
+						.addGroup(gl_panel_4.createSequentialGroup()
+							.addComponent(lblStatistics)
+							.addContainerGap(128, Short.MAX_VALUE))))
+		);
+		gl_panel_4.setVerticalGroup(
+			gl_panel_4.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_panel_4.createSequentialGroup()
+					.addContainerGap()
+					.addComponent(lblStatistics)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addGroup(gl_panel_4.createParallelGroup(Alignment.BASELINE)
+						.addComponent(lblUsersHead)
+						.addComponent(lblUsers))
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addGroup(gl_panel_4.createParallelGroup(Alignment.BASELINE)
+						.addComponent(lblUsersOnlineHead)
+						.addComponent(lblUsersOnline))
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addGroup(gl_panel_4.createParallelGroup(Alignment.BASELINE)
+						.addComponent(lblLocalSize)
+						.addComponent(lblBufferSize))
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addGroup(gl_panel_4.createParallelGroup(Alignment.BASELINE)
+						.addComponent(lblServerUptimeHead)
+						.addComponent(lblServerUptime))
+					.addGap(18)
+					.addComponent(lblTechnicalStatistics)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addGroup(gl_panel_4.createParallelGroup(Alignment.BASELINE)
+						.addComponent(lblMemoryUsageHead)
+						.addComponent(lblMemoryUsage))
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addGroup(gl_panel_4.createParallelGroup(Alignment.BASELINE)
+						.addComponent(lblNetworkOverheadHead)
+						.addComponent(lblNetworkOverhead))
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addGroup(gl_panel_4.createParallelGroup(Alignment.BASELINE)
+						.addComponent(lblNetworkIpHead)
+						.addComponent(lblNetworkIP))
+					.addContainerGap(46, Short.MAX_VALUE))
+		);
 		panel_4.setLayout(gl_panel_4);
 		pnlInternalPane.setLayout(new BorderLayout(0, 0));
 
@@ -906,47 +926,18 @@ public class AppletUI extends Applet{
 		pnlDate.setBackground(Color.GRAY);
 		pnlDate.setBorder(new LineBorder(new Color(0, 0, 0)));
 		pnlDateHolder.add(pnlDate, BorderLayout.NORTH);
-		pnlDate.setLayout(new MigLayout("", "[][grow][][grow][]", "[14px]"));
+		pnlDate.setLayout(new MigLayout("", "[][grow][200px:n:256px][grow][]", "[14px]"));
 
 		lblMode = new JLabel("DATA_MODE");
 		lblMode.setHorizontalAlignment(SwingConstants.CENTER);
 		lblMode.setForeground(Color.ORANGE);
-		pnlDate.add(lblMode, "cell 2 0,alignx left,aligny top");
+		pnlDate.add(lblMode, "cell 2 0,alignx center,aligny top");
 
 		listData = new JList<String>();
 		listData.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		listData.addListSelectionListener(new ListSelectionListener() {
 			public void valueChanged(ListSelectionEvent arg0) {
-				if (client.payload != null && listData.getSelectedValue() != null) {
-					String selection = listData.getSelectedValue();
-					ArrayList<Payload.Entry> entries = null;
-					if (dataMode.equals(DATA_MODE.MODE_AIRCRAFT)) {
-						entries = client.payload.getDataByAircraft(selection);
-					}else if (dataMode.equals(DATA_MODE.MODE_PILOT)) {
-
-					}else if (dataMode.equals(DATA_MODE.MODE_AIRCRAFT)) {
-
-					} 
-					if (entries != null) {
-						ArrayList<String> training = new ArrayList<String>();
-						ArrayList<String> flight = new ArrayList<String>();
-						ArrayList<String> maintinence = new ArrayList<String>();
-						for (Payload.Entry entry : entries) {
-							for (String s : entry.getTrainingData()) {
-								training.add(s);
-							}
-							for (String s : entry.getFlightData()) {
-								flight.add(s);
-							}
-							for (String s : entry.getMaintinenceData()) {
-								maintinence.add(s);
-							}
-						}
-						tLogsList.setModel(ConvertArrayToModel(training));
-						fLogsList.setModel(ConvertArrayToModel(flight));
-						mLogsList.setModel(ConvertArrayToModel(maintinence));
-					}
-				}
+				eventHandler.UpdateLogs();
 			}
 		});
 		listData.setBackground(Color.DARK_GRAY);
@@ -978,7 +969,7 @@ public class AppletUI extends Applet{
 
 		eventTicker.start();
 	}
-	
+
 	public DefaultListModel<String> ConvertArrayToModel(ArrayList<String> s) {
 		DefaultListModel<String> out = new DefaultListModel<String>();
 		for (String a : s) {
@@ -1024,27 +1015,41 @@ public class AppletUI extends Applet{
 
 			if (client.payload != null && client.authenticated == true) {
 				try {
-					if (!userList.getModel().equals(client.payload.getUserModel())) {
-						userList.setModel(client.payload.getUserModel());
+					if (CheckForDLM(client.payload.getUserModel())) {
+						if (!DLMComparator(userList.getModel(),client.payload.getUserModel())) {
+							userList.setModel(client.payload.getUserModel());
+						}
 					}
-					if (!rankList.getModel().equals(client.payload.getRankModel())) {
-						rankList.setModel(client.payload.getRankModel());
+					if (CheckForDLM(client.payload.getRankModel())) {
+						if (!DLMComparator(rankList.getModel(),client.payload.getRankModel())) {
+							rankList.setModel(client.payload.getRankModel());
+						}
 					}
+
 					//Set the JList modality based on the Mode, and the JLabel
 					if (dataMode.equals(DATA_MODE.MODE_AIRCRAFT)) {
-						if (client.payload.getNameModel().getSize() > 0 && !client.payload.getNameModel().elementAt(0).equals("")) {
-							lblMode.setText("Aircraft");
-							listData.setModel(client.payload.getNameModel());
+						if (CheckForDLM(client.payload.getNameModel())) {
+							if (!DLMComparator(listData.getModel(), client.GetPayload().getNameModel())) {
+								lblMode.setText("Aircraft");
+								listData.setModel(client.payload.getNameModel());
+								UpdateLogs();
+							}
 						}
 					}else if (dataMode.equals(DATA_MODE.MODE_DATE)) {
-						if (client.payload.getDateModel().getSize() > 0 && !client.payload.getDateModel().elementAt(0).equals("")) {
-							lblMode.setText("Date");
-							listData.setModel(client.payload.getDateModel());
+						if (CheckForDLM(client.payload.getDateModel())) {
+							if (!DLMComparator(listData.getModel(), client.GetPayload().getDateModel())) {
+								lblMode.setText("Date");
+								listData.setModel(client.payload.getDateModel());
+								UpdateLogs();
+							}
 						}
 					}else if (dataMode.equals(DATA_MODE.MODE_PILOT)) {
-						if (client.payload.getPilotModel().getSize() > 0 && !client.payload.getPilotModel().elementAt(0).equals("")) {
-							lblMode.setText("Pilot");
-							listData.setModel(client.payload.getPilotModel());
+						if (CheckForDLM(client.payload.getPilotModel())) {
+							if (!DLMComparator(listData.getModel(), client.GetPayload().getPilotModel())) {
+								lblMode.setText("Pilot");
+								listData.setModel(client.payload.getPilotModel());
+								UpdateLogs();
+							}
 						}
 					}
 				}catch (Exception e) {
@@ -1079,6 +1084,80 @@ public class AppletUI extends Applet{
 					}
 				}
 			}
+			
+			listConsole.setSelectedIndex(listConsole.getModel().getSize());
+			listConsole.ensureIndexIsVisible(listConsole.getSelectedIndex() - 1);
+		}
+
+		public void UpdateLogs() {
+			if (client.payload != null && listData.getSelectedValue() != null) {
+				String selection = listData.getSelectedValue();
+				ArrayList<Payload.Entry> entries = null;
+				client.Log("Performing local search for '" + selection + "' via " + dataMode.toString() + ".");
+				if (dataMode.equals(DATA_MODE.MODE_AIRCRAFT)) {
+					entries = client.payload.getDataByAircraft(selection);
+				}else if (dataMode.equals(DATA_MODE.MODE_PILOT)) {
+					entries = client.payload.getDataByPilot(selection);
+				}else if (dataMode.equals(DATA_MODE.MODE_DATE)) {
+					entries = client.payload.getDataByDate(selection);
+				} 
+				if (entries != null) {
+					ArrayList<String> training = new ArrayList<String>();
+					ArrayList<String> flight = new ArrayList<String>();
+					ArrayList<String> maintinence = new ArrayList<String>();
+					int t = 0;
+					int f = 0;
+					int m = 0;
+					for (Payload.Entry entry : entries) {
+						String tData = entry.getTrainingData();
+						String fData = entry.getFlightData();
+						String mData = entry.getMaintinenceData();
+
+						if (tData.length() > 0) {
+							t++;
+							training.add(tData);
+						}
+
+						if (fData.length() > 0) {
+							f++;
+							flight.add(entry.getFlightData());
+						}
+
+						if (mData.length() > 0) {
+							m++;
+							maintinence.add(entry.getMaintinenceData());
+						}
+					}
+					tLogsList.setModel(ConvertArrayToModel(training));
+					fLogsList.setModel(ConvertArrayToModel(flight));
+					mLogsList.setModel(ConvertArrayToModel(maintinence));
+					client.Log("Result: " + t + " training entries; " + f + " flight entries; " + m + " maintinence entries.");
+				}else {
+					client.Log("No results found!");
+				}
+			}
+		}
+
+		public boolean DLMComparator(ListModel a, DefaultListModel<String> b) {
+			//For some reason, we cannot compare them as the objects they are, so we can do a line-by-line check.
+			//First things first, are they the same size?
+			if (a.getSize() == b.getSize()) {
+				for (int i = 0; i < a.getSize(); i++) {
+					if (!a.getElementAt(i).toString().equals(b.getElementAt(i))) {
+						return false;
+					}
+				}
+			}else {
+				return false;
+			}
+			return true;
+		}
+
+		public boolean CheckForDLM(DefaultListModel<String> model) {
+			if (model.getSize() > 0 && !model.elementAt(0).equals("")) {
+				return true;
+			}
+			return false;
 		}
 
 		public String convertUptime() {

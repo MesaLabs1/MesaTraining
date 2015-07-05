@@ -17,5 +17,5 @@
 	</Data>
 	
 	<Users>
-		<jaboulhosn LastLogin="04072015;025335" Password="1" Rank="superadmin"><!--User: jaboulhosn, with password "testpassword" was last logged in on 05/19/2015, 8:10:36 PM--></jaboulhosn></Users>
+		<jaboulhosn LastLogin="04072015;175330" Password="1" Rank="superadmin"><!--User: jaboulhosn, with password "testpassword" was last logged in on 05/19/2015, 8:10:36 PM--></jaboulhosn></Users>
 	<Permissions admin="modify" superadmin="create;delete;modify" user=""/></Database>

@@ -703,7 +703,7 @@ public class UI extends JFrame{
 //				mon1YCap = memUsage;
 //			}
 			//Network Overhead Cap
-			mon0YCap = 50;
+			mon0YCap = 200;
 			
 			//Max System Memory
 			long allocatedMemory = (Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory());
@@ -715,10 +715,10 @@ public class UI extends JFrame{
 		private void DrawValues() {
 			//Mon0
 			g2d.setFont(target.getFont().deriveFont(10.0f));
-			double height = ((double)numOverhead / (double)mon0YCap) * mon0Area.height;
+			double height = ((double)opsCount / (double)mon0YCap) * mon0Area.height;
 			Point p = new Point(mon0XValue, (mon0Area.y + mon0Area.height - 4 - (int)height));
 			g2d.fillRect(p.x, p.y, 3, 3);
-			String overhead = String.valueOf(numOverhead);
+			String overhead = String.valueOf(opsCount);
 			g2d.drawString(overhead, p.x - (fm.stringWidth(overhead) / 2), p.y - 2);
 			mon0XValue += incrementMon0;
 			if (mon0XValue > incrementMon0) {

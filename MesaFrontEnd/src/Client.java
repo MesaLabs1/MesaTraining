@@ -266,6 +266,8 @@ public class Client {
 									ui.lblNetworkOverhead.setText("" + payload.getNumOverhead());
 									ui.lblNetworkIP.setText("" + payload.getNetIP());
 									ui.lblBufferSize.setText("INACTIVE");
+									
+									//As a security measure, we've moved the rank check to a completely separate command. We can add a signature to this to make it even more secure.
 									instance.RemoteRequest("$GET RANK " + instance.username);
 								}
 							}
