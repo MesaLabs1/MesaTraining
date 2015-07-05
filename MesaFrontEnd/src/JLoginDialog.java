@@ -53,7 +53,7 @@ public class JLoginDialog extends JDialog{
 		superInstance = instance;
 		
 		//Set Size of Dialog to something smaller than 640x480, preferably in multiples of 8 or 16.
-		this.setSize(new Dimension(445, 189));
+		this.setSize(new Dimension(445, 224));
 		
 		//A Java toolkit that provides us with information about the target system.
 		Toolkit toolkit = Toolkit.getDefaultToolkit();

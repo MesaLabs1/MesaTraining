@@ -49,6 +49,11 @@ public class Client {
 		System.out.println(log);
 		ui.consoleModel.addElement(log);
 	}
+	
+	void SilentLog(String mesage) {
+		System.out.println(mesage);
+		ui.consoleModel.addElement(mesage);
+	}
 
 	/**
 	 * The following block of code allows this class to fetch the calling class' data
@@ -130,6 +135,9 @@ public class Client {
 			query = new ArrayList<String>();
 		}
 
+		public String getUsername() {
+			return username;
+		}
 
 		@Override
 		public void run() {
@@ -140,11 +148,11 @@ public class Client {
 				in = new DataInputStream(client.getInputStream());
 				out = new DataOutputStream(client.getOutputStream());
 
-				 ObjectInputStream ois = new ObjectInputStream(client.getInputStream());
-				 
+				ObjectInputStream ois = new ObjectInputStream(client.getInputStream());
+
 				Log("Client initializing on " + client.getLocalAddress() + "@" + client.getLocalPort() + ".");
 
-				Log("Preparing to handshake the client at " + client.getRemoteSocketAddress() + ". I hope I know the secret handshake.");
+				Log("Preparing to handshake the client at " + client.getRemoteSocketAddress() + ". Transmitting authorization protocol.");
 
 				/*
 				 * Client Sends: Version, Computer Name, IP-Address
@@ -158,6 +166,8 @@ public class Client {
 				 * 
 				 * client Waits for Client Request
 				 * Client: Request
+				 * Server: Response
+				 * Server: Synchronize data class
 				 * 
 				 * -> Repeat
 				 * 
@@ -230,7 +240,7 @@ public class Client {
 										//Log("[QUERY] " + request + "; ID:" + id);
 										out.writeUTF(request);
 										response = in.readUTF();
-										
+
 									} catch (IOException e) {
 										e.printStackTrace();
 									}
@@ -240,8 +250,21 @@ public class Client {
 									}else if (response.equals("$NODATA")) {
 										//There was no data returned by the server.
 										//Log("No data was returned by the server.");
+									}else if (response.equals("$PERMS")) {
+										Log("You do not have the sufficient priveleges for this action.");
 									}else if (response.equals("$ERROR")) {
-										Log("Invalid command.");
+										Log("Invalid request: '" + request + "'.");
+									}else if (response.equals("$SUCCESS")) {
+										Log("The remote operation was completed successfully.");
+									}else if (response.startsWith("$FAILURE")) {
+										if (response.length() > "$FAILURE".length()) {
+											Log("The remote operation has failed. Reason: " + response.substring("$FAILURE ".length(), response.length()));
+										}else {
+											Log("The remote operation has failed for an unstated reason.");
+										}
+									}else if (response.startsWith("$RECOVERY ")) {
+										String password = response.substring("RECOVERY ".length(), response.length());
+										ui.ShowUIDialog("MesaLabs Password Recovery", "The password for this user was recovered successfully. It is: " + password);
 									}else {
 										String[] recv = null;
 										if (response.startsWith("$RANK ")) {
@@ -265,8 +288,8 @@ public class Client {
 									ui.lblMemoryUsage.setText(payload.getMemUsage());
 									ui.lblNetworkOverhead.setText("" + payload.getNumOverhead());
 									ui.lblNetworkIP.setText("" + payload.getNetIP());
-									ui.lblBufferSize.setText("INACTIVE");
-									
+									ui.lblBufferSize.setText(QUERY_ID + "");
+
 									//As a security measure, we've moved the rank check to a completely separate command. We can add a signature to this to make it even more secure.
 									instance.RemoteRequest("$GET RANK " + instance.username);
 								}
@@ -288,15 +311,24 @@ public class Client {
 			}catch(SocketTimeoutException s) {
 				Log("The socket has timed out and been reset.");
 				callback.ShowHelpText("Call the Pope, all hell just broke loose.");
+				if (ui != null) {
+					ui.hideControls();
+				}
 				active = false;
 				s.printStackTrace();
 			}catch(ConnectException c) {
 				Log("Connection Refused.. is the server running?");
 				callback.ShowHelpText("Connection refused. Is the server running?");
+				if (ui != null) {
+					ui.hideControls();
+				}
 				active = false;
 			}catch(IOException e) {
 				Log("The socket has been reset.");
 				active = false;
+				if (ui != null) {
+					ui.hideControls();
+				}
 				e.printStackTrace();
 			}
 		}

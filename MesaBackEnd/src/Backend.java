@@ -244,7 +244,7 @@ public class Backend {
 								 * GC - Garbage Collection
 								 * 
 								 * Garbage Collection involves Java searching memory spaces for defunct/unused data and destroying it
-								 * to as to minimize our memory footprint. While we can call GC via System.gc(), Java also does it 
+								 * so as to minimize our memory footprint. While we can call GC via System.gc(), Java also does it 
 								 * when it believes a large amount of data is unused.  
 								 */
 
@@ -302,7 +302,7 @@ public class Backend {
 			payload.setFlightLogs(dbMan.RequestField(DatabaseManager.FieldType.LOGS, DatabaseManager.FieldSubType.FLIGHT));
 			payload.setMaintinenceLogs(dbMan.RequestField(DatabaseManager.FieldType.LOGS, DatabaseManager.FieldSubType.MAINTINENCE));
 			payload.setTrainingLogs(dbMan.RequestField(DatabaseManager.FieldType.LOGS, DatabaseManager.FieldSubType.TRAINING));
-			
+
 			String[] ranklist = dbMan.RequestRankList();
 			DefaultListModel<String> userModel = new DefaultListModel<String>();
 			DefaultListModel<String> rankModel = new DefaultListModel<String>();
@@ -316,7 +316,7 @@ public class Backend {
 				payload.setUserModel(userModel);
 				payload.setRankModel(rankModel);
 			}
-			
+
 			int count = dbMan.GetUserCount();
 			if (count > 0) {
 				payload.setNumUsers(count);
@@ -518,84 +518,134 @@ public class Backend {
 									boolean done = false;
 
 									while (!done) {
-										ui.numOverhead++;
-										dbMan.Refresh();
+										try {
+											ui.numOverhead++;
+											dbMan.Refresh();
 
-										ui.progressBar.setValue(99);
-										rank = dbMan.RequestRank(username.toLowerCase());
+											ui.progressBar.setValue(99);
+											rank = dbMan.RequestRank(username.toLowerCase());
 
-										String request = in.readUTF();
-										if (request.equals("$NOREQUEST")) {
-											/*
-											 * The below code handles primitive commands for data manipulations, so lets serialize the class object on our downtime.
-											 * Bear in mind that since our client is read only, and we handle our transforms above, we do not need to read
-											 * in from the client. This is a one way conversation.
-											 */
-											oos.reset();
-											oos.writeObject(payload);	
-										}else {
-											if (request.startsWith("$MSG")) {					//We can use MSG to send information from the client directly to the console, here. This is for debugging.
-												String msg = request.substring("$MSG ".length(), request.length());
-												util.Log("[MSG] " + msg);
+											String request = in.readUTF();
+											if (request.equals("$NOREQUEST")) {
+												/*
+												 * The below code handles primitive commands for data manipulations, so lets serialize the class object on our downtime.
+												 * Bear in mind that since our client is read only, and we handle our transforms above, we do not need to read
+												 * in from the client. This is a one way conversation.
+												 */
+												oos.reset();
+												oos.writeObject(payload);	
 											}else {
-												if (request.startsWith("$GET")) {				//We serialize our major data classes, but we can send and recv commands like this.
-													String cmd = request.substring("$GET ".length(), request.length());
-													if (cmd.startsWith("RANK ")) {
-														String user = cmd.substring("RANK ".length(), cmd.length());
-														//util.Log("RECV remote request for " + user + "'s rank...");
-														String rank = dbMan.RequestRank(user.toLowerCase());
-														if (rank != null) {
-															//util.Log("Transmitting rank...");
-															out.writeUTF("$RANK " + user.toLowerCase() + ";" + rank);
-														}else {
-															//util.Log("Could not locate user by ID, sending error...");
-															out.writeUTF("$ERROR");
-														}
-													}
-												}else if (request.equals("$ABORT")) {
-													done = true;
-												}
-
-												//In this case, we've restricted certain commands to superadmins
-												if (rank.equals("admin") || rank.equals("superadmin")) {
-													if (request.startsWith("$CREATE")) {
-														//Create command, allows for anything from a user to a log or entry.
-														String cmd = request.substring("$CREATE ".length(), request.length());
-														if (cmd.startsWith("USER") && rank.equals("superadmin")) {
-															String start = cmd.substring("$CREATE USER ".length(), cmd.length());
-															String user = start.split(" ")[0];
-															String password = start.split(" ")[1];
-															String localrank = start.split(" ")[2];
-
-															dbMan.CreateUser(username, user, password, localrank);
-														}
-
-														if (cmd.startsWith("ENTRY")) {
-
-														}else if (cmd.startsWith("LOG")) {
-
-														}
-													}else if (request.startsWith("$RECOVER") && rank.equals("superadmin")) {
-
-													}else if (request.startsWith("$CHANGE")) {
-
-													}else if (request.startsWith("$REMOVE") && rank.equals("superadmin")) {
-
-													}else if (request.startsWith("$PROMOTE") && rank.equals("superadmin")) {
-														String user = request.substring("$PROMOTE ".length(), request.length());
-														dbMan.PromoteUser(user);
-													}else if (request.startsWith("$DEMOTE") && rank.equals("superadmin")) {
-														String user = request.substring("$DEMOTE ".length(), request.length());
-														dbMan.DemoteUser(user);
-													}
+												if (request.startsWith("$MSG")) {					//We can use MSG to send information from the client directly to the console, here. This is for debugging.
+													String msg = request.substring("$MSG ".length(), request.length());
+													util.Log("[MSG] " + msg);
 												}else {
-													out.writeUTF("$PERMS");
+													if (request.startsWith("$GET")) {				//We serialize our major data classes, but we can send and recv commands like this.
+														String cmd = request.substring("$GET ".length(), request.length());
+														if (cmd.startsWith("RANK ")) {
+															String user = cmd.substring("RANK ".length(), cmd.length());
+															//util.Log("RECV remote request for " + user + "'s rank...");
+															String rank = dbMan.RequestRank(user.toLowerCase());
+															if (rank != null) {
+																//util.Log("Transmitting rank...");
+																out.writeUTF("$RANK " + user.toLowerCase() + ";" + rank);
+															}else {
+																//util.Log("Could not locate user by ID, sending error...");
+																out.writeUTF("$ERROR");
+															}
+														}
+													}else if (request.equals("$ABORT")) {
+														done = true;
+													}
+
+													//In this case, we've restricted certain commands to superadmins
+													if (rank != null) {
+														if (rank.equals("admin") || rank.equals("superadmin")) {
+															if (request.startsWith("$CREATE")) {
+																//Create command, allows for anything from a user to a log or entry.
+																String cmd = request.substring("$CREATE ".length(), request.length());
+																if (cmd.startsWith("USER") && rank.equals("superadmin")) {
+																	String start = request.substring("$CREATE USER ".length(), request.length());
+																	String user = start.split(" ")[0].toLowerCase();
+																	String password = start.split(" ")[1];
+																	String localrank = start.split(" ")[2].toLowerCase();
+
+																	if (user.length() > 0) {
+																		if (password.length() > 5) {
+																			if (localrank.equals("user") || localrank.equals("admin") || localrank.equals("superadmin")) {
+																				String resp = dbMan.CreateUser(username, user, password, localrank);
+																				if (resp.length() > 0) {
+																					out.writeUTF("$FAILURE " + resp);
+																				}else {
+																					out.writeUTF("$SUCCESS");
+																				}
+																			}else {
+																				out.writeUTF("$FAILURE '" + localrank + "' is not a valid rank. Available ranks: user, admin, superadmin.");
+																			}
+																		}else {
+																			out.writeUTF("$FAILURE Passcode must exceed 5 characters in length.");
+																		}
+																	}else {
+																		out.writeUTF("$FAILURE Username cannot be 0 characters in length.");
+																	}
+																}else if (cmd.startsWith("ENTRY")) {
+
+																}else if (cmd.startsWith("LOG")) {
+
+																}
+															}else if (request.startsWith("$RECOVER") && rank.equals("superadmin")) {
+																out.writeUTF("$RECOVERY " + dbMan.GetPassword(request.substring("$RECOVER ".length(), request.length())));
+															}else if (request.startsWith("$CHANGE ")) {
+																String cmd = request.substring("$CHANGE ".length(), request.length());
+																if (cmd.startsWith("PASSWORD")) {
+																	String username = cmd.split(" ")[1];
+																	String oldpass = cmd.split(" ")[2];
+																	String newpass = cmd.split(" ")[3];
+																	dbMan.ChangePassword(username, oldpass, newpass);
+																}
+															}else if (request.startsWith("$REMOVE") && rank.equals("superadmin")) {
+																String cmd = request.substring("$REMOVE ".length(), request.length());
+																if (cmd.startsWith("USER") && rank.equals("superadmin")) {
+																	String user = request.substring("$DELETE USER ".length(), request.length());
+																	if (username.equals(user)) {
+																		out.writeUTF("$FAILURE You cannot delete the account you're currently using.");
+																	}else {
+																		boolean pass = dbMan.DeleteUser(user);
+																		if (!pass) {
+																			out.writeUTF("$FAILURE A user doesn't exist by the username '" + user + "'.");
+																		}else {
+																			out.writeUTF("$SUCCESS");
+																		}
+																	}
+																}else if (cmd.startsWith("ENTRY")) {
+
+																}else if (cmd.startsWith("LOG")) {
+
+																}
+															}else if (request.startsWith("$PROMOTE") && rank.equals("superadmin")) {
+																String user = request.substring("$PROMOTE ".length(), request.length());
+																dbMan.PromoteUser(user);
+																out.writeUTF("$SUCCESS");
+															}else if (request.startsWith("$DEMOTE") && rank.equals("superadmin")) {
+																String user = request.substring("$DEMOTE ".length(), request.length());
+																dbMan.DemoteUser(user);
+																out.writeUTF("$SUCCESS");
+															}
+														}else {
+															out.writeUTF("$PERMS");
+														}
+													}else {
+														out.writeUTF("$ERROR");
+													}
 												}
 											}
-										}
 
-										ui.progressBar.setValue(100);
-										ui.numOverhead--;
+											ui.progressBar.setValue(100);
+											ui.numOverhead--;
+										}catch (Exception e) {
+											//e.printStackTrace();
+											util.Log("Forcing premature termination of the thread.");
+											break;
+										}
 									}
 								}else {
 									util.Log("Remote Client failed to identify themselves. This is not malicious, they simply failed to log in.");

@@ -51,8 +51,8 @@ public class Init {
 		 * host system, not on your specific OS.
 		 */
 		try {
-			UIManager.setLookAndFeel("com.sun.java.swing.plaf.gtk.GTKLookAndFeel");
-			
+			//UIManager.setLookAndFeel("com.sun.java.swing.plaf.gtk.GTKLookAndFeel");
+			UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
 			/**
 			 * A Button Mnemonic is the key a user has to press to activate that button automatically.
 			 * Since we want the program to display them, when the user hits ALT, the mnemonic will display.

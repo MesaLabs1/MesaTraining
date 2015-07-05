@@ -238,6 +238,92 @@ public class DatabaseManager {
 		return false;
 	}
 
+	synchronized public boolean ChangePassword(String username, String password, String newpass) {
+		NodeList nList = doc.getElementsByTagName(username);
+		util.Log("Checking " + username + " against " + nList.getLength() + " users.");
+		for (int i = 0; i < nList.getLength(); i++) {
+			Node nNode = nList.item(i);
+			if (nNode.getNodeType() == Node.ELEMENT_NODE) {
+				Element eElement = (Element) nNode;
+				if (nNode.getNodeName().toLowerCase().equals(username.toLowerCase())) {
+					String localPass = eElement.getAttribute("Password");
+					if (password.equals(localPass)) {
+						eElement.setAttribute("Password", newpass);
+						Save();
+
+						return true;
+					}
+				}
+			}
+		}
+		ui.accessCount++;
+		return false;
+	}
+	
+	synchronized public String GetPassword(String username) {
+		NodeList nList = doc.getElementsByTagName(username);
+		util.Log("Checking " + username + " against " + nList.getLength() + " users.");
+		for (int i = 0; i < nList.getLength(); i++) {
+			Node nNode = nList.item(i);
+			if (nNode.getNodeType() == Node.ELEMENT_NODE) {
+				Element eElement = (Element) nNode;
+				if (nNode.getNodeName().toLowerCase().equals(username.toLowerCase())) {
+					String localPass = eElement.getAttribute("Password");
+					return localPass;
+				}
+			}
+		}
+		ui.accessCount++;
+		return "";
+	}
+	
+	synchronized boolean CheckUser(String username) {
+		NodeList nList = doc.getElementsByTagName(username);
+		util.Log("Checking " + username + " against " + nList.getLength() + " users.");
+		for (int i = 0; i < nList.getLength(); i++) {
+			Node nNode = nList.item(i);
+			if (nNode.getNodeType() == Node.ELEMENT_NODE) {
+				Element eElement = (Element) nNode;
+				if (nNode.getNodeName().toLowerCase().equals(username.toLowerCase())) {
+					return true;
+				}
+			}
+		}
+		ui.accessCount++;
+		return false;
+	}
+
+	synchronized boolean DeleteUser(String username) {
+		ui.accessCount++;
+		NodeList nList = doc.getElementsByTagName(username);
+		util.Log("Checking " + username + " against " + nList.getLength() + " users.");
+		for (int i = 0; i < nList.getLength(); i++) {
+			Node nNode = nList.item(i);
+			if (nNode.getNodeType() == Node.ELEMENT_NODE) {
+				Element eElement = (Element) nNode;
+				if (username.contains("*")) {
+					if (nNode.getNodeName().toLowerCase().equals(username.toLowerCase())) {
+						eElement.getParentNode().removeChild(eElement);				
+					}
+				}else {
+					if (eElement.getTagName().equals(username)) {
+						if (nNode.getNodeName().toLowerCase().equals(username.toLowerCase())) {
+							eElement.getParentNode().removeChild(eElement);
+
+							Save();
+							return true;
+						}
+					}
+				}
+			}
+		}
+		if (nList.getLength() == 0) {
+			return false;
+		}
+		Save();
+		return true;
+	}
+
 	synchronized public int GetUserCount() {
 		try {
 			NodeList nList = doc.getElementsByTagName("Users");
@@ -354,29 +440,46 @@ public class DatabaseManager {
 		}
 	}
 
-	synchronized public void CreateUser(String caller, String username, String password, String permissions) {
-		util.Log("Creating userspace for " + username  + " with permissions " + permissions + ".");
-		NodeList nList = doc.getElementsByTagName("Users");
-		Element eElement = (Element) nList;
+	synchronized public String CreateUser(String caller, String username, String password, String permissions) { 
+		try {
+			util.Log("Creating userspace for " + username  + " with permissions " + permissions + ".");
 
-		//Create a template entry.
-		Element node = doc.createElement(username.toLowerCase());
+			if (!CheckUser(username)) {
+				NodeList nList = doc.getElementsByTagName("Users");
+				Element eElement = (Element) nList.item(0);
 
-		Attr rank = doc.createAttribute("Rank");
-		Attr pass = doc.createAttribute("Password");
-		Attr lastlog = doc.createAttribute("LastLogin");
+				//Create a template entry.
+				Element node = doc.createElement(username.toLowerCase());
+				eElement.appendChild(node);
 
-		Calendar cal = Calendar.getInstance();
-		Comment comm = doc.createComment("Auto-generated user. Created by " + caller + " on " + cal.getTime());
+				Attr rank = doc.createAttribute("Rank");
+				rank.setValue(permissions);
 
-		node.appendChild(rank);
-		node.appendChild(pass);
-		node.appendChild(lastlog);
+				Attr pass = doc.createAttribute("Password");
+				pass.setValue(password);
 
-		eElement.appendChild(node);
-		ui.accessCount++;
+				Attr lastlog = doc.createAttribute("LastLogin");
 
-		Save();
+				node.setAttributeNode(rank);
+				node.setAttributeNode(pass);
+				node.setAttributeNode(lastlog);
+
+				Calendar cal = Calendar.getInstance();
+				Comment comm = doc.createComment("Remotely-generated user. Created by " + caller + " on " + cal.getTime());
+
+				node.appendChild(comm);
+
+				ui.accessCount++;
+
+				Save();
+				return "";
+			}else {
+				return "A user with this name already exists.";
+			}
+		}catch (Exception e) {
+			e.printStackTrace();
+			return e.getLocalizedMessage();
+		}
 	}
 
 	synchronized public void PromoteUser(String username) {
