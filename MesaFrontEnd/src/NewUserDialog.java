@@ -29,6 +29,8 @@ import java.awt.Component;
 
 import javax.swing.Box;
 import javax.swing.JRadioButton;
+import javax.swing.event.ChangeListener;
+import javax.swing.event.ChangeEvent;
 
 /**
  * This class simply shows a dialog used for changing a password.
@@ -95,13 +97,37 @@ public class NewUserDialog extends JDialog{
 		panel_1.add(passwordField, "cell 0 6,growx");
 		
 		radioUser = new JRadioButton("User");
+		radioUser.addChangeListener(new ChangeListener() {
+			public void stateChanged(ChangeEvent arg0) {
+				if (radioUser.isSelected()) {
+					radioAdmin.setSelected(false);
+					radioSuperadmin.setSelected(false);
+				}
+			}
+		});
 		radioUser.setSelected(true);
 		panel_1.add(radioUser, "flowx,cell 0 7,alignx center");
 		
 		radioAdmin = new JRadioButton("Admin");
+		radioAdmin.addChangeListener(new ChangeListener() {
+			public void stateChanged(ChangeEvent e) {
+				if (radioAdmin.isSelected()) {
+					radioUser.setSelected(false);
+					radioSuperadmin.setSelected(false);
+				}
+			}
+		});
 		panel_1.add(radioAdmin, "cell 0 7,alignx center");
 		
 		radioSuperadmin = new JRadioButton("Superadmin");
+		radioSuperadmin.addChangeListener(new ChangeListener() {
+			public void stateChanged(ChangeEvent e) {
+				if (radioSuperadmin.isSelected()) {
+					radioUser.setSelected(false);
+					radioAdmin.setSelected(false);
+				}
+			}
+		});
 		panel_1.add(radioSuperadmin, "cell 0 7,alignx center");
 		
 		JButton btnAuthenticate = new JButton("Confirm");
@@ -126,6 +152,8 @@ public class NewUserDialog extends JDialog{
 		});
 		panel_1.add(btnAuthenticate, "cell 1 7 2 1");
 		
+		this.setModal(true);
+		this.setAlwaysOnTop(true);
 		this.setVisible(true);
 	}
 	

@@ -703,7 +703,7 @@ public class UI extends JFrame{
 //				mon1YCap = memUsage;
 //			}
 			//Network Overhead Cap
-			mon0YCap = 200;
+			mon0YCap = 300;
 			
 			//Max System Memory
 			long allocatedMemory = (Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory());

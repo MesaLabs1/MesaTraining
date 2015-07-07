@@ -1,10 +1,12 @@
 import java.io.File;
 import java.io.IOException;
+import java.io.Serializable;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -43,6 +45,7 @@ public class DatabaseManager {
 
 	Utils util;
 	UI ui;
+	Payload payload;
 
 	//DB Stuff
 	DocumentBuilderFactory dbFactory;
@@ -92,8 +95,9 @@ public class DatabaseManager {
 		}
 	}
 
-	public DatabaseManager(Utils ut, UI u) {
+	public DatabaseManager(Utils ut, UI u, Payload p) {
 		util = ut;
+		payload = p;
 		ui = u;
 
 		util.Log("Initializing DBManager...");
@@ -259,7 +263,7 @@ public class DatabaseManager {
 		ui.accessCount++;
 		return false;
 	}
-	
+
 	synchronized public String GetPassword(String username) {
 		NodeList nList = doc.getElementsByTagName(username);
 		util.Log("Checking " + username + " against " + nList.getLength() + " users.");
@@ -276,7 +280,7 @@ public class DatabaseManager {
 		ui.accessCount++;
 		return "";
 	}
-	
+
 	synchronized boolean CheckUser(String username) {
 		NodeList nList = doc.getElementsByTagName(username);
 		util.Log("Checking " + username + " against " + nList.getLength() + " users.");
@@ -384,6 +388,23 @@ public class DatabaseManager {
 			return output;
 		}catch (Exception e) {
 			return null;
+		}
+	}
+
+	public void SendPayloadStacks() {
+		if (payload != null) {
+			payload.ClearEntries();
+
+			String[] dates = RequestField(DatabaseManager.FieldType.DATES, DatabaseManager.FieldSubType.NONE);
+			String[] pilots = RequestField(DatabaseManager.FieldType.PILOTS, DatabaseManager.FieldSubType.NONE);
+			String[] aircrafts = RequestField(DatabaseManager.FieldType.AIRCRAFTS, DatabaseManager.FieldSubType.NONE);
+			String[] flight = RequestField(DatabaseManager.FieldType.LOGS, DatabaseManager.FieldSubType.FLIGHT);
+			String[] maintenance = RequestField(DatabaseManager.FieldType.LOGS, DatabaseManager.FieldSubType.MAINTINENCE);
+			String[] training = RequestField(DatabaseManager.FieldType.LOGS, DatabaseManager.FieldSubType.TRAINING);
+
+			for (int i = 0; i < dates.length; i++) {
+				payload.AddEntry(dates[i], pilots[i], aircrafts[i], flight[i], maintenance[i], training[i]);
+			}
 		}
 	}
 
@@ -535,4 +556,5 @@ public class DatabaseManager {
 
 		Save();
 	}
+
 }

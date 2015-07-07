@@ -102,6 +102,8 @@ public class PasswordDialog extends JDialog{
 		});
 		panel_1.add(btnAuthenticate, "cell 1 6 2 1");
 		
+		this.setModal(true);
+		this.setAlwaysOnTop(true);
 		this.setVisible(true);
 	}
 	

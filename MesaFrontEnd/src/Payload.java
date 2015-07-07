@@ -55,16 +55,16 @@ public class Payload implements Serializable {
 				String day = value.substring(0, 2);
 				String year = value.substring(4, 8);
 
-				String hour = value.substring(9, 11);
-				String min = value.substring(11, 13);
-				String sec = value.substring(13, 15);
+				//				String hour = value.substring(9, 11);
+				//				String min = value.substring(11, 13);
+				//				String sec = value.substring(13, 15);
 
-				date = month + "/" + day + "/" + year + " at " + hour + ":" + min + ":" + sec;
-				if (Integer.valueOf(hour) >= 12) {
-					date += " PM";
-				}else {
-					date += " AM";
-				}
+				date = month + "/" + day + "/" + year;
+				//				if (Integer.valueOf(hour) >= 12) {
+				//					date += " PM";
+				//				}else {
+				//					date += " AM";
+				//				}
 				actualDates.addElement(date);
 			}
 		}
@@ -163,18 +163,22 @@ public class Payload implements Serializable {
 		this.netIP = netIP;
 	}
 
-	/**
-	 * Call this method when you're done uploading to the class, so you can parse the changes.
-	 */
-	public void index() {
-		for (int i = 0; i < dateModel.getSize(); i++) {
-			Entry entry = new Entry(pilotModel.getElementAt(i), nameModel.getElementAt(i), dateModel.getElementAt(i));
-			entry.setFlightData(flightLogs[i]);
-			entry.setMaintinenceData(maintinenceLogs[i]);
-			entry.setTrainingData(trainingLogs[i]);
+	public void ClearEntries() {
+		entries = new ArrayList<Entry>();
+	}
 
-			entries.add(entry);
-		}
+	public void AddEntry(Entry e) {
+		entries.add(e);
+	}
+
+	public void AddEntry(String date, String pilot, String aircraft, String ... params) {
+		Entry e = new Entry(pilot, aircraft, date);
+		e.setFlightData(params[0]);
+		e.setTrainingData(params[1]);
+		e.setMaintinenceData(params[2]);
+
+
+		entries.add(e);
 	}
 
 	public ArrayList<Entry> getDataByPilot(String p) {
@@ -190,10 +194,7 @@ public class Payload implements Serializable {
 	public ArrayList<Entry> getDataByDate(String d) {
 		ArrayList<Entry> output = new ArrayList<Entry>();
 		for (Entry e : entries) {
-			//This extra step doesnt compare times, just days, so we dont get repeated entries.
-			if (e.getDate().substring(0, "00/00/0000".length()).equals(d.substring(0, "00/00/0000".length()))) {
-				output.add(e);
-			}
+			output.add(e);
 		}
 		return output;
 	}
@@ -232,7 +233,9 @@ public class Payload implements Serializable {
 		this.trainingLogs = trainingLogs;
 	}
 
-	public class Entry {
+	public class Entry implements Serializable{
+		private static final long serialVersionUID = -2799008524139349499L;
+
 		private String pilot;
 		private String aircraft;
 		private String date;
@@ -250,7 +253,11 @@ public class Payload implements Serializable {
 		}
 
 		public String getDate() {
-			return date;
+			String month = date.substring(2, 4);
+			String day = date.substring(0, 2);
+			String year = date.substring(4, 8);
+
+			return month + "/" + day + "/" + year;
 		}
 
 		public String getFlightData() {

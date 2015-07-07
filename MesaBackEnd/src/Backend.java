@@ -53,9 +53,12 @@ public class Backend {
 
 		//Create a new NetworkMaster
 		netMaster = new NetworkMaster();
-
+		
+		//Generate the Payload stub
+		payload = new Payload();
+		
 		//Initialize the DBManager and point it to the shared resources
-		dbMan = new DatabaseManager(util, netMaster.ui);
+		dbMan = new DatabaseManager(util, netMaster.ui, payload);
 
 		//Create a wrapper thread
 		netMasterThread = new Thread(netMaster);
@@ -81,7 +84,6 @@ public class Backend {
 
 		public EventHandler() {
 			backend = Backend.this;
-			payload = new Payload();
 			netMaster = backend.netMaster;
 			ui = netMaster.ui;
 		}
@@ -299,10 +301,7 @@ public class Backend {
 			payload.setDateModel(ConvertArrayToModel(dbMan.RequestField(DatabaseManager.FieldType.DATES, DatabaseManager.FieldSubType.NONE)));
 			payload.setPilotModel(ConvertArrayToModel(dbMan.RequestField(DatabaseManager.FieldType.PILOTS, DatabaseManager.FieldSubType.NONE)));
 			payload.setNameModel(ConvertArrayToModel(dbMan.RequestField(DatabaseManager.FieldType.AIRCRAFTS, DatabaseManager.FieldSubType.NONE)));
-			payload.setFlightLogs(dbMan.RequestField(DatabaseManager.FieldType.LOGS, DatabaseManager.FieldSubType.FLIGHT));
-			payload.setMaintinenceLogs(dbMan.RequestField(DatabaseManager.FieldType.LOGS, DatabaseManager.FieldSubType.MAINTINENCE));
-			payload.setTrainingLogs(dbMan.RequestField(DatabaseManager.FieldType.LOGS, DatabaseManager.FieldSubType.TRAINING));
-
+			
 			String[] ranklist = dbMan.RequestRankList();
 			DefaultListModel<String> userModel = new DefaultListModel<String>();
 			DefaultListModel<String> rankModel = new DefaultListModel<String>();
@@ -329,6 +328,8 @@ public class Backend {
 			payload.setNumOverhead(ui.opsCount);
 			payload.setUptime(ui.lblUptime.getText());
 			payload.setMemUsage(ui.lblMemUsage.getText());
+			
+			dbMan.SendPayloadStacks();
 		}
 
 		public DefaultListModel<String> ConvertArrayToModel(String[] in) {

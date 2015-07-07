@@ -46,7 +46,6 @@ import javax.swing.BoxLayout;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Image;
-import java.awt.Point;
 
 import javax.swing.SwingConstants;
 
@@ -61,9 +60,7 @@ import javax.swing.JTextField;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.JScrollPane;
-import javax.swing.ScrollPaneConstants;
 
-import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 
 /**
@@ -205,7 +202,7 @@ public class AppletUI extends Applet{
 		}catch (UnsupportedLookAndFeelException e) {
 			e.printStackTrace();
 		}catch (ClassNotFoundException e) {
-
+			e.printStackTrace();
 		}catch (InstantiationException e) {
 			e.printStackTrace();
 		}catch (IllegalAccessException e) {
@@ -595,52 +592,58 @@ public class AppletUI extends Applet{
 		JLabel lblAdministrativeTasks = new JLabel("Administrative Tasks");
 		lblAdministrativeTasks.setForeground(Color.LIGHT_GRAY);
 
-		JButton btnNewButton = new JButton("Factory Reset");
-		btnNewButton.setBackground(Color.GRAY);
-		btnNewButton.setForeground(Color.WHITE);
+		JButton btnFactoryReset = new JButton("Factory Reset");
+		btnFactoryReset.setBackground(Color.GRAY);
+		btnFactoryReset.setForeground(Color.WHITE);
 
-		superadminElements.add(btnNewButton);
-		
-				JButton btnCreateEntry = new JButton("Create New Entry");
-				btnCreateEntry.setBackground(Color.GRAY);
-				btnCreateEntry.setForeground(Color.WHITE);
-				
-						adminElements.add(btnCreateEntry);
-		
-				JButton btnDeleteEntries = new JButton("Delete Entry");
-				btnDeleteEntries.setBackground(Color.GRAY);
-				btnDeleteEntries.setForeground(Color.WHITE);
-				
-						superadminElements.add(btnDeleteEntries);
+		superadminElements.add(btnFactoryReset);
+
+		JButton btnCreateEntry = new JButton("Create New Entry");
+		btnCreateEntry.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				JDialog entry = new NewEntry(NewEntry.ReportType.FullReport);
+			}
+		});
+		btnCreateEntry.setBackground(Color.GRAY);
+		btnCreateEntry.setForeground(Color.WHITE);
+
+		adminElements.add(btnCreateEntry);
+
+		JButton btnDeleteEntries = new JButton("Delete Entry");
+		btnDeleteEntries.setBackground(Color.GRAY);
+		btnDeleteEntries.setForeground(Color.WHITE);
+
+		superadminElements.add(btnDeleteEntries);
 
 		GroupLayout gl_pnlAdmin = new GroupLayout(pnlAdmin);
 		gl_pnlAdmin.setHorizontalGroup(
-			gl_pnlAdmin.createParallelGroup(Alignment.LEADING)
+				gl_pnlAdmin.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_pnlAdmin.createSequentialGroup()
-					.addContainerGap()
-					.addGroup(gl_pnlAdmin.createParallelGroup(Alignment.LEADING)
-						.addComponent(btnDeleteEntries, GroupLayout.DEFAULT_SIZE, 191, Short.MAX_VALUE)
-						.addGroup(gl_pnlAdmin.createParallelGroup(Alignment.TRAILING, false)
-							.addComponent(btnNewButton, Alignment.LEADING, 0, 0, Short.MAX_VALUE)
-							.addComponent(btnCreateEntry, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 191, Short.MAX_VALUE))
-						.addComponent(lblAdministrativeTasks))
-					.addContainerGap())
-		);
+						.addContainerGap()
+						.addGroup(gl_pnlAdmin.createParallelGroup(Alignment.LEADING)
+								.addComponent(btnDeleteEntries, GroupLayout.DEFAULT_SIZE, 191, Short.MAX_VALUE)
+								.addGroup(gl_pnlAdmin.createParallelGroup(Alignment.TRAILING, false)
+										.addComponent(btnFactoryReset, Alignment.LEADING, 0, 0, Short.MAX_VALUE)
+										.addComponent(btnCreateEntry, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 191, Short.MAX_VALUE))
+										.addComponent(lblAdministrativeTasks))
+										.addContainerGap())
+				);
 		gl_pnlAdmin.setVerticalGroup(
-			gl_pnlAdmin.createParallelGroup(Alignment.LEADING)
+				gl_pnlAdmin.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_pnlAdmin.createSequentialGroup()
-					.addGap(7)
-					.addComponent(lblAdministrativeTasks)
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(btnNewButton)
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(btnCreateEntry)
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(btnDeleteEntries)
-					.addContainerGap())
-		);
+						.addGap(7)
+						.addComponent(lblAdministrativeTasks)
+						.addPreferredGap(ComponentPlacement.RELATED)
+						.addComponent(btnFactoryReset)
+						.addPreferredGap(ComponentPlacement.RELATED)
+						.addComponent(btnCreateEntry)
+						.addPreferredGap(ComponentPlacement.RELATED)
+						.addComponent(btnDeleteEntries)
+						.addContainerGap())
+				);
 		pnlAdmin.setLayout(gl_pnlAdmin);
-		pnlAdministrationHolder.setLayout(new MigLayout("", "[::212px,grow][2px:n:2px][252px:n:252px][2px:n:2px][grow]", "[132px:n:132px][][growprio 99,grow]"));
+		pnlAdministrationHolder.setLayout(new MigLayout("", "[::212px,grow][2px:n:2px][252px:n:252px][2px:n:2px][grow]", "[132px:n:132px][growprio 99,grow]"));
 		pnlAdministrationHolder.add(pnlAdmin, "cell 0 0,grow");
 
 		JPanel pnlManagement = new JPanel();
@@ -714,11 +717,11 @@ public class AppletUI extends Applet{
 
 		JLabel lblRank = new JLabel("Rank");
 		lblRank.setForeground(Color.WHITE);
-		pnlAdministrationHolder.add(pnlManagement, "cell 2 0 1 3,grow");
+		pnlAdministrationHolder.add(pnlManagement, "cell 2 0 1 2,grow");
 		pnlManagement.setLayout(new MigLayout("", "[121px][110px]", "[14px][14px][167px,grow][23px:n:23px][23px][23px]"));
 		pnlManagement.add(lblUserManagement, "cell 0 0,alignx left,aligny top");
 		pnlManagement.add(userList, "cell 0 2,grow");
-		
+
 		JButton btnCreateUser = new JButton("Create User");
 		btnCreateUser.addMouseListener(new MouseAdapter() {
 			@Override
@@ -730,6 +733,8 @@ public class AppletUI extends Applet{
 		btnCreateUser.setForeground(Color.WHITE);
 		pnlManagement.add(btnCreateUser, "cell 0 3,growx");
 		
+		superadminElements.add(btnCreateUser);
+
 		JButton btnChangePassword = new JButton("Change PWD");
 		btnChangePassword.addMouseListener(new MouseAdapter() {
 			@Override
@@ -739,7 +744,10 @@ public class AppletUI extends Applet{
 		});
 		btnChangePassword.setBackground(Color.GRAY);
 		btnChangePassword.setForeground(Color.WHITE);
-		pnlManagement.add(btnChangePassword, "cell 1 3");
+		pnlManagement.add(btnChangePassword, "cell 1 3,growx");
+		
+		superadminElements.add(btnChangePassword);
+		
 		pnlManagement.add(btnRemoveUser, "cell 0 4,growx,aligny top");
 		pnlManagement.add(btnDemote, "cell 0 5,growx,aligny top");
 		pnlManagement.add(rankList, "cell 1 2,grow");
@@ -751,7 +759,7 @@ public class AppletUI extends Applet{
 		JPanel panel_5 = new JPanel();
 		panel_5.setBorder(new LineBorder(Color.WHITE));
 		panel_5.setBackground(Color.DARK_GRAY);
-		pnlAdministrationHolder.add(panel_5, "cell 4 0 1 3,grow");
+		pnlAdministrationHolder.add(panel_5, "cell 4 0 1 2,grow");
 		panel_5.setLayout(new MigLayout("", "[grow]", "[][grow][]"));
 
 		JLabel lblConsole = new JLabel("Console");
@@ -822,145 +830,143 @@ public class AppletUI extends Applet{
 		btnExecute.setBackground(Color.GRAY);
 		panel_5.add(btnExecute, "cell 0 2");
 
-		adminElements.add(btnExecute);
-																																				
-																																						JPanel panel_4 = new JPanel();
-																																						panel_4.setBorder(new LineBorder(Color.WHITE));
-																																						panel_4.setBackground(Color.DARK_GRAY);
-																																						pnlAdministrationHolder.add(panel_4, "cell 0 2,growx,aligny top");
-																																						
-																																								JLabel lblStatistics = new JLabel("Statistics");
-																																								lblStatistics.setForeground(Color.LIGHT_GRAY);
-																																								
-																																										JLabel lblUsersHead = new JLabel("Users:");
-																																										lblUsersHead.setForeground(Color.WHITE);
-																																										
-																																												JLabel lblUsersOnlineHead = new JLabel("Users Online:");
-																																												lblUsersOnlineHead.setForeground(Color.WHITE);
-																																												
-																																														JLabel lblLocalSize = new JLabel("Local Buffer Size:");
-																																														lblLocalSize.setForeground(Color.WHITE);
-																																														
-																																																JLabel lblServerUptimeHead = new JLabel("Server Uptime:");
-																																																lblServerUptimeHead.setForeground(Color.WHITE);
-																																																
-																																																		JLabel lblTechnicalStatistics = new JLabel("Technical Statistics");
-																																																		lblTechnicalStatistics.setForeground(Color.LIGHT_GRAY);
-																																																		
-																																																				JLabel lblMemoryUsageHead = new JLabel("Memory Usage:");
-																																																				lblMemoryUsageHead.setForeground(Color.WHITE);
-																																																				
-																																																						JLabel lblNetworkOverheadHead = new JLabel("Ops/second:");
-																																																						lblNetworkOverheadHead.setForeground(Color.WHITE);
-																																																						
-																																																								JLabel lblNetworkIpHead = new JLabel("Network IP:");
-																																																								lblNetworkIpHead.setForeground(Color.WHITE);
-																																																								
-																																																										lblUsers = new JLabel("XXX");
-																																																										lblUsers.setFont(new Font("Tahoma", Font.BOLD, 11));
-																																																										lblUsers.setForeground(Color.WHITE);
-																																																										
-																																																												lblUsersOnline = new JLabel("XXX");
-																																																												lblUsersOnline.setFont(new Font("Tahoma", Font.BOLD, 11));
-																																																												lblUsersOnline.setForeground(Color.WHITE);
-																																																												
-																																																														lblBufferSize = new JLabel("XXX");
-																																																														lblBufferSize.setFont(new Font("Tahoma", Font.BOLD, 11));
-																																																														lblBufferSize.setForeground(Color.WHITE);
-																																																														
-																																																																lblServerUptime = new JLabel("XXX");
-																																																																lblServerUptime.setFont(new Font("Tahoma", Font.BOLD, 11));
-																																																																lblServerUptime.setForeground(Color.WHITE);
-																																																																
-																																																																		lblMemoryUsage = new JLabel("XXX");
-																																																																		lblMemoryUsage.setFont(new Font("Tahoma", Font.BOLD, 11));
-																																																																		lblMemoryUsage.setForeground(Color.WHITE);
-																																																																		
-																																																																				lblNetworkOverhead = new JLabel("XXX");
-																																																																				lblNetworkOverhead.setFont(new Font("Tahoma", Font.BOLD, 11));
-																																																																				lblNetworkOverhead.setForeground(Color.WHITE);
-																																																																				
-																																																																						lblNetworkIP = new JLabel("XXX");
-																																																																						lblNetworkIP.setFont(new Font("Tahoma", Font.BOLD, 11));
-																																																																						lblNetworkIP.setForeground(Color.WHITE);
-																																																																						GroupLayout gl_panel_4 = new GroupLayout(panel_4);
-																																																																						gl_panel_4.setHorizontalGroup(
-																																																																								gl_panel_4.createParallelGroup(Alignment.LEADING)
-																																																																								.addGroup(gl_panel_4.createSequentialGroup()
-																																																																										.addContainerGap()
-																																																																										.addGroup(gl_panel_4.createParallelGroup(Alignment.LEADING)
-																																																																												.addGroup(gl_panel_4.createSequentialGroup()
-																																																																														.addGroup(gl_panel_4.createParallelGroup(Alignment.LEADING)
-																																																																																.addGroup(gl_panel_4.createSequentialGroup()
-																																																																																		.addGap(10)
-																																																																																		.addGroup(gl_panel_4.createParallelGroup(Alignment.LEADING)
-																																																																																				.addComponent(lblUsersHead)
-																																																																																				.addComponent(lblUsersOnlineHead)
-																																																																																				.addComponent(lblLocalSize)
-																																																																																				.addComponent(lblServerUptimeHead))
-																																																																																				.addPreferredGap(ComponentPlacement.RELATED, 32, Short.MAX_VALUE)
-																																																																																				.addGroup(gl_panel_4.createParallelGroup(Alignment.LEADING, false)
-																																																																																						.addComponent(lblUsers, GroupLayout.DEFAULT_SIZE, 26, Short.MAX_VALUE)
-																																																																																						.addComponent(lblUsersOnline, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-																																																																																						.addComponent(lblBufferSize, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-																																																																																						.addComponent(lblServerUptime)))
-																																																																																						.addGroup(gl_panel_4.createSequentialGroup()
-																																																																																								.addGroup(gl_panel_4.createParallelGroup(Alignment.LEADING)
-																																																																																										.addComponent(lblTechnicalStatistics)
-																																																																																										.addGroup(gl_panel_4.createSequentialGroup()
-																																																																																												.addGap(10)
-																																																																																												.addGroup(gl_panel_4.createParallelGroup(Alignment.LEADING)
-																																																																																														.addComponent(lblNetworkOverheadHead)
-																																																																																														.addComponent(lblMemoryUsageHead)
-																																																																																														.addComponent(lblNetworkIpHead))))
-																																																																																														.addPreferredGap(ComponentPlacement.RELATED, 32, Short.MAX_VALUE)
-																																																																																														.addGroup(gl_panel_4.createParallelGroup(Alignment.LEADING, false)
-																																																																																																.addComponent(lblMemoryUsage, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-																																																																																																.addComponent(lblNetworkOverhead, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-																																																																																																.addComponent(lblNetworkIP))))
-																																																																																																.addGap(20))
-																																																																																																.addGroup(gl_panel_4.createSequentialGroup()
-																																																																																																		.addComponent(lblStatistics)
-																																																																																																		.addContainerGap(128, Short.MAX_VALUE))))
-																																																																								);
-																																																																						gl_panel_4.setVerticalGroup(
-																																																																								gl_panel_4.createParallelGroup(Alignment.LEADING)
-																																																																								.addGroup(gl_panel_4.createSequentialGroup()
-																																																																										.addContainerGap()
-																																																																										.addComponent(lblStatistics)
-																																																																										.addPreferredGap(ComponentPlacement.RELATED)
-																																																																										.addGroup(gl_panel_4.createParallelGroup(Alignment.BASELINE)
-																																																																												.addComponent(lblUsersHead)
-																																																																												.addComponent(lblUsers))
-																																																																												.addPreferredGap(ComponentPlacement.RELATED)
-																																																																												.addGroup(gl_panel_4.createParallelGroup(Alignment.BASELINE)
-																																																																														.addComponent(lblUsersOnlineHead)
-																																																																														.addComponent(lblUsersOnline))
-																																																																														.addPreferredGap(ComponentPlacement.RELATED)
-																																																																														.addGroup(gl_panel_4.createParallelGroup(Alignment.BASELINE)
-																																																																																.addComponent(lblLocalSize)
-																																																																																.addComponent(lblBufferSize))
-																																																																																.addPreferredGap(ComponentPlacement.RELATED)
-																																																																																.addGroup(gl_panel_4.createParallelGroup(Alignment.BASELINE)
-																																																																																		.addComponent(lblServerUptimeHead)
-																																																																																		.addComponent(lblServerUptime))
-																																																																																		.addGap(18)
-																																																																																		.addComponent(lblTechnicalStatistics)
-																																																																																		.addPreferredGap(ComponentPlacement.RELATED)
-																																																																																		.addGroup(gl_panel_4.createParallelGroup(Alignment.BASELINE)
-																																																																																				.addComponent(lblMemoryUsageHead)
-																																																																																				.addComponent(lblMemoryUsage))
-																																																																																				.addPreferredGap(ComponentPlacement.RELATED)
-																																																																																				.addGroup(gl_panel_4.createParallelGroup(Alignment.BASELINE)
-																																																																																						.addComponent(lblNetworkOverheadHead)
-																																																																																						.addComponent(lblNetworkOverhead))
-																																																																																						.addPreferredGap(ComponentPlacement.RELATED)
-																																																																																						.addGroup(gl_panel_4.createParallelGroup(Alignment.BASELINE)
-																																																																																								.addComponent(lblNetworkIpHead)
-																																																																																								.addComponent(lblNetworkIP))
-																																																																																								.addContainerGap(46, Short.MAX_VALUE))
-																																																																								);
-																																																																						panel_4.setLayout(gl_panel_4);
+		JPanel panel_4 = new JPanel();
+		panel_4.setBorder(new LineBorder(Color.WHITE));
+		panel_4.setBackground(Color.DARK_GRAY);
+		pnlAdministrationHolder.add(panel_4, "cell 0 1,growx,aligny top");
+
+		JLabel lblStatistics = new JLabel("Statistics");
+		lblStatistics.setForeground(Color.LIGHT_GRAY);
+
+		JLabel lblUsersHead = new JLabel("Users:");
+		lblUsersHead.setForeground(Color.WHITE);
+
+		JLabel lblUsersOnlineHead = new JLabel("Users Online:");
+		lblUsersOnlineHead.setForeground(Color.WHITE);
+
+		JLabel lblLocalSize = new JLabel("Local Buffer Size:");
+		lblLocalSize.setForeground(Color.WHITE);
+
+		JLabel lblServerUptimeHead = new JLabel("Server Uptime:");
+		lblServerUptimeHead.setForeground(Color.WHITE);
+
+		JLabel lblTechnicalStatistics = new JLabel("Technical Statistics");
+		lblTechnicalStatistics.setForeground(Color.LIGHT_GRAY);
+
+		JLabel lblMemoryUsageHead = new JLabel("Memory Usage:");
+		lblMemoryUsageHead.setForeground(Color.WHITE);
+
+		JLabel lblNetworkOverheadHead = new JLabel("Ops/second:");
+		lblNetworkOverheadHead.setForeground(Color.WHITE);
+
+		JLabel lblNetworkIpHead = new JLabel("Network IP:");
+		lblNetworkIpHead.setForeground(Color.WHITE);
+
+		lblUsers = new JLabel("XXX");
+		lblUsers.setFont(new Font("Tahoma", Font.BOLD, 11));
+		lblUsers.setForeground(Color.WHITE);
+
+		lblUsersOnline = new JLabel("XXX");
+		lblUsersOnline.setFont(new Font("Tahoma", Font.BOLD, 11));
+		lblUsersOnline.setForeground(Color.WHITE);
+
+		lblBufferSize = new JLabel("XXX");
+		lblBufferSize.setFont(new Font("Tahoma", Font.BOLD, 11));
+		lblBufferSize.setForeground(Color.WHITE);
+
+		lblServerUptime = new JLabel("XXX");
+		lblServerUptime.setFont(new Font("Tahoma", Font.BOLD, 11));
+		lblServerUptime.setForeground(Color.WHITE);
+
+		lblMemoryUsage = new JLabel("XXX");
+		lblMemoryUsage.setFont(new Font("Tahoma", Font.BOLD, 11));
+		lblMemoryUsage.setForeground(Color.WHITE);
+
+		lblNetworkOverhead = new JLabel("XXX");
+		lblNetworkOverhead.setFont(new Font("Tahoma", Font.BOLD, 11));
+		lblNetworkOverhead.setForeground(Color.WHITE);
+
+		lblNetworkIP = new JLabel("XXX");
+		lblNetworkIP.setFont(new Font("Tahoma", Font.BOLD, 11));
+		lblNetworkIP.setForeground(Color.WHITE);
+		GroupLayout gl_panel_4 = new GroupLayout(panel_4);
+		gl_panel_4.setHorizontalGroup(
+				gl_panel_4.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_panel_4.createSequentialGroup()
+						.addContainerGap()
+						.addGroup(gl_panel_4.createParallelGroup(Alignment.LEADING)
+								.addGroup(gl_panel_4.createSequentialGroup()
+										.addGroup(gl_panel_4.createParallelGroup(Alignment.LEADING)
+												.addGroup(gl_panel_4.createSequentialGroup()
+														.addGap(10)
+														.addGroup(gl_panel_4.createParallelGroup(Alignment.LEADING)
+																.addComponent(lblUsersHead)
+																.addComponent(lblUsersOnlineHead)
+																.addComponent(lblLocalSize)
+																.addComponent(lblServerUptimeHead))
+																.addPreferredGap(ComponentPlacement.RELATED, 32, Short.MAX_VALUE)
+																.addGroup(gl_panel_4.createParallelGroup(Alignment.LEADING, false)
+																		.addComponent(lblUsers, GroupLayout.DEFAULT_SIZE, 26, Short.MAX_VALUE)
+																		.addComponent(lblUsersOnline, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+																		.addComponent(lblBufferSize, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+																		.addComponent(lblServerUptime)))
+																		.addGroup(gl_panel_4.createSequentialGroup()
+																				.addGroup(gl_panel_4.createParallelGroup(Alignment.LEADING)
+																						.addComponent(lblTechnicalStatistics)
+																						.addGroup(gl_panel_4.createSequentialGroup()
+																								.addGap(10)
+																								.addGroup(gl_panel_4.createParallelGroup(Alignment.LEADING)
+																										.addComponent(lblNetworkOverheadHead)
+																										.addComponent(lblMemoryUsageHead)
+																										.addComponent(lblNetworkIpHead))))
+																										.addPreferredGap(ComponentPlacement.RELATED, 32, Short.MAX_VALUE)
+																										.addGroup(gl_panel_4.createParallelGroup(Alignment.LEADING, false)
+																												.addComponent(lblMemoryUsage, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+																												.addComponent(lblNetworkOverhead, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+																												.addComponent(lblNetworkIP))))
+																												.addGap(20))
+																												.addGroup(gl_panel_4.createSequentialGroup()
+																														.addComponent(lblStatistics)
+																														.addContainerGap(128, Short.MAX_VALUE))))
+				);
+		gl_panel_4.setVerticalGroup(
+				gl_panel_4.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_panel_4.createSequentialGroup()
+						.addContainerGap()
+						.addComponent(lblStatistics)
+						.addPreferredGap(ComponentPlacement.RELATED)
+						.addGroup(gl_panel_4.createParallelGroup(Alignment.BASELINE)
+								.addComponent(lblUsersHead)
+								.addComponent(lblUsers))
+								.addPreferredGap(ComponentPlacement.RELATED)
+								.addGroup(gl_panel_4.createParallelGroup(Alignment.BASELINE)
+										.addComponent(lblUsersOnlineHead)
+										.addComponent(lblUsersOnline))
+										.addPreferredGap(ComponentPlacement.RELATED)
+										.addGroup(gl_panel_4.createParallelGroup(Alignment.BASELINE)
+												.addComponent(lblLocalSize)
+												.addComponent(lblBufferSize))
+												.addPreferredGap(ComponentPlacement.RELATED)
+												.addGroup(gl_panel_4.createParallelGroup(Alignment.BASELINE)
+														.addComponent(lblServerUptimeHead)
+														.addComponent(lblServerUptime))
+														.addGap(18)
+														.addComponent(lblTechnicalStatistics)
+														.addPreferredGap(ComponentPlacement.RELATED)
+														.addGroup(gl_panel_4.createParallelGroup(Alignment.BASELINE)
+																.addComponent(lblMemoryUsageHead)
+																.addComponent(lblMemoryUsage))
+																.addPreferredGap(ComponentPlacement.RELATED)
+																.addGroup(gl_panel_4.createParallelGroup(Alignment.BASELINE)
+																		.addComponent(lblNetworkOverheadHead)
+																		.addComponent(lblNetworkOverhead))
+																		.addPreferredGap(ComponentPlacement.RELATED)
+																		.addGroup(gl_panel_4.createParallelGroup(Alignment.BASELINE)
+																				.addComponent(lblNetworkIpHead)
+																				.addComponent(lblNetworkIP))
+																				.addContainerGap(46, Short.MAX_VALUE))
+				);
+		panel_4.setLayout(gl_panel_4);
 		pnlInternalPane.setLayout(new BorderLayout(0, 0));
 
 		JPanel pnlDateSuper = new JPanel();
@@ -1041,7 +1047,7 @@ public class AppletUI extends Applet{
 			c.setVisible(true);
 		}
 	}
-	
+
 	public void ShowUIDialog(String title, String message) {
 		JOptionPane.showMessageDialog(SwingUtilities.windowForComponent(this), message, title, JOptionPane.INFORMATION_MESSAGE);
 	}
@@ -1075,7 +1081,7 @@ public class AppletUI extends Applet{
 						client.SilentLog("\t USER \t Removes a user. Parameters: USERNAME");
 						client.SilentLog("\t ENTRY \t Removes an entry in the database. Parameters: DATE/PILOT/AIRCRAFT, VALUE.");
 						client.SilentLog("\t LOG \t Removes a log file. Paramters: FLIGHT/MAINTENANCE/TRAINING, Date, Pilot, Aircraft, Log Entry Regex");
-					
+
 					}else if (helpArea.equalsIgnoreCase("clear")) {
 						client.SilentLog("Executing this command removes all entries on this console screen. It does not affect the system in any way.");
 					}
@@ -1208,19 +1214,30 @@ public class AppletUI extends Applet{
 						String fData = entry.getFlightData();
 						String mData = entry.getMaintinenceData();
 
+						String append = "";
+						
+						if (dataMode.equals(DATA_MODE.MODE_AIRCRAFT)) {
+							//We want to add on the pilot, and the date
+							append = "[" + entry.getPilot() + "][" + entry.getDate() + "] ";
+						}else if (dataMode.equals(DATA_MODE.MODE_PILOT)) {
+							append = "[" + entry.getAircraft() + "][" + entry.getDate() + "] ";
+						}else if (dataMode.equals(DATA_MODE.MODE_DATE)) {
+							append = "[" + entry.getPilot() + "][" + entry.getAircraft() + "] ";
+						} 
+						
 						if (tData.length() > 0) {
 							t++;
-							training.add(tData);
+							training.add(append + tData);
 						}
 
 						if (fData.length() > 0) {
 							f++;
-							flight.add(entry.getFlightData());
+							flight.add(append + fData);
 						}
 
 						if (mData.length() > 0) {
 							m++;
-							maintinence.add(entry.getMaintinenceData());
+							maintinence.add(append + mData);
 						}
 					}
 					tLogsList.setModel(ConvertArrayToModel(training));
