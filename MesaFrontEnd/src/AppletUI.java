@@ -183,14 +183,8 @@ public class AppletUI extends Applet{
 	}
 
 	public AppletUI() {
-		/*
-		 * Set the visual style to be Linux, since we are developing this for a Linux target. BUT WAIT.
-		 * Whoa, isn't Java supposed to be super cross compatible with everything forever? Yes. But heres the thing.
-		 * UI Look and Feel, a UI Manager derivative, tells the system how buttons, controls, and interfaces Look.
-		 * However, each systems visual interfaces take up marginally more or less pixels-per-control to display.
-		 * By setting the L&F to Windows, the display editor will show us the interface as it will appear on the 
-		 * host system, not on your specific OS.
-		 */
+		new NewEntry(NewEntry.ReportType.FullReport);
+		
 		try {
 			//UIManager.setLookAndFeel("com.sun.java.swing.plaf.gtk.GTKLookAndFeel");
 			UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
