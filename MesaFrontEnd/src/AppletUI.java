@@ -183,8 +183,6 @@ public class AppletUI extends Applet{
 	}
 
 	public AppletUI() {
-		new NewEntry(NewEntry.ReportType.FullReport);
-		
 		try {
 			//UIManager.setLookAndFeel("com.sun.java.swing.plaf.gtk.GTKLookAndFeel");
 			UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
@@ -274,7 +272,7 @@ public class AppletUI extends Applet{
 		JButton btnPilotMode = new JButton("Pilot Mode");
 		btnPilotMode.addMouseListener(new MouseAdapter() {
 			@Override
-			public void mouseClicked(MouseEvent arg0) {
+			public void mouseReleased(MouseEvent arg0) {
 				dataMode = DATA_MODE.MODE_PILOT;
 				client.Log("Switching to Pilot Mode...");
 			}
@@ -286,7 +284,7 @@ public class AppletUI extends Applet{
 		JButton btnAircraftMode = new JButton("Aircraft Mode");
 		btnAircraftMode.addMouseListener(new MouseAdapter() {
 			@Override
-			public void mouseClicked(MouseEvent e) {
+			public void mouseReleased(MouseEvent e) {
 				dataMode = DATA_MODE.MODE_AIRCRAFT;
 				client.Log("Switching to Aircraft Mode...");
 			}
@@ -298,7 +296,7 @@ public class AppletUI extends Applet{
 		JButton btnDateMode = new JButton("Date Mode");
 		btnDateMode.addMouseListener(new MouseAdapter() {
 			@Override
-			public void mouseClicked(MouseEvent e) {
+			public void mouseReleased(MouseEvent e) {
 				dataMode = DATA_MODE.MODE_DATE;
 				client.Log("Switching to Date Mode...");
 			}
@@ -595,8 +593,8 @@ public class AppletUI extends Applet{
 		JButton btnCreateEntry = new JButton("Create New Entry");
 		btnCreateEntry.addMouseListener(new MouseAdapter() {
 			@Override
-			public void mouseClicked(MouseEvent e) {
-				JDialog entry = new NewEntry(NewEntry.ReportType.FullReport);
+			public void mouseReleased(MouseEvent e) {
+				JDialog entry = new NewEntry(client, NewEntry.ReportType.FullReport);
 			}
 		});
 		btnCreateEntry.setBackground(Color.GRAY);
@@ -651,7 +649,7 @@ public class AppletUI extends Applet{
 		JButton btnPromote = new JButton("Promote");
 		btnPromote.addMouseListener(new MouseAdapter() {
 			@Override
-			public void mouseClicked(MouseEvent arg0) {
+			public void mouseReleased(MouseEvent arg0) {
 				client.Log("Sending PROMOTE request for '" + userList.getSelectedValue() + "'...");
 				client.instance.RemoteRequest("$PROMOTE " + userList.getSelectedValue());
 			}
@@ -662,7 +660,7 @@ public class AppletUI extends Applet{
 		JButton btnDemote = new JButton("Demote");
 		btnDemote.addMouseListener(new MouseAdapter() {
 			@Override
-			public void mouseClicked(MouseEvent arg0) {
+			public void mouseReleased(MouseEvent arg0) {
 				client.Log("Sending DEMOTE request for '" + userList.getSelectedValue() + "'...");
 				client.instance.RemoteRequest("$DEMOTE " + userList.getSelectedValue());
 			}
@@ -681,7 +679,7 @@ public class AppletUI extends Applet{
 		JButton btnRecover = new JButton("Recover User");
 		btnRecover.addMouseListener(new MouseAdapter() {
 			@Override
-			public void mouseClicked(MouseEvent e) {
+			public void mouseReleased(MouseEvent e) {
 				client.instance.RemoteRequest("$RECOVER " + userList.getSelectedValue());
 			}
 		});
@@ -691,7 +689,7 @@ public class AppletUI extends Applet{
 		JButton btnRemoveUser = new JButton("Remove User");
 		btnRemoveUser.addMouseListener(new MouseAdapter() {
 			@Override
-			public void mouseClicked(MouseEvent e) {
+			public void mouseReleased(MouseEvent e) {
 				client.instance.RemoteRequest("$REMOVE USER " + userList.getSelectedValue());
 			}
 		});
@@ -719,7 +717,7 @@ public class AppletUI extends Applet{
 		JButton btnCreateUser = new JButton("Create User");
 		btnCreateUser.addMouseListener(new MouseAdapter() {
 			@Override
-			public void mouseClicked(MouseEvent e) {
+			public void mouseReleased(MouseEvent e) {
 				NewUserDialog nud = new NewUserDialog(client);
 			}
 		});
@@ -732,7 +730,7 @@ public class AppletUI extends Applet{
 		JButton btnChangePassword = new JButton("Change PWD");
 		btnChangePassword.addMouseListener(new MouseAdapter() {
 			@Override
-			public void mouseClicked(MouseEvent e) {
+			public void mouseReleased(MouseEvent e) {
 				PasswordDialog pd = new PasswordDialog(client);
 			}
 		});
@@ -816,7 +814,7 @@ public class AppletUI extends Applet{
 		JButton btnExecute = new JButton("Execute");
 		btnExecute.addMouseListener(new MouseAdapter() {
 			@Override
-			public void mouseClicked(MouseEvent e) {
+			public void mouseReleased(MouseEvent e) {
 				ProcessCommand(inputField.getText());
 			}
 		});
@@ -1015,8 +1013,6 @@ public class AppletUI extends Applet{
 		eventHandler = new EventHandler();
 		eventTicker = new Timer(1, eventHandler);
 
-		this.addMouseListener(eventHandler);
-
 		JLoginDialog dialog = new JLoginDialog(client);
 
 		eventTicker.start();
@@ -1086,7 +1082,7 @@ public class AppletUI extends Applet{
 		}
 	}
 
-	public class EventHandler implements ActionListener, MouseListener {
+	public class EventHandler implements ActionListener {
 		int secondsTicker = 0;
 		AppletUI superInstance;
 
@@ -1310,31 +1306,6 @@ public class AppletUI extends Applet{
 
 			sUptime = sHours + ":" + sMinutes + ":" + sSeconds;
 			return sUptime;
-		}
-
-		@Override
-		public void mouseClicked(MouseEvent e) {
-
-		}
-
-		@Override
-		public void mouseEntered(MouseEvent e) {
-
-		}
-
-		@Override
-		public void mouseExited(MouseEvent e) {
-
-		}
-
-		@Override
-		public void mousePressed(MouseEvent e) {
-
-		}
-
-		@Override
-		public void mouseReleased(MouseEvent e) {
-
 		}
 	}
 }	

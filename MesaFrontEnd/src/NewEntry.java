@@ -31,12 +31,10 @@ import java.awt.event.MouseEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ChangeEvent;
 
-import java.awt.Component;
-
-import javax.swing.Box;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.LayoutStyle.ComponentPlacement;
+import net.miginfocom.swing.MigLayout;
 
 
 public class NewEntry extends JDialog{
@@ -48,8 +46,8 @@ public class NewEntry extends JDialog{
 	private JTextField txtMinute;
 	private JTextField txtAircraft;
 	private JTextField txtPilot;
-	
-	JTextArea txtNotes;
+
+	private JTextArea txtNotes;
 
 	private JPanel pnlCollab;
 
@@ -62,6 +60,7 @@ public class NewEntry extends JDialog{
 	JPanel pnl3;
 	JPanel pnl2;
 	JPanel pnl1;
+	JPanel panel;
 
 	JButton btnNext;
 	JButton btnPrevious;
@@ -78,12 +77,16 @@ public class NewEntry extends JDialog{
 	JRadioButton radioPM;
 
 	JLabel lblProgress;
+	JLabel lblHeader;
+
+	Client network;
 
 	enum ReportType {
 		FullReport, RepairOnly, TrainingOnly, FlightOnly
 	}
 
-	public NewEntry(ReportType r) {
+	public NewEntry(Client c, ReportType r) {
+		network = c;
 		try {
 			UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
 			UIManager.getDefaults().put("Button.showMnemonics", Boolean.TRUE);
@@ -96,7 +99,7 @@ public class NewEntry extends JDialog{
 		}catch (IllegalAccessException e) {
 			e.printStackTrace();
 		}
-		
+
 		helper = new WizardHelper();
 		timer = new Timer(100, helper);
 
@@ -106,7 +109,7 @@ public class NewEntry extends JDialog{
 		getContentPane().setBackground(Color.LIGHT_GRAY);
 		setType(Type.UTILITY);
 		setTitle("WebConnect - Create a New Database Entry");
-		this.setSize(new Dimension(640, 278));
+		this.setSize(new Dimension(715, 300));
 		getContentPane().setLayout(new BorderLayout(0, 0));
 
 		JPanel pnlFooter = new JPanel();
@@ -116,8 +119,10 @@ public class NewEntry extends JDialog{
 		btnPrevious = new JButton("Previous");
 		btnPrevious.addMouseListener(new MouseAdapter() {
 			@Override
-			public void mouseClicked(MouseEvent e) {
-				helper.Previous();
+			public void mouseReleased(MouseEvent e) {
+				if (NewEntry.this.btnPrevious.isEnabled()) {
+					helper.Previous();
+				}
 			}
 		});
 
@@ -127,23 +132,32 @@ public class NewEntry extends JDialog{
 		btnNext = new JButton("Next");
 		btnNext.addMouseListener(new MouseAdapter() {
 			@Override
-			public void mouseClicked(MouseEvent arg0) {
-				helper.Next();
+			public void mouseReleased(MouseEvent arg0) {
+				if (NewEntry.this.btnNext.isEnabled()) {
+					helper.Next();
+				}
 			}
 		});
 
 		btnFinish = new JButton("Finish");
+		btnFinish.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseReleased(MouseEvent e) {
+				if (NewEntry.this.btnFinish.isEnabled()) {
+					TransmitData();
+				}
+			}
+		});
 		btnFinish.setEnabled(false);
 
-		Component verticalStrut = Box.createVerticalStrut(20);
 		GroupLayout gl_pnlFooter = new GroupLayout(pnlFooter);
 		gl_pnlFooter.setHorizontalGroup(
-				gl_pnlFooter.createParallelGroup(Alignment.LEADING)
-				.addGroup(Alignment.TRAILING, gl_pnlFooter.createSequentialGroup()
+				gl_pnlFooter.createParallelGroup(Alignment.TRAILING)
+				.addGroup(gl_pnlFooter.createSequentialGroup()
 						.addComponent(btnPrevious)
-						.addPreferredGap(ComponentPlacement.RELATED, 179, Short.MAX_VALUE)
+						.addGap(212)
 						.addComponent(lblProgress)
-						.addGap(119)
+						.addPreferredGap(ComponentPlacement.RELATED, 212, Short.MAX_VALUE)
 						.addComponent(btnNext)
 						.addPreferredGap(ComponentPlacement.RELATED)
 						.addComponent(btnFinish))
@@ -152,11 +166,11 @@ public class NewEntry extends JDialog{
 				gl_pnlFooter.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_pnlFooter.createSequentialGroup()
 						.addGap(5)
-						.addGroup(gl_pnlFooter.createParallelGroup(Alignment.BASELINE)
+						.addGroup(gl_pnlFooter.createParallelGroup(Alignment.BASELINE, false)
 								.addComponent(btnFinish)
 								.addComponent(btnNext)
-								.addComponent(lblProgress)
-								.addComponent(btnPrevious)))
+								.addComponent(btnPrevious)
+								.addComponent(lblProgress)))
 				);
 		pnlFooter.setLayout(gl_pnlFooter);
 
@@ -164,98 +178,87 @@ public class NewEntry extends JDialog{
 		pnlHeader.setBorder(new BevelBorder(BevelBorder.RAISED, null, null, null, null));
 		getContentPane().add(pnlHeader, BorderLayout.NORTH);
 
-		JLabel lblCreateADatabase = new JLabel("Create a database entry in a few easy steps. Use this Entry Wizard to speed up the process!");
-		pnlHeader.add(lblCreateADatabase);
+		lblHeader = new JLabel("Create a database entry in a few easy steps. Use this Entry Wizard to speed up the process!");
+		pnlHeader.add(lblHeader);
 
-		JPanel panel = new JPanel();
+		panel = new JPanel();
+		panel.setBackground(Color.LIGHT_GRAY);
 		getContentPane().add(panel);
-		panel.setLayout(null);
+		panel.setLayout(new MigLayout("", "[grow]", "[179px]"));
 
 		pnl1 = new JPanel();
-		pnl1.setBounds(0, 196, 640, -196);
-		panel.add(pnl1);
+		//panel.add(pnl1, "flowx,cell 0 0,grow");
 		pnl1.setBackground(Color.LIGHT_GRAY);
-		pnl1.setLayout(null);
+		pnl1.setLayout(new MigLayout("", "[][32px:n][2px:n][32px:n][2px:n][32px:n][][25px][32px:n:32px][][][::32px][][][2px][3px][5px][39px][3px][94px][8px][1px][9px][25px][43px][92px]", "[26px][14px][23px][][14px][][]"));
 
 		JLabel lblDateAndTime = new JLabel("Date and Time");
 		lblDateAndTime.setFont(new Font("Tahoma", Font.BOLD, 16));
-		lblDateAndTime.setBounds(10, 11, 125, 26);
-		pnl1.add(lblDateAndTime);
+		pnl1.add(lblDateAndTime, "cell 0 0,grow");
 
 		JLabel lblPleaseSetThe = new JLabel("Please enter the date and time that this flight took place.");
-		lblPleaseSetThe.setBounds(20, 39, 308, 14);
-		pnl1.add(lblPleaseSetThe);
-
-		JLabel lblThisFlightOccurred = new JLabel("This flight occurred on");
-		lblThisFlightOccurred.setBounds(20, 88, 113, 14);
-		pnl1.add(lblThisFlightOccurred);
-
-		txtDay = new JTextField();
-		txtDay.setBounds(131, 85, 35, 20);
-		pnl1.add(txtDay);
-		txtDay.setColumns(10);
-
-		JLabel label = new JLabel("/");
-		label.setBounds(168, 88, 12, 14);
-		pnl1.add(label);
-
-		JLabel lblDay = new JLabel("day");
-		lblDay.setBounds(141, 106, 24, 14);
-		pnl1.add(lblDay);
-
-		txtMonth = new JTextField();
-		txtMonth.setColumns(10);
-		txtMonth.setBounds(176, 85, 35, 20);
-		pnl1.add(txtMonth);
-
-		JLabel lblMonth = new JLabel("month");
-		lblMonth.setBounds(178, 106, 33, 14);
-		pnl1.add(lblMonth);
-
-		JLabel label_2 = new JLabel("/");
-		label_2.setBounds(213, 88, 12, 14);
-		pnl1.add(label_2);
-
-		txtYear = new JTextField();
-		txtYear.setColumns(10);
-		txtYear.setBounds(221, 85, 35, 20);
-		pnl1.add(txtYear);
-
-		JLabel lblYear = new JLabel("year");
-		lblYear.setBounds(231, 106, 24, 14);
-		pnl1.add(lblYear);
-
-		JLabel lblNewLabel = new JLabel("and started at about ");
-		lblNewLabel.setBounds(263, 88, 103, 14);
-		pnl1.add(lblNewLabel);
-
-		txtHour = new JTextField();
-		txtHour.setColumns(10);
-		txtHour.setBounds(365, 85, 35, 20);
-		pnl1.add(txtHour);
-
-		JLabel lblHour = new JLabel("hour");
-		lblHour.setBounds(375, 106, 24, 14);
-		pnl1.add(lblHour);
-
-		JLabel label_3 = new JLabel(":");
-		label_3.setBounds(402, 88, 12, 14);
-		pnl1.add(label_3);
-
-		txtMinute = new JTextField();
-		txtMinute.setColumns(10);
-		txtMinute.setBounds(410, 85, 35, 20);
-		pnl1.add(txtMinute);
-
-		JLabel lblMinute = new JLabel("minute");
-		lblMinute.setBounds(412, 106, 33, 14);
-		pnl1.add(lblMinute);
+		pnl1.add(lblPleaseSetThe, "cell 0 1 20 1,growx,aligny top");
 
 		radioAM = new JRadioButton("AM");
 		radioAM.setSelected(true);
 		radioAM.setBackground(Color.LIGHT_GRAY);
-		radioAM.setBounds(460, 65, 50, 23);
-		pnl1.add(radioAM);
+		pnl1.add(radioAM, "cell 12 2,alignx left,aligny top");
+		radioAM.addChangeListener(new ChangeListener() {
+			public void stateChanged(ChangeEvent e) {
+				if (NewEntry.this.radioAM.isSelected()) {
+					NewEntry.this.radioPM.setSelected(false);
+				}
+			}
+		});
+
+		JLabel lblThisFlightOccurred = new JLabel("This flight occurred on");
+		pnl1.add(lblThisFlightOccurred, "flowx,cell 0 3,alignx right,aligny center");
+
+		txtDay = new JTextField();
+		pnl1.add(txtDay, "cell 1 3,growx,aligny bottom");
+		txtDay.setColumns(10);
+
+		JLabel label = new JLabel("/");
+		pnl1.add(label, "cell 2 3,growx,aligny top");
+
+		txtMonth = new JTextField();
+		txtMonth.setColumns(10);
+		pnl1.add(txtMonth, "cell 3 3,growx,aligny bottom");
+
+		JLabel label_2 = new JLabel("/");
+		pnl1.add(label_2, "cell 4 3,alignx left,aligny top");
+
+		txtYear = new JTextField();
+		txtYear.setColumns(10);
+		pnl1.add(txtYear, "cell 5 3,growx,aligny bottom");
+
+		JLabel lblNewLabel = new JLabel("and started at about ");
+		pnl1.add(lblNewLabel, "cell 6 3,alignx center,aligny center");
+
+		txtHour = new JTextField();
+		txtHour.setColumns(10);
+		pnl1.add(txtHour, "cell 8 3,growx,aligny center");
+
+		JLabel label_3 = new JLabel(":");
+		pnl1.add(label_3, "cell 9 3,alignx left,aligny top");
+
+		txtMinute = new JTextField();
+		txtMinute.setColumns(10);
+		pnl1.add(txtMinute, "cell 10 3,growx,aligny bottom");
+
+		JLabel lblDay = new JLabel("day");
+		pnl1.add(lblDay, "cell 1 4,alignx center,aligny top");
+
+		JLabel lblMonth = new JLabel("month");
+		pnl1.add(lblMonth, "cell 3 4,alignx center,aligny top");
+
+		JLabel lblYear = new JLabel("year");
+		pnl1.add(lblYear, "cell 5 4,alignx center,aligny top");
+
+		JLabel lblHour = new JLabel("hour");
+		pnl1.add(lblHour, "cell 8 4,alignx center,aligny top");
+
+		JLabel lblMinute = new JLabel("minute");
+		pnl1.add(lblMinute, "cell 10 4,alignx center,aligny top");
 
 		radioPM = new JRadioButton("PM");
 		radioPM.addChangeListener(new ChangeListener() {
@@ -265,65 +268,43 @@ public class NewEntry extends JDialog{
 				}
 			}
 		});
-		radioAM.addChangeListener(new ChangeListener() {
-			public void stateChanged(ChangeEvent e) {
-				if (NewEntry.this.radioAM.isSelected()) {
-					NewEntry.this.radioPM.setSelected(false);
-				}
-			}
-		});
 		radioPM.setBackground(Color.LIGHT_GRAY);
-		radioPM.setBounds(460, 102, 50, 23);
-		pnl1.add(radioPM);
+		pnl1.add(radioPM, "cell 12 4,alignx left,aligny top");
 
-		JLabel lblNewLabel_1 = new JLabel("and it ");
-		lblNewLabel_1.setBounds(506, 88, 46, 14);
-		pnl1.add(lblNewLabel_1);
-
-		JLabel lblWasCompletedUsing = new JLabel("was completed using the ");
-		lblWasCompletedUsing.setBounds(21, 127, 125, 14);
-		pnl1.add(lblWasCompletedUsing);
+		JLabel lblWasCompletedUsing = new JLabel("The mission was completed using the ");
+		pnl1.add(lblWasCompletedUsing, "cell 0 5 2 1,alignx center,aligny center");
 
 		txtAircraft = new JTextField();
-		txtAircraft.setBounds(151, 124, 157, 20);
-		pnl1.add(txtAircraft);
+		pnl1.add(txtAircraft, "cell 2 5 4 1,growx,aligny center");
 		txtAircraft.setColumns(10);
 
-		JLabel lblAircraftName = new JLabel("aircraft name");
-		lblAircraftName.setBounds(193, 146, 71, 14);
-		pnl1.add(lblAircraftName);
-
 		JLabel lblAircraft = new JLabel("aircraft.");
-		lblAircraft.setBounds(318, 127, 46, 14);
-		pnl1.add(lblAircraft);
+		pnl1.add(lblAircraft, "cell 6 5,alignx left,aligny center");
+
+		JLabel lblAircraftName = new JLabel("aircraft name");
+		pnl1.add(lblAircraftName, "cell 3 6,alignx right,aligny top");
 
 		pnl2 = new JPanel();
-		pnl2.setBounds(0, 196, 640, -196);
-		panel.add(pnl2);
+		panel.add(pnl2, "cell 0 0,grow");
 		pnl2.setBackground(Color.LIGHT_GRAY);
-		pnl2.setLayout(null);
+		pnl2.setLayout(new MigLayout("", "[8px:n][][][][][][][grow]", "[20px][3px][17px][19px][84px]"));
 
 		JLabel lblPilots = new JLabel("Pilots");
-		lblPilots.setBounds(10, 11, 59, 20);
 		lblPilots.setFont(new Font("Tahoma", Font.BOLD, 16));
-		pnl2.add(lblPilots);
+		pnl2.add(lblPilots, "cell 0 0 2 1,alignx left,aligny top");
 
 		JLabel lblThisFlightWas = new JLabel("This flight was completed by ");
-		lblThisFlightWas.setBounds(20, 35, 138, 14);
-		pnl2.add(lblThisFlightWas);
+		pnl2.add(lblThisFlightWas, "cell 1 2,alignx right,aligny top");
 
 		txtPilot = new JTextField();
-		txtPilot.setBounds(159, 32, 163, 20);
-		pnl2.add(txtPilot);
+		pnl2.add(txtPilot, "cell 2 1 2 2,growx,aligny top");
 		txtPilot.setColumns(10);
 
-		JLabel lblYourFirst = new JLabel("your first + last name");
-		lblYourFirst.setBounds(182, 52, 104, 14);
-		pnl2.add(lblYourFirst);
+		JLabel lblYourFirst = new JLabel("first initial, last name");
+		pnl2.add(lblYourFirst, "cell 2 3 2 1,alignx center,aligny top");
 
 		JLabel lblAndWasDone = new JLabel("and was done so");
-		lblAndWasDone.setBounds(332, 35, 81, 14);
-		pnl2.add(lblAndWasDone);
+		pnl2.add(lblAndWasDone, "cell 4 2 2 1,alignx left,aligny top");
 
 		radioAlone = new JRadioButton("alone.");
 		radioAlone.setSelected(true);
@@ -336,8 +317,7 @@ public class NewEntry extends JDialog{
 			}
 		});
 		radioAlone.setBackground(Color.LIGHT_GRAY);
-		radioAlone.setBounds(427, 12, 59, 23);
-		pnl2.add(radioAlone);
+		pnl2.add(radioAlone, "cell 6 0 1 2,alignx left,aligny bottom");
 
 		radioCollab = new JRadioButton("in collaboration with");
 		radioCollab.addChangeListener(new ChangeListener() {
@@ -349,29 +329,26 @@ public class NewEntry extends JDialog{
 			}
 		});
 		radioCollab.setBackground(Color.LIGHT_GRAY);
-		radioCollab.setBounds(427, 48, 121, 23);
-		pnl2.add(radioCollab);
+		pnl2.add(radioCollab, "cell 6 2 1 2,alignx left,aligny bottom");
 
 		pnlCollab = new JPanel();
 		pnlCollab.setBackground(Color.LIGHT_GRAY);
-		pnlCollab.setBounds(20, 77, 249, 84);
-		pnl2.add(pnlCollab);
-		pnlCollab.setLayout(null);
+		pnl2.add(pnlCollab, "cell 1 4 4 1,grow");
+		pnlCollab.setLayout(new MigLayout("", "[4px:n][72px:n:72px][grow]", "[15px][2px][23px][11px][23px]"));
 
-		JLabel lblTheFollowingPilots = new JLabel("the following pilots:");
-		lblTheFollowingPilots.setBounds(10, 0, 101, 14);
-		pnlCollab.add(lblTheFollowingPilots);
+		JLabel lblTheFollowingPilots = new JLabel("these pilots:");
+		pnlCollab.add(lblTheFollowingPilots, "cell 0 0 2 1,alignx right,aligny center");
 
 		listCollab = new JList<String>();
+		listCollab.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
 		listCollab.setModel(collabModel);
-		listCollab.setBackground(Color.LIGHT_GRAY);
-		listCollab.setBounds(121, -1, 122, 74);
-		pnlCollab.add(listCollab);
+		listCollab.setBackground(Color.GRAY);
+		pnlCollab.add(listCollab, "cell 2 0 1 5,grow");
 
 		JButton btnAdd = new JButton("Add");
 		btnAdd.addMouseListener(new MouseAdapter() {
 			@Override
-			public void mouseClicked(MouseEvent e) {
+			public void mouseReleased(MouseEvent e) {
 				String resp = JOptionPane.showInputDialog("Enter the name of the collaborative pilot:");
 				if (resp != null && resp.length() > 0) {
 					collabModel.addElement(resp);
@@ -380,13 +357,12 @@ public class NewEntry extends JDialog{
 		});
 		btnAdd.setForeground(Color.WHITE);
 		btnAdd.setBackground(Color.DARK_GRAY);
-		btnAdd.setBounds(22, 50, 89, 23);
-		pnlCollab.add(btnAdd);
+		pnlCollab.add(btnAdd, "cell 0 4 2 1,growx,aligny top");
 
 		JButton btnRemove = new JButton("Remove");
 		btnRemove.addMouseListener(new MouseAdapter() {
 			@Override
-			public void mouseClicked(MouseEvent e) {
+			public void mouseReleased(MouseEvent e) {
 				if (listCollab.getSelectedValue() != null && listCollab.getSelectedValue().length() > 0) {
 					collabModel.remove(listCollab.getSelectedIndex());
 				}
@@ -394,48 +370,33 @@ public class NewEntry extends JDialog{
 		});
 		btnRemove.setForeground(Color.WHITE);
 		btnRemove.setBackground(Color.DARK_GRAY);
-		btnRemove.setBounds(22, 16, 89, 23);
-		pnlCollab.add(btnRemove);
+		pnlCollab.add(btnRemove, "cell 0 2 2 1,growx,aligny top");
 
-		JLabel lblNoteIfYoure = new JLabel("Note: If you're submitting a maintinence log, fill out this form anyway.");
+		JLabel lblNoteIfYoure = new JLabel("Note: Even if this is maintenance, fill out the form anyway.");
 		lblNoteIfYoure.setForeground(Color.BLACK);
-		lblNoteIfYoure.setBounds(279, 147, 340, 14);
-		pnl2.add(lblNoteIfYoure);
+		pnl2.add(lblNoteIfYoure, "cell 5 4 3 1,alignx left,aligny bottom");
+
+		pnlCollab.setVisible(false);
 
 		pnl3 = new JPanel();
-		pnl3.setBounds(0, 0, 640, 194);
-		panel.add(pnl3);
+		//panel.add(pnl3, "cell 0 0,grow");
 		pnl3.setBackground(Color.LIGHT_GRAY);
-		pnl3.setLayout(null);
+		pnl3.setLayout(new MigLayout("", "[4px:n:4px][][][46px][grow]", "[20px][14px][23px][23px][][56px]"));
 
 		JLabel lblAddReportData = new JLabel("Add Report Data");
-		lblAddReportData.setBounds(10, 11, 169, 20);
 		lblAddReportData.setFont(new Font("Tahoma", Font.BOLD, 16));
-		pnl3.add(lblAddReportData);
+		pnl3.add(lblAddReportData, "cell 0 0 4 1,alignx left,aligny top");
 
 		JLabel lblStuff = new JLabel("You've provided all the information necessary to submit this report. Please fill out the form below with additional details.");
-		lblStuff.setBounds(20, 33, 594, 14);
-		pnl3.add(lblStuff);
+		pnl3.add(lblStuff, "cell 1 1 4 1,growx,aligny top");
 
-		JLabel lblThisWasA = new JLabel("This was a ");
-		lblThisWasA.setBounds(30, 58, 65, 14);
-		pnl3.add(lblThisWasA);
+		JLabel lblThisWasA = new JLabel("I completed a");
+		pnl3.add(lblThisWasA, "cell 1 2,growx,aligny center");
 
 		radioFlight = new JRadioButton("Flight.");
 		radioFlight.setSelected(true);
 		radioFlight.setBackground(Color.LIGHT_GRAY);
-		radioFlight.setBounds(88, 54, 72, 23);
-		pnl3.add(radioFlight);
-
-		radioRepair = new JRadioButton("Repair.");
-		radioRepair.setBackground(Color.LIGHT_GRAY);
-		radioRepair.setBounds(88, 79, 72, 23);
-		pnl3.add(radioRepair);
-
-		radioTraining = new JRadioButton("Training.");
-		radioTraining.setBackground(Color.LIGHT_GRAY);
-		radioTraining.setBounds(88, 105, 72, 23);
-		pnl3.add(radioTraining);
+		pnl3.add(radioFlight, "cell 2 2,alignx left,aligny top");
 
 		radioFlight.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent arg0) {
@@ -446,14 +407,9 @@ public class NewEntry extends JDialog{
 			}
 		});
 
-		radioRepair.addChangeListener(new ChangeListener() {
-			public void stateChanged(ChangeEvent arg0) {
-				if (NewEntry.this.radioRepair.isSelected()) {
-					NewEntry.this.radioFlight.setSelected(false);
-					NewEntry.this.radioTraining.setSelected(false);
-				}
-			}
-		});
+		radioTraining = new JRadioButton("Training.");
+		radioTraining.setBackground(Color.LIGHT_GRAY);
+		pnl3.add(radioTraining, "cell 2 3,alignx left,aligny top");
 
 		radioTraining.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent arg0) {
@@ -464,14 +420,25 @@ public class NewEntry extends JDialog{
 			}
 		});
 
+		radioRepair = new JRadioButton("Repair.");
+		radioRepair.setBackground(Color.LIGHT_GRAY);
+		pnl3.add(radioRepair, "cell 2 4,alignx left,aligny top");
+
+		radioRepair.addChangeListener(new ChangeListener() {
+			public void stateChanged(ChangeEvent arg0) {
+				if (NewEntry.this.radioRepair.isSelected()) {
+					NewEntry.this.radioFlight.setSelected(false);
+					NewEntry.this.radioTraining.setSelected(false);
+				}
+			}
+		});
+
 		JLabel lblNotes = new JLabel("Notes:");
-		lblNotes.setBounds(169, 58, 46, 14);
-		pnl3.add(lblNotes);
+		pnl3.add(lblNotes, "cell 3 2,growx,aligny center");
 
 		JPanel panel_2 = new JPanel();
 		panel_2.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
-		panel_2.setBounds(218, 59, 381, 102);
-		pnl3.add(panel_2);
+		pnl3.add(panel_2, "cell 4 2 1 4,grow");
 		panel_2.setLayout(new BorderLayout(0, 0));
 
 		JScrollPane scrollPane = new JScrollPane();
@@ -483,8 +450,6 @@ public class NewEntry extends JDialog{
 		txtNotes.setForeground(Color.WHITE);
 		scrollPane.setViewportView(txtNotes);
 		txtNotes.setBackground(Color.GRAY);
-
-		pnlCollab.setVisible(false);
 
 		if (r.equals(ReportType.FlightOnly)) {
 			radioFlight.setSelected(true);
@@ -516,31 +481,78 @@ public class NewEntry extends JDialog{
 		timer.start();
 	}
 
+	public boolean TransmitData() {
+		try {
+			String hour = txtHour.getText();
+			String minute = txtMinute.getText();
+
+			String day = txtDay.getText();
+			String month = txtMonth.getText();
+			String year = txtYear.getText();
+
+			String pilots = txtAircraft.getText();
+
+			String notes = txtNotes.getText();
+			String type = "UNKNOWN";
+
+			if (!radioAlone.isSelected()) {
+				for (int i = 0; i < collabModel.getSize(); i++) {
+					pilots += ";" + collabModel.getElementAt(i);
+				}
+			}
+
+			if (radioRepair.isSelected()) {
+				type = "maintenance";
+			}else if (radioTraining.isSelected()) {
+				type = "training";
+			}else if (radioFlight.isSelected()) {
+				type = "flight";
+			}
+
+			network.instance.RemoteRequest("$CREATE ENTRY " + pilots + " " + (day + month + year + ";" + hour + minute + "00") + " " + txtAircraft.getText() + " " + type + " " + notes);
+			return true;
+		}catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
+
 	public class WizardHelper implements ActionListener {
 		private int stage = 0;
+		private int prevStage = -1;
 
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
-			if (stage == 0) {
-				pnl1.setVisible(true);
-				pnl2.setVisible(false);
-				pnl3.setVisible(false);
-				btnPrevious.setEnabled(false);
-				btnFinish.setEnabled(false);
-				lblProgress.setText("Step 1 of 3");
-			}else if (stage == 1) {
-				pnl1.setVisible(false);
-				pnl2.setVisible(true);
-				pnl3.setVisible(false);
-				btnFinish.setEnabled(false);
-				lblProgress.setText("Step 2 of 3");
-			}else if (stage == 2) {
-				pnl1.setVisible(false);
-				pnl2.setVisible(false);
-				pnl3.setVisible(true);
-				btnNext.setEnabled(false);
-				lblProgress.setText("Step 3 of 3");
+			if (stage != prevStage) {
+				if (stage == 0) {
+					panel.add(pnl1, "flowx,cell 0 0,grow");
+					panel.remove(pnl2);
+					panel.remove(pnl3);
+					btnPrevious.setEnabled(false);
+					btnFinish.setEnabled(false);
+					lblProgress.setText("Step 1 of 3");
+					lblHeader.setText("Create a database entry in a few easy steps. Use this Entry Wizard to speed up the process!");
+				}else if (stage == 1) {
+					panel.add(pnl2, "flowx,cell 0 0,grow");
+					panel.remove(pnl1);
+					panel.remove(pnl3);
+					btnFinish.setEnabled(false);
+					btnPrevious.setEnabled(true);
+					lblProgress.setText("Step 2 of 3");
+					lblHeader.setText("This form can also be used for maintenance entries. Enter your name for 'pilot' if so.");
+				}else if (stage == 2) {
+					panel.add(pnl3, "flowx,cell 0 0,grow");
+					panel.remove(pnl2);
+					panel.remove(pnl1);
+					btnNext.setEnabled(false);
+					btnPrevious.setEnabled(true);
+					lblProgress.setText("Step 3 of 3");
+					lblHeader.setText("Collaborations are supported! You can enter collaborative pilots below.");
+				}
+				NewEntry.this.validate();
+				NewEntry.this.repaint();
 			}
+			prevStage = stage;
 		}
 
 		public boolean CheckForLetters(String text) {
@@ -554,23 +566,29 @@ public class NewEntry extends JDialog{
 		public boolean CheckStageOne() {
 			String hour = txtHour.getText();
 			String minute = txtMinute.getText();
-			String second = "00";
 
 			String day = txtDay.getText();
 			String month = txtMonth.getText();
 			String year = txtYear.getText();
 
-			if (!CheckForLetters(hour) && hour.length() > 0) {
+			String aircraft = txtAircraft.getText();
+
+			if (!CheckForLetters(hour) && hour.length() == 2) {
 				txtHour.setBackground(Color.WHITE);
-				if (!CheckForLetters(minute) && minute.length() > 0) {
+				if (!CheckForLetters(minute) && minute.length() == 2) {
 					txtMinute.setBackground(Color.WHITE);
-					if (!CheckForLetters(day) && day.length() > 0) {
+					if (!CheckForLetters(day) && day.length() == 2) {
 						txtDay.setBackground(Color.WHITE);
-						if (!CheckForLetters(month) && month.length() > 0) {
+						if (!CheckForLetters(month) && month.length() == 2) {
 							txtMonth.setBackground(Color.WHITE);
-							if (!CheckForLetters(year) && year.length() > 0) {
+							if (!CheckForLetters(year) && year.length() == 4) {
 								txtYear.setBackground(Color.WHITE);
-								return true;
+								if (aircraft.length() > 0) {
+									txtAircraft.setBackground(Color.WHITE);
+									return true;
+								}else {
+									txtAircraft.setBackground(Color.RED);
+								}
 							}else {
 								txtYear.setBackground(Color.RED);
 							}

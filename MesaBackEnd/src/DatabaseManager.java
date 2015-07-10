@@ -403,7 +403,11 @@ public class DatabaseManager {
 			String[] training = RequestField(DatabaseManager.FieldType.LOGS, DatabaseManager.FieldSubType.TRAINING);
 
 			for (int i = 0; i < dates.length; i++) {
-				payload.AddEntry(dates[i], pilots[i], aircrafts[i], flight[i], maintenance[i], training[i]);
+				Payload.Entry entry = payload.CreateBlankEntry(dates[i], pilots[i], aircrafts[i]);
+				entry.setFlightData(flight[i]);
+				entry.setMaintinenceData(maintenance[i]);
+				entry.setTrainingData(training[i]);
+				payload.AddEntry(entry);
 			}
 		}
 	}
@@ -430,7 +434,7 @@ public class DatabaseManager {
 							values += attribute.getValue() + "~";	
 						}
 					}else {
-						//This could be the Logs entries, since they use Elements, then attributes
+						//This could be the Log entries, since they use Elements, then attributes
 						NodeList subList = nNode.getChildNodes();
 						for (int j = 0; j < subList.getLength(); j++) {
 							Node subNode = subList.item(j);

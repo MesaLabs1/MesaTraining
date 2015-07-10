@@ -53,10 +53,10 @@ public class Backend {
 
 		//Create a new NetworkMaster
 		netMaster = new NetworkMaster();
-		
+
 		//Generate the Payload stub
 		payload = new Payload();
-		
+
 		//Initialize the DBManager and point it to the shared resources
 		dbMan = new DatabaseManager(util, netMaster.ui, payload);
 
@@ -301,7 +301,7 @@ public class Backend {
 			payload.setDateModel(ConvertArrayToModel(dbMan.RequestField(DatabaseManager.FieldType.DATES, DatabaseManager.FieldSubType.NONE)));
 			payload.setPilotModel(ConvertArrayToModel(dbMan.RequestField(DatabaseManager.FieldType.PILOTS, DatabaseManager.FieldSubType.NONE)));
 			payload.setNameModel(ConvertArrayToModel(dbMan.RequestField(DatabaseManager.FieldType.AIRCRAFTS, DatabaseManager.FieldSubType.NONE)));
-			
+
 			String[] ranklist = dbMan.RequestRankList();
 			DefaultListModel<String> userModel = new DefaultListModel<String>();
 			DefaultListModel<String> rankModel = new DefaultListModel<String>();
@@ -328,7 +328,7 @@ public class Backend {
 			payload.setNumOverhead(ui.opsCount);
 			payload.setUptime(ui.lblUptime.getText());
 			payload.setMemUsage(ui.lblMemUsage.getText());
-			
+
 			dbMan.SendPayloadStacks();
 		}
 
@@ -589,7 +589,31 @@ public class Backend {
 																		out.writeUTF("$FAILURE Username cannot be 0 characters in length.");
 																	}
 																}else if (cmd.startsWith("ENTRY")) {
+																	//$CREATE ENTRY PILOT AIRCRAFT DATE TYPE NOTES
+																	try {
+																		String split[] = cmd.split(" ");
+																		String pilot = split[1].toLowerCase();
+																		String aircraft = split[2].toLowerCase();
+																		String date = split[3].toLowerCase();
+																		String type = split[4].toLowerCase();
+																		String notes = split[5];
 
+																		Payload.Entry entry = payload.CreateBlankEntry(pilot, aircraft, date);
+																		if (type.equals("training")) {
+																			entry.setTrainingData(notes);
+																		}else if (type.equals("maintenance")) {
+																			entry.setMaintinenceData(notes);
+																		}else if (type.equals("flight")) {
+																			entry.setFlightData(notes);
+																		}
+
+																		payload.AddEntry(entry);
+
+																		out.writeUTF("$SUCCESS");
+																	}catch (Exception e) {
+																		e.printStackTrace();
+																		out.writeUTF("$FAILURE The operation did not complete with the given parameters.");
+																	}
 																}else if (cmd.startsWith("LOG")) {
 
 																}

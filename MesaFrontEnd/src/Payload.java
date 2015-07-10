@@ -170,15 +170,9 @@ public class Payload implements Serializable {
 	public void AddEntry(Entry e) {
 		entries.add(e);
 	}
-
-	public void AddEntry(String date, String pilot, String aircraft, String ... params) {
-		Entry e = new Entry(pilot, aircraft, date);
-		e.setFlightData(params[0]);
-		e.setTrainingData(params[1]);
-		e.setMaintinenceData(params[2]);
-
-
-		entries.add(e);
+	
+	public Entry CreateBlankEntry(String p, String a, String d) {
+		return new Entry(p, a, d);
 	}
 
 	public ArrayList<Entry> getDataByPilot(String p) {
@@ -261,6 +255,9 @@ public class Payload implements Serializable {
 		}
 
 		public String getFlightData() {
+			if (flightData == null) {
+				return "";
+			}
 			return flightData;
 		}
 
@@ -269,6 +266,9 @@ public class Payload implements Serializable {
 		}
 
 		public String getMaintinenceData() {
+			if (maintinenceData == null) {
+				return "";
+			}
 			return maintinenceData;
 		}
 
@@ -277,6 +277,9 @@ public class Payload implements Serializable {
 		}
 
 		public String getTrainingData() {
+			if (trainingData == null) {
+				return "";
+			}
 			return trainingData;
 		}
 
