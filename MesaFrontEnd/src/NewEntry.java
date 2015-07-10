@@ -145,6 +145,7 @@ public class NewEntry extends JDialog{
 			public void mouseReleased(MouseEvent e) {
 				if (NewEntry.this.btnFinish.isEnabled()) {
 					TransmitData();
+					NewEntry.this.dispose();
 				}
 			}
 		});
@@ -189,7 +190,7 @@ public class NewEntry extends JDialog{
 		pnl1 = new JPanel();
 		//panel.add(pnl1, "flowx,cell 0 0,grow");
 		pnl1.setBackground(Color.LIGHT_GRAY);
-		pnl1.setLayout(new MigLayout("", "[][32px:n][2px:n][32px:n][2px:n][32px:n][][25px][32px:n:32px][][][::32px][][][2px][3px][5px][39px][3px][94px][8px][1px][9px][25px][43px][92px]", "[26px][14px][23px][][14px][][]"));
+		pnl1.setLayout(new MigLayout("", "[][32px:n:32px][2px:n][32px:n:32px][2px:n][48px:n][][25px][32px:n:32px][][::32px][][][][2px][3px][5px][39px][3px][94px][8px][1px][9px][25px][43px][92px]", "[26px][14px][23px][][14px][][]"));
 
 		JLabel lblDateAndTime = new JLabel("Date and Time");
 		lblDateAndTime.setFont(new Font("Tahoma", Font.BOLD, 16));
@@ -271,23 +272,23 @@ public class NewEntry extends JDialog{
 		radioPM.setBackground(Color.LIGHT_GRAY);
 		pnl1.add(radioPM, "cell 12 4,alignx left,aligny top");
 
-		JLabel lblWasCompletedUsing = new JLabel("The mission was completed using the ");
-		pnl1.add(lblWasCompletedUsing, "cell 0 5 2 1,alignx center,aligny center");
-
-		txtAircraft = new JTextField();
-		pnl1.add(txtAircraft, "cell 2 5 4 1,growx,aligny center");
-		txtAircraft.setColumns(10);
+		JLabel lblWasCompletedUsing = new JLabel("This flight used the ");
+		pnl1.add(lblWasCompletedUsing, "cell 0 5,alignx left,aligny center");
+		
+				txtAircraft = new JTextField();
+				pnl1.add(txtAircraft, "cell 1 5 5 1,growx,aligny center");
+				txtAircraft.setColumns(10);
 
 		JLabel lblAircraft = new JLabel("aircraft.");
 		pnl1.add(lblAircraft, "cell 6 5,alignx left,aligny center");
-
-		JLabel lblAircraftName = new JLabel("aircraft name");
-		pnl1.add(lblAircraftName, "cell 3 6,alignx right,aligny top");
+		
+				JLabel lblAircraftName = new JLabel("aircraft name");
+				pnl1.add(lblAircraftName, "cell 1 6 5 1,alignx center,aligny top");
 
 		pnl2 = new JPanel();
 		panel.add(pnl2, "cell 0 0,grow");
 		pnl2.setBackground(Color.LIGHT_GRAY);
-		pnl2.setLayout(new MigLayout("", "[8px:n][][][][][][][grow]", "[20px][3px][17px][19px][84px]"));
+		pnl2.setLayout(new MigLayout("", "[8px:n][][][100px:n][][][][grow]", "[20px][3px][17px][19px][84px]"));
 
 		JLabel lblPilots = new JLabel("Pilots");
 		lblPilots.setFont(new Font("Tahoma", Font.BOLD, 16));
@@ -300,7 +301,7 @@ public class NewEntry extends JDialog{
 		pnl2.add(txtPilot, "cell 2 1 2 2,growx,aligny top");
 		txtPilot.setColumns(10);
 
-		JLabel lblYourFirst = new JLabel("first initial, last name");
+		JLabel lblYourFirst = new JLabel("UCMNetID");
 		pnl2.add(lblYourFirst, "cell 2 3 2 1,alignx center,aligny top");
 
 		JLabel lblAndWasDone = new JLabel("and was done so");
@@ -334,7 +335,7 @@ public class NewEntry extends JDialog{
 		pnlCollab = new JPanel();
 		pnlCollab.setBackground(Color.LIGHT_GRAY);
 		pnl2.add(pnlCollab, "cell 1 4 4 1,grow");
-		pnlCollab.setLayout(new MigLayout("", "[4px:n][72px:n:72px][grow]", "[15px][2px][23px][11px][23px]"));
+		pnlCollab.setLayout(new MigLayout("", "[4px:n][72px:n:72px][8px:n:8px][grow]", "[15px][2px][23px][11px][23px]"));
 
 		JLabel lblTheFollowingPilots = new JLabel("these pilots:");
 		pnlCollab.add(lblTheFollowingPilots, "cell 0 0 2 1,alignx right,aligny center");
@@ -343,7 +344,7 @@ public class NewEntry extends JDialog{
 		listCollab.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
 		listCollab.setModel(collabModel);
 		listCollab.setBackground(Color.GRAY);
-		pnlCollab.add(listCollab, "cell 2 0 1 5,grow");
+		pnlCollab.add(listCollab, "cell 3 0 1 5,grow");
 
 		JButton btnAdd = new JButton("Add");
 		btnAdd.addMouseListener(new MouseAdapter() {
@@ -357,7 +358,7 @@ public class NewEntry extends JDialog{
 		});
 		btnAdd.setForeground(Color.WHITE);
 		btnAdd.setBackground(Color.DARK_GRAY);
-		pnlCollab.add(btnAdd, "cell 0 4 2 1,growx,aligny top");
+		pnlCollab.add(btnAdd, "cell 0 4 3 1,growx,aligny top");
 
 		JButton btnRemove = new JButton("Remove");
 		btnRemove.addMouseListener(new MouseAdapter() {
@@ -530,6 +531,7 @@ public class NewEntry extends JDialog{
 					panel.remove(pnl3);
 					btnPrevious.setEnabled(false);
 					btnFinish.setEnabled(false);
+					btnNext.setEnabled(true);
 					lblProgress.setText("Step 1 of 3");
 					lblHeader.setText("Create a database entry in a few easy steps. Use this Entry Wizard to speed up the process!");
 				}else if (stage == 1) {
@@ -538,6 +540,7 @@ public class NewEntry extends JDialog{
 					panel.remove(pnl3);
 					btnFinish.setEnabled(false);
 					btnPrevious.setEnabled(true);
+					btnNext.setEnabled(true);
 					lblProgress.setText("Step 2 of 3");
 					lblHeader.setText("This form can also be used for maintenance entries. Enter your name for 'pilot' if so.");
 				}else if (stage == 2) {
@@ -546,6 +549,7 @@ public class NewEntry extends JDialog{
 					panel.remove(pnl1);
 					btnNext.setEnabled(false);
 					btnPrevious.setEnabled(true);
+					btnFinish.setEnabled(true);
 					lblProgress.setText("Step 3 of 3");
 					lblHeader.setText("Collaborations are supported! You can enter collaborative pilots below.");
 				}

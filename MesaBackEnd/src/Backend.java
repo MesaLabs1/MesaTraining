@@ -591,6 +591,8 @@ public class Backend {
 																}else if (cmd.startsWith("ENTRY")) {
 																	//$CREATE ENTRY PILOT AIRCRAFT DATE TYPE NOTES
 																	try {
+																		util.Log(cmd);
+																		
 																		String split[] = cmd.split(" ");
 																		String pilot = split[1].toLowerCase();
 																		String aircraft = split[2].toLowerCase();
