@@ -49,7 +49,7 @@ public class Client {
 		System.out.println(log);
 		ui.consoleModel.addElement(log);
 	}
-	
+
 	void SilentLog(String mesage) {
 		System.out.println(mesage);
 		ui.consoleModel.addElement(mesage);
@@ -145,10 +145,10 @@ public class Client {
 				//TODO: We need the remote address for this connection.
 				client = new Socket("127.0.0.1", 1337);
 
-				in = new DataInputStream(client.getInputStream());
-				out = new DataOutputStream(client.getOutputStream());
-
 				ObjectInputStream ois = new ObjectInputStream(client.getInputStream());
+				out = new DataOutputStream(client.getOutputStream());
+				
+				in = new DataInputStream(client.getInputStream());
 
 				Log("Client initializing on " + client.getLocalAddress() + "@" + client.getLocalPort() + ".");
 
@@ -235,6 +235,11 @@ public class Client {
 									String[] split = request.split(";");
 									int id = Integer.parseInt(split[0]);
 									request = split[1];
+									if (split.length > 2) {
+										for (int i = 2; i < split.length; i++) {
+											request += ";" + split[i];
+										}
+									}
 									query.remove(0);
 									try {
 										//Log("[QUERY] " + request + "; ID:" + id);

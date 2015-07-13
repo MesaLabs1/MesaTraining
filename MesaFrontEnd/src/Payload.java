@@ -253,6 +253,10 @@ public class Payload implements Serializable {
 
 			return month + "/" + day + "/" + year;
 		}
+		
+		public String getRawDate() {
+			return date;
+		}
 
 		public String getFlightData() {
 			if (flightData == null) {

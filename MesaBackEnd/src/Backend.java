@@ -298,9 +298,9 @@ public class Backend {
 		}
 
 		public void UpdatePayload() {
-			payload.setDateModel(ConvertArrayToModel(dbMan.RequestField(DatabaseManager.FieldType.DATES, DatabaseManager.FieldSubType.NONE)));
-			payload.setPilotModel(ConvertArrayToModel(dbMan.RequestField(DatabaseManager.FieldType.PILOTS, DatabaseManager.FieldSubType.NONE)));
-			payload.setNameModel(ConvertArrayToModel(dbMan.RequestField(DatabaseManager.FieldType.AIRCRAFTS, DatabaseManager.FieldSubType.NONE)));
+			payload.setDateModel(ConvertArrayToModel(dbMan.GetAllOfType(DatabaseManager.FieldType.DATES)));
+			payload.setPilotModel(ConvertArrayToModel(dbMan.GetAllOfType(DatabaseManager.FieldType.PILOTS)));
+			payload.setNameModel(ConvertArrayToModel(dbMan.GetAllOfType(DatabaseManager.FieldType.AIRCRAFTS)));
 
 			String[] ranklist = dbMan.RequestRankList();
 			DefaultListModel<String> userModel = new DefaultListModel<String>();
@@ -333,19 +333,22 @@ public class Backend {
 		}
 
 		public DefaultListModel<String> ConvertArrayToModel(String[] in) {
-			DefaultListModel<String> model = new DefaultListModel<String>();
-			for (String s : in) {
-				boolean found = false;
-				for (int i = 0; i < model.size(); i++) {
-					if (s.equals(model.elementAt(i))) {
-						found = true;
+			if (in != null) {
+				DefaultListModel<String> model = new DefaultListModel<String>();
+				for (String s : in) {
+					boolean found = false;
+					for (int i = 0; i < model.size(); i++) {
+						if (s.equals(model.elementAt(i))) {
+							found = true;
+						}
+					}
+					if (!found) {
+						model.addElement(s);
 					}
 				}
-				if (!found) {
-					model.addElement(s);
-				}
+				return model;
 			}
-			return model;
+			return new DefaultListModel<String>();
 		}
 
 		/**
@@ -400,10 +403,13 @@ public class Backend {
 					ui.accessCount++;
 					ui.progressBar.setValue(10);
 
-					in = new DataInputStream(server.getInputStream());
+					oos = new ObjectOutputStream(server.getOutputStream());
 					out = new DataOutputStream(server.getOutputStream());
 
-					oos = new ObjectOutputStream(server.getOutputStream());
+					in = new DataInputStream(server.getInputStream());
+
+
+
 
 					util.Log("You've awoken " + name + " on port " + server.getLocalPort() + ".");
 					util.Log("[" + name + "] Authorizing " + server.getRemoteSocketAddress() + "...");
@@ -591,14 +597,17 @@ public class Backend {
 																}else if (cmd.startsWith("ENTRY")) {
 																	//$CREATE ENTRY PILOT AIRCRAFT DATE TYPE NOTES
 																	try {
-																		util.Log(cmd);
-																		
-																		String split[] = cmd.split(" ");
-																		String pilot = split[1].toLowerCase();
+																		String split[] = request.substring("$CREATE ENTRY ".length(), request.length()).split(" ");
+																		String pilot = split[0].toLowerCase();
 																		String aircraft = split[2].toLowerCase();
-																		String date = split[3].toLowerCase();
-																		String type = split[4].toLowerCase();
-																		String notes = split[5];
+																		String date = split[1].toLowerCase();
+																		String type = split[3].toLowerCase();
+																		String notes = "";
+																		for (int i = 4; i < split.length; i++) {
+																			notes += split[i] + " ";
+																		}
+
+																		//util.Log("Pilot: " + pilot + ". Aircraft: " + aircraft + ". Date: " + date + ". Type: " + type + ". Notes: " + notes);
 
 																		Payload.Entry entry = payload.CreateBlankEntry(pilot, aircraft, date);
 																		if (type.equals("training")) {
@@ -609,9 +618,14 @@ public class Backend {
 																			entry.setFlightData(notes);
 																		}
 
-																		payload.AddEntry(entry);
 
-																		out.writeUTF("$SUCCESS");
+																		String resp = dbMan.CreateEntry(username, entry);
+
+																		if (resp.length() == 0) {
+																			out.writeUTF("$SUCCESS");
+																		}else {
+																			out.writeUTF("$FAILURE " + resp);
+																		}
 																	}catch (Exception e) {
 																		e.printStackTrace();
 																		out.writeUTF("$FAILURE The operation did not complete with the given parameters.");

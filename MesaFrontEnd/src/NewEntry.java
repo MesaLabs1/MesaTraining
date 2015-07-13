@@ -145,7 +145,9 @@ public class NewEntry extends JDialog{
 			public void mouseReleased(MouseEvent e) {
 				if (NewEntry.this.btnFinish.isEnabled()) {
 					TransmitData();
+					NewEntry.this.setVisible(false);
 					NewEntry.this.dispose();
+					NewEntry.this.setEnabled(false);
 				}
 			}
 		});
@@ -274,16 +276,16 @@ public class NewEntry extends JDialog{
 
 		JLabel lblWasCompletedUsing = new JLabel("This flight used the ");
 		pnl1.add(lblWasCompletedUsing, "cell 0 5,alignx left,aligny center");
-		
-				txtAircraft = new JTextField();
-				pnl1.add(txtAircraft, "cell 1 5 5 1,growx,aligny center");
-				txtAircraft.setColumns(10);
+
+		txtAircraft = new JTextField();
+		pnl1.add(txtAircraft, "cell 1 5 5 1,growx,aligny center");
+		txtAircraft.setColumns(10);
 
 		JLabel lblAircraft = new JLabel("aircraft.");
 		pnl1.add(lblAircraft, "cell 6 5,alignx left,aligny center");
-		
-				JLabel lblAircraftName = new JLabel("aircraft name");
-				pnl1.add(lblAircraftName, "cell 1 6 5 1,alignx center,aligny top");
+
+		JLabel lblAircraftName = new JLabel("aircraft name");
+		pnl1.add(lblAircraftName, "cell 1 6 5 1,alignx center,aligny top");
 
 		pnl2 = new JPanel();
 		panel.add(pnl2, "cell 0 0,grow");
@@ -358,7 +360,7 @@ public class NewEntry extends JDialog{
 		});
 		btnAdd.setForeground(Color.WHITE);
 		btnAdd.setBackground(Color.DARK_GRAY);
-		pnlCollab.add(btnAdd, "cell 0 4 3 1,growx,aligny top");
+		pnlCollab.add(btnAdd, "cell 0 4 2 1,growx,aligny top");
 
 		JButton btnRemove = new JButton("Remove");
 		btnRemove.addMouseListener(new MouseAdapter() {
@@ -491,12 +493,12 @@ public class NewEntry extends JDialog{
 			String month = txtMonth.getText();
 			String year = txtYear.getText();
 
-			String pilots = txtAircraft.getText();
+			String pilots = txtPilot.getText();
 
 			String notes = txtNotes.getText();
 			String type = "UNKNOWN";
 
-			if (!radioAlone.isSelected()) {
+			if (radioCollab.isSelected()) {
 				for (int i = 0; i < collabModel.getSize(); i++) {
 					pilots += ";" + collabModel.getElementAt(i);
 				}
@@ -510,7 +512,10 @@ public class NewEntry extends JDialog{
 				type = "flight";
 			}
 
-			network.instance.RemoteRequest("$CREATE ENTRY " + pilots + " " + (day + month + year + ";" + hour + minute + "00") + " " + txtAircraft.getText() + " " + type + " " + notes);
+			String date =  month + day + year + ";" + hour + minute + "00";
+
+			String req = "$CREATE ENTRY " + pilots + " " + date + " " + txtAircraft.getText() + " " + type + " " + notes;
+			network.instance.RemoteRequest(req);
 			return true;
 		}catch (Exception e) {
 			e.printStackTrace();

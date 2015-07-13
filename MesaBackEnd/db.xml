@@ -1,21 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?><Database Header="com.mesalabs1.xml.database">
 	<!--Database contains all USER and AIRCRAFT information.--><Data>
-		<!--Contains Date, Pilot, Aircraft, and Logs for Maintinence, Training, Flight, and Administration--><Date Entry1="19052015;182436"><!--Example Date: 05/19/2015, at 18:24:36 (Global Time, so 6:24:36 PM). Indicates the last use date.--></Date>
-		<Pilot Entry1="Andreas Anderson;Jad Aboulhosn"><!--Supports multiple pilots, in this case both Jad and Andy.-->
-		</Pilot><Aircraft Entry1="Bixler"><!--Can support multiple aircraft, but recommend making another entry-->
-</Aircraft><Logs><Maintinence>
-	<Entry1 M05192015="Repair of left wing, modification of landing gear."><!--Designate M05192015 indicates Maintinence 05/19/2015. The contents indicate the repair in verbose text.--></Entry1></Maintinence><Training>
-	<Entry1 T05192015="Went out for a training flight in an airfield. Notes go here."><!--Designate T0519015 indicates Training 05/19/2015. The contents indicate the training notes.--></Entry1></Training>
-	<Flight>
-		<Entry1 F05192015="Went out for a regular flight in an airfield. Notes go here."><!--Designate F05192015 indicates Flight 05/19/2015. The contents indicate the flight notes.-->
-		</Entry1></Flight>
-	<Administration>
-		<Entry1 A05192015="[PRMT] Andy to Admin"><!--Tags indicate comands to display to the admins. [PRMT] = Promote, [DMT] = Demote, [RMV] = Remove-->
-		</Entry1></Administration></Logs>
 		
 		
-	</Data>
+	<Entry1 Aircraft="bixler" Date="31081996;042000" Notes="f_I was born on this day." Pilot="jaboulhosn"/></Data>
 	
 	<Users>
-		<jaboulhosn LastLogin="09072015;174714" Password="Jad0831" Rank="superadmin"><!--Remotely-generated user. Created by jaboulhosn2 on Sun Jul 05 08:36:44 PDT 2015--></jaboulhosn></Users>
-	<Permissions admin="modify" superadmin="create;delete;modify" user=""/></Database>
+		<jaboulhosn LastLogin="12072015;234117" Password="Jad0831" Rank="superadmin"><!--Remotely-generated user. Created by jaboulhosn2 on Sun Jul 05 08:36:44 PDT 2015--></jaboulhosn></Users><Permissions admin="modify" superadmin="create;delete;modify" user=""/>
+	</Database>

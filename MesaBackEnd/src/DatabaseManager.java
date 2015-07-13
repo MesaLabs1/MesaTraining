@@ -74,27 +74,6 @@ public class DatabaseManager {
 		}
 	}
 
-	public enum FieldSubType {
-		NONE ("None"), 
-		TRAINING ("Training"), 
-		FLIGHT ("Flight"), 
-		MAINTINENCE ("Maintinence");
-
-		private final String name;       
-
-		private FieldSubType(String s) {
-			name = s;
-		}
-
-		public boolean equalsName(String otherName){
-			return (otherName == null)? false:name.equals(otherName);
-		}
-
-		public String toString(){
-			return name;
-		}
-	}
-
 	public DatabaseManager(Utils ut, UI u, Payload p) {
 		util = ut;
 		payload = p;
@@ -393,75 +372,130 @@ public class DatabaseManager {
 
 	public void SendPayloadStacks() {
 		if (payload != null) {
-			payload.ClearEntries();
-
-			String[] dates = RequestField(DatabaseManager.FieldType.DATES, DatabaseManager.FieldSubType.NONE);
-			String[] pilots = RequestField(DatabaseManager.FieldType.PILOTS, DatabaseManager.FieldSubType.NONE);
-			String[] aircrafts = RequestField(DatabaseManager.FieldType.AIRCRAFTS, DatabaseManager.FieldSubType.NONE);
-			String[] flight = RequestField(DatabaseManager.FieldType.LOGS, DatabaseManager.FieldSubType.FLIGHT);
-			String[] maintenance = RequestField(DatabaseManager.FieldType.LOGS, DatabaseManager.FieldSubType.MAINTINENCE);
-			String[] training = RequestField(DatabaseManager.FieldType.LOGS, DatabaseManager.FieldSubType.TRAINING);
-
-			for (int i = 0; i < dates.length; i++) {
-				Payload.Entry entry = payload.CreateBlankEntry(dates[i], pilots[i], aircrafts[i]);
-				entry.setFlightData(flight[i]);
-				entry.setMaintinenceData(maintenance[i]);
-				entry.setTrainingData(training[i]);
-				payload.AddEntry(entry);
+			Payload.Entry[] entries = ConvertXMLToPayload();
+			
+			if (entries != null) {
+				payload.ClearEntries();
+				for (int i = 0; i < entries.length; i++) {
+					payload.AddEntry(entries[i]);
+				}
 			}
 		}
 	}
 
-	synchronized public String[] RequestField(FieldType type, FieldSubType subtype) {
+	synchronized public Payload.Entry[] ConvertXMLToPayload() {
 		try {
-			NodeList nList = null;
-			if (type.equals(FieldType.LOGS)) {		//Let's access by the tag we want, not the superlevel.
-				nList = doc.getElementsByTagName(subtype.toString());
-			}else {
-				nList = doc.getElementsByTagName(type.toString());
-			}
+			if (doc != null) {
+				ArrayList<Payload.Entry> entries = new ArrayList<Payload.Entry>();
 
-			String values = "";
-			for (int i = 0; i < nList.getLength(); i++) {
-				Node nNode = nList.item(i);
-				if (nNode.getNodeType() == Node.ELEMENT_NODE) {
-					Element eElement = (Element)nNode;
-					if (eElement.hasAttributes()) {
-						NamedNodeMap map = eElement.getAttributes();
-						for (int j = 0; j < map.getLength(); j++) {
-							Node subNode = map.item(j);
-							Attr attribute = (Attr)subNode;
-							values += attribute.getValue() + "~";	
-						}
-					}else {
-						//This could be the Log entries, since they use Elements, then attributes
-						NodeList subList = nNode.getChildNodes();
-						for (int j = 0; j < subList.getLength(); j++) {
-							Node subNode = subList.item(j);
-							if (subNode.getNodeType() == Node.ELEMENT_NODE) {
-								Element subElement = (Element)subNode;
-								if (subElement.hasAttributes()) {
-									NamedNodeMap map = subElement.getAttributes();
-									for (int k = 0; k < map.getLength(); k++) {
-										Node subSubNode = map.item(k);
-										Attr attribute = (Attr)subSubNode;
-										values += attribute.getValue() + "~";	
-									}
-								}
-							}
+				NodeList nList = doc.getElementsByTagName("Data");
+				Node nNode = nList.item(0);
+				for (int i = 0; i < nNode.getChildNodes().getLength(); i++) {
+					Node subNode = nNode.getChildNodes().item(i);
+					if (subNode.getNodeType() == Node.ELEMENT_NODE) {
+						Element eElement = (Element) subNode;
+						String date = eElement.getAttribute("Date");
+						String aircraft = eElement.getAttribute("Aircraft");
+						String notes = eElement.getAttribute("Notes");
+						String pilot = eElement.getAttribute("Pilot");
+
+						Payload.Entry entry = payload.CreateBlankEntry(pilot, aircraft, date);
+						
+						if (notes.startsWith("m_")) {
+							entry.setMaintinenceData(notes.substring(2, notes.length()));
+							entries.add(entry);
+						}else if (notes.startsWith("t_")) {
+							entry.setTrainingData(notes.substring(2, notes.length()));
+							entries.add(entry);
+						}else if (notes.startsWith("f_")) {
+							entry.setFlightData(notes.substring(2, notes.length()));
+							entries.add(entry);
 						}
 					}
 				}
+				ui.accessCount++;
+
+				Payload.Entry[] entriesArray = new Payload.Entry[entries.size()];
+				for (int i = 0; i < entries.size(); i++) {
+					entriesArray[i] = entries.get(i);
+				}
+
+				return entriesArray;
 			}
-			if (values.length() > 0) {
-				values = values.substring(0, values.length() - 1);
-			}
-			ui.accessCount++;
-			return values.split("~");
+			return null;
 		}catch (Exception e) {
-			//Return an empty array (this is a ghetto way of doing it), to keep the system up.
+			//e.printStackTrace();
 			//NOTE: This error seems to occur whenever a client terminates connection due to premature thread termination in an ADO.
-			return "".split("");
+			return null;
+		}
+	}
+
+	synchronized public String[] GetAllOfType(FieldType type) {
+		try {
+			if (doc != null) {
+				ArrayList<String> results = new ArrayList<String>();
+				String[] resultsArray;
+
+				NodeList nList = doc.getElementsByTagName("Data");
+				Node nNode = nList.item(0);
+				for (int i = 0; i < nNode.getChildNodes().getLength(); i++) {
+					Node subNode = nNode.getChildNodes().item(i);
+					if (subNode.getNodeType() == Node.ELEMENT_NODE) {
+						Element eElement = (Element) subNode;
+						if (type.equals(FieldType.DATES)) {
+							String date = eElement.getAttribute("Date");
+							results.add(date);
+						}else if (type.equals(FieldType.AIRCRAFTS)) {
+							String aircraft = eElement.getAttribute("Aircraft");
+							results.add(aircraft);
+						}else if (type.equals(FieldType.PILOTS)) {
+							String pilot = eElement.getAttribute("Pilot");
+							results.add(pilot);
+						}
+					}
+				}
+
+				resultsArray = new String[results.size()];
+				for (int i = 0; i < results.size(); i++) {
+					resultsArray[i] = results.get(i);
+				}
+				return resultsArray;
+			}
+			return null;
+		}catch (Exception e) {
+			//e.printStackTrace();
+			return null;
+		}
+	}
+
+	synchronized public String CreateEntry(String caller, Payload.Entry entry) {
+		try {
+			NodeList nList = doc.getElementsByTagName("Data");
+			Element dataPoint = (Element)nList.item(0);
+			Element element = doc.createElement("Entry" + (dataPoint.getChildNodes().getLength()));
+
+			dataPoint.appendChild(element);
+			element.setAttribute("Date", entry.getRawDate());
+			element.setAttribute("Aircraft", entry.getAircraft());
+			element.setAttribute("Pilot", entry.getPilot());
+
+			if (entry.getFlightData().length() > 0) {
+				element.setAttribute("Notes", "f_" + entry.getFlightData());
+			}else if (entry.getMaintinenceData().length() > 0) {
+				element.setAttribute("Notes", "m_" + entry.getMaintinenceData());
+			}else if (entry.getTrainingData().length() > 0) {
+				element.setAttribute("Notes", "t_" + entry.getTrainingData());
+			}
+
+			ui.accessCount++;
+
+			util.Log("Reloading the DOM XML System...");
+
+			Save();
+			return "";
+		}catch (Exception e) {
+			e.printStackTrace();
+			return e.getMessage();
 		}
 	}
 
