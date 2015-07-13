@@ -658,9 +658,13 @@ public class Backend {
 																		}
 																	}
 																}else if (cmd.startsWith("ENTRY")) {
-
+																	//$REMOVE ENTRY TYPE STRING
+																	String split[] = request.substring("$REMOVE ENTRY ".length(), request.length()).split(" ");
+																	String type = split[0].toLowerCase();
+																	String value = split[2].toLowerCase();
+																	dbMan.RemoveEntryByType(username, type, value);
 																}else if (cmd.startsWith("LOG")) {
-
+																	
 																}
 															}else if (request.startsWith("$PROMOTE") && rank.equals("superadmin")) {
 																String user = request.substring("$PROMOTE ".length(), request.length());

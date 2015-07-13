@@ -2,8 +2,8 @@
 	<!--Database contains all USER and AIRCRAFT information.--><Data>
 		
 		
-	<Entry1 Aircraft="bixler" Date="31081996;042000" Notes="f_I was born on this day." Pilot="jaboulhosn"/></Data>
+	<Entry1 Aircraft="bixler" Date="31081996;042000" Notes="f_I was born on this day." Pilot="jaboulhosn"/><Entry2 Aircraft="bixler" Date="20041996;042000" Notes="f_Enter your notes here. " Pilot="jaboulhosn;jclow"/></Data>
 	
 	<Users>
-		<jaboulhosn LastLogin="12072015;234117" Password="Jad0831" Rank="superadmin"><!--Remotely-generated user. Created by jaboulhosn2 on Sun Jul 05 08:36:44 PDT 2015--></jaboulhosn></Users><Permissions admin="modify" superadmin="create;delete;modify" user=""/>
+		<jaboulhosn LastLogin="13072015;095540" Password="Jad0831" Rank="superadmin"><!--Remotely-generated user. Created by jaboulhosn2 on Sun Jul 05 08:36:44 PDT 2015--></jaboulhosn></Users><Permissions admin="modify" superadmin="create;delete;modify" user=""/>
 	</Database>

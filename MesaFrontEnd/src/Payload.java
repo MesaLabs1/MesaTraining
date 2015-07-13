@@ -170,7 +170,7 @@ public class Payload implements Serializable {
 	public void AddEntry(Entry e) {
 		entries.add(e);
 	}
-	
+
 	public Entry CreateBlankEntry(String p, String a, String d) {
 		return new Entry(p, a, d);
 	}
@@ -188,7 +188,9 @@ public class Payload implements Serializable {
 	public ArrayList<Entry> getDataByDate(String d) {
 		ArrayList<Entry> output = new ArrayList<Entry>();
 		for (Entry e : entries) {
-			output.add(e);
+			if (e.getDate().equals(d)) {
+				output.add(e);
+			}
 		}
 		return output;
 	}
@@ -253,7 +255,7 @@ public class Payload implements Serializable {
 
 			return month + "/" + day + "/" + year;
 		}
-		
+
 		public String getRawDate() {
 			return date;
 		}

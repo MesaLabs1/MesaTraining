@@ -270,9 +270,9 @@ public class AppletUI extends Applet{
 		});
 
 		JButton btnPilotMode = new JButton("Pilot Mode");
-		btnPilotMode.addMouseListener(new MouseAdapter() {
+		btnPilotMode.addActionListener(new ActionListener() {
 			@Override
-			public void mouseReleased(MouseEvent arg0) {
+			public void actionPerformed(ActionEvent arg0) {
 				dataMode = DATA_MODE.MODE_PILOT;
 				client.Log("Switching to Pilot Mode...");
 			}
@@ -282,9 +282,9 @@ public class AppletUI extends Applet{
 		pnlHeader.add(btnPilotMode, "cell 8 0");
 
 		JButton btnAircraftMode = new JButton("Aircraft Mode");
-		btnAircraftMode.addMouseListener(new MouseAdapter() {
+		btnAircraftMode.addActionListener(new ActionListener() {
 			@Override
-			public void mouseReleased(MouseEvent e) {
+			public void actionPerformed(ActionEvent arg0) {
 				dataMode = DATA_MODE.MODE_AIRCRAFT;
 				client.Log("Switching to Aircraft Mode...");
 			}
@@ -294,9 +294,9 @@ public class AppletUI extends Applet{
 		pnlHeader.add(btnAircraftMode, "cell 9 0");
 
 		JButton btnDateMode = new JButton("Date Mode");
-		btnDateMode.addMouseListener(new MouseAdapter() {
+		btnDateMode.addActionListener(new ActionListener() {
 			@Override
-			public void mouseReleased(MouseEvent e) {
+			public void actionPerformed(ActionEvent arg0) {
 				dataMode = DATA_MODE.MODE_DATE;
 				client.Log("Switching to Date Mode...");
 			}
@@ -591,10 +591,10 @@ public class AppletUI extends Applet{
 		superadminElements.add(btnFactoryReset);
 
 		JButton btnCreateEntry = new JButton("Create New Entry");
-		btnCreateEntry.addMouseListener(new MouseAdapter() {
+		btnCreateEntry.addActionListener(new ActionListener() {
 			@Override
-			public void mouseReleased(MouseEvent e) {
-				JDialog entry = new NewEntry(client, NewEntry.ReportType.FullReport);
+			public void actionPerformed(ActionEvent arg0) {
+				new NewEntry(client, NewEntry.ReportType.FullReport);
 			}
 		});
 		btnCreateEntry.setBackground(Color.GRAY);
@@ -603,6 +603,22 @@ public class AppletUI extends Applet{
 		adminElements.add(btnCreateEntry);
 
 		JButton btnDeleteEntries = new JButton("Delete Entry");
+		btnDeleteEntries.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				if (listData.getSelectedValue() != null) {
+					String type = "";
+					if (dataMode.equals(DATA_MODE.MODE_AIRCRAFT)) {
+						type = "aircraft";
+					}else if (dataMode.equals(DATA_MODE.MODE_DATE)) {
+						type = "date";
+					}else if (dataMode.equals(DATA_MODE.MODE_PILOT)) {
+						type = "pilot";
+					}
+					String search = listData.getSelectedValue();
+					client.instance.RemoteRequest("$REMOVE ENTRY " + type + " " + search);
+				}
+			}
+		});
 		btnDeleteEntries.setBackground(Color.GRAY);
 		btnDeleteEntries.setForeground(Color.WHITE);
 
@@ -647,9 +663,9 @@ public class AppletUI extends Applet{
 		lblUserManagement.setForeground(Color.LIGHT_GRAY);
 
 		JButton btnPromote = new JButton("Promote");
-		btnPromote.addMouseListener(new MouseAdapter() {
+		btnPromote.addActionListener(new ActionListener() {
 			@Override
-			public void mouseReleased(MouseEvent arg0) {
+			public void actionPerformed(ActionEvent arg0) {
 				client.Log("Sending PROMOTE request for '" + userList.getSelectedValue() + "'...");
 				client.instance.RemoteRequest("$PROMOTE " + userList.getSelectedValue());
 			}
@@ -658,9 +674,9 @@ public class AppletUI extends Applet{
 		btnPromote.setBackground(Color.GRAY);
 
 		JButton btnDemote = new JButton("Demote");
-		btnDemote.addMouseListener(new MouseAdapter() {
+		btnDemote.addActionListener(new ActionListener() {
 			@Override
-			public void mouseReleased(MouseEvent arg0) {
+			public void actionPerformed(ActionEvent arg0) {
 				client.Log("Sending DEMOTE request for '" + userList.getSelectedValue() + "'...");
 				client.instance.RemoteRequest("$DEMOTE " + userList.getSelectedValue());
 			}
@@ -677,9 +693,9 @@ public class AppletUI extends Applet{
 		userList.setBorder(new LineBorder(Color.WHITE));
 
 		JButton btnRecover = new JButton("Recover User");
-		btnRecover.addMouseListener(new MouseAdapter() {
+		btnRecover.addActionListener(new ActionListener() {
 			@Override
-			public void mouseReleased(MouseEvent e) {
+			public void actionPerformed(ActionEvent arg0) {
 				client.instance.RemoteRequest("$RECOVER " + userList.getSelectedValue());
 			}
 		});
@@ -687,9 +703,9 @@ public class AppletUI extends Applet{
 		btnRecover.setBackground(Color.GRAY);
 
 		JButton btnRemoveUser = new JButton("Remove User");
-		btnRemoveUser.addMouseListener(new MouseAdapter() {
+		btnRemoveUser.addActionListener(new ActionListener() {
 			@Override
-			public void mouseReleased(MouseEvent e) {
+			public void actionPerformed(ActionEvent arg0) {
 				client.instance.RemoteRequest("$REMOVE USER " + userList.getSelectedValue());
 			}
 		});
@@ -715,9 +731,9 @@ public class AppletUI extends Applet{
 		pnlManagement.add(userList, "cell 0 2,grow");
 
 		JButton btnCreateUser = new JButton("Create User");
-		btnCreateUser.addMouseListener(new MouseAdapter() {
+		btnCreateUser.addActionListener(new ActionListener() {
 			@Override
-			public void mouseReleased(MouseEvent e) {
+			public void actionPerformed(ActionEvent arg0) {
 				NewUserDialog nud = new NewUserDialog(client);
 			}
 		});
@@ -728,9 +744,9 @@ public class AppletUI extends Applet{
 		superadminElements.add(btnCreateUser);
 
 		JButton btnChangePassword = new JButton("Change PWD");
-		btnChangePassword.addMouseListener(new MouseAdapter() {
+		btnChangePassword.addActionListener(new ActionListener() {
 			@Override
-			public void mouseReleased(MouseEvent e) {
+			public void actionPerformed(ActionEvent arg0) {
 				PasswordDialog pd = new PasswordDialog(client);
 			}
 		});
@@ -812,9 +828,9 @@ public class AppletUI extends Applet{
 		inputField.setColumns(10);
 
 		JButton btnExecute = new JButton("Execute");
-		btnExecute.addMouseListener(new MouseAdapter() {
+		btnExecute.addActionListener(new ActionListener() {
 			@Override
-			public void mouseReleased(MouseEvent e) {
+			public void actionPerformed(ActionEvent arg0) {
 				ProcessCommand(inputField.getText());
 			}
 		});

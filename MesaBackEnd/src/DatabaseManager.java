@@ -373,7 +373,7 @@ public class DatabaseManager {
 	public void SendPayloadStacks() {
 		if (payload != null) {
 			Payload.Entry[] entries = ConvertXMLToPayload();
-			
+
 			if (entries != null) {
 				payload.ClearEntries();
 				for (int i = 0; i < entries.length; i++) {
@@ -400,7 +400,7 @@ public class DatabaseManager {
 						String pilot = eElement.getAttribute("Pilot");
 
 						Payload.Entry entry = payload.CreateBlankEntry(pilot, aircraft, date);
-						
+
 						if (notes.startsWith("m_")) {
 							entry.setMaintinenceData(notes.substring(2, notes.length()));
 							entries.add(entry);
@@ -495,6 +495,41 @@ public class DatabaseManager {
 			return "";
 		}catch (Exception e) {
 			e.printStackTrace();
+			return e.getMessage();
+		}
+	}
+
+	synchronized public String RemoveEntryByType(String caller, String type, String search) {
+		try {
+			if (doc != null) {
+				NodeList nList = doc.getElementsByTagName("Data");
+				Node nNode = nList.item(0);
+				for (int i = 0; i < nNode.getChildNodes().getLength(); i++) {
+					Node subNode = nNode.getChildNodes().item(i);
+					if (subNode.getNodeType() == Node.ELEMENT_NODE) {
+						Element eElement = (Element) subNode;
+						if (type.equals("date")) {
+							if (eElement.getAttribute("Date").equals(search)) {
+								nNode.removeChild(subNode);
+								util.Log("The user " + caller + " is deleting '" + subNode.getLocalName() + "' via a " + type + " search for '" + search + "'...");
+							}
+						}else if (type.equals("pilot")) {
+							if (eElement.getAttribute("Pilot").equals(search)) {
+								nNode.removeChild(subNode);
+								util.Log("The user " + caller + " is deleting '" + subNode.getLocalName() + "' via a " + type + " search for '" + search + "'...");
+							}
+						}else if (type.equals("aircraft")) {
+							if (eElement.getAttribute("Aircraft").equals(search)) {
+								nNode.removeChild(subNode);
+								util.Log("The user " + caller + " is deleting '" + subNode.getLocalName() + "' via a " + type + " search for '" + search + "'...");
+							}
+						}
+					}
+				}
+			}
+			return "";
+		}catch (Exception e) {
+			//e.printStackTrace();
 			return e.getMessage();
 		}
 	}

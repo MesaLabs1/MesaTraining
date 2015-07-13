@@ -145,7 +145,6 @@ public class NewEntry extends JDialog{
 			public void mouseReleased(MouseEvent e) {
 				if (NewEntry.this.btnFinish.isEnabled()) {
 					TransmitData();
-					NewEntry.this.setVisible(false);
 					NewEntry.this.dispose();
 					NewEntry.this.setEnabled(false);
 				}
