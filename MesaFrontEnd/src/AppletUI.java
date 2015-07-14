@@ -607,14 +607,15 @@ public class AppletUI extends Applet{
 			public void actionPerformed(ActionEvent arg0) {
 				if (listData.getSelectedValue() != null) {
 					String type = "";
+					String search = listData.getSelectedValue();
 					if (dataMode.equals(DATA_MODE.MODE_AIRCRAFT)) {
 						type = "aircraft";
 					}else if (dataMode.equals(DATA_MODE.MODE_DATE)) {
 						type = "date";
+						search = search.substring(3, 5) + search.substring(0, 2) + search.substring(6, 10);
 					}else if (dataMode.equals(DATA_MODE.MODE_PILOT)) {
 						type = "pilot";
 					}
-					String search = listData.getSelectedValue();
 					client.instance.RemoteRequest("$REMOVE ENTRY " + type + " " + search);
 				}
 			}

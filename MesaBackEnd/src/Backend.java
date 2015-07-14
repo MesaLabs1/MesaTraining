@@ -661,8 +661,14 @@ public class Backend {
 																	//$REMOVE ENTRY TYPE STRING
 																	String split[] = request.substring("$REMOVE ENTRY ".length(), request.length()).split(" ");
 																	String type = split[0].toLowerCase();
-																	String value = split[2].toLowerCase();
-																	dbMan.RemoveEntryByType(username, type, value);
+																	String value = split[1].toLowerCase();
+																	String resp = dbMan.RemoveEntryByType(username, type, value);
+																	
+																	if (resp.length() == 0) {
+																		out.writeUTF("$SUCCESS");
+																	}else {
+																		out.writeUTF("$FAILURE " + resp);
+																	}
 																}else if (cmd.startsWith("LOG")) {
 																	
 																}
