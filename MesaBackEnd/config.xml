@@ -1,6 +1,6 @@
 <config>
-	<INIT Version="">
+	<INIT Version="1" Update="">
 	
 	</INIT>
 	
-</config>
+	<Network Port="1337" MaxConnections="12" MaxOverhead="0"></Network></config>

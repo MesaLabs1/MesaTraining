@@ -95,6 +95,8 @@ public class UI extends JFrame{
 	int accessCount;
 	int opsCount;
 	
+	Init.PropertyMaster propMaster;
+	
 	/*
 	 * Async Flags
 	 * 
@@ -135,9 +137,10 @@ public class UI extends JFrame{
 	 * the actionPerformed method in the EventHandler class.
 	 */
 
-	public UI(Utils u) {
-		util = u;
-
+	public UI(Init.PropertyMaster pm) {
+		util = pm.util;
+		propMaster = pm;
+		
 		//setType(Type.UTILITY);
 
 		setAlwaysOnTop(true);
@@ -458,7 +461,7 @@ public class UI extends JFrame{
 			ui.lblOverall.setText("" + ui.numOverall);
 			ui.lblThreads.setText("" + ui.numThreads);
 			ui.lblOverhead.setText("" + ui.numOverhead);
-			ui.lblVersion.setText("" + Init.PropertyMaster.BACKEND_VERSION);
+			ui.lblVersion.setText("" + propMaster.BACKEND_VERSION);
 
 			//Special variables
 			ui.lblUptime.setText(convertUpTime());

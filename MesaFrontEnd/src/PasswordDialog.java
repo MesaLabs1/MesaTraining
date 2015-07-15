@@ -39,17 +39,10 @@ public class PasswordDialog extends JDialog{
 	
 	public PasswordDialog(Client c) {
 		setTitle("Mesa Labs WebConnect - Change Password");
-		setResizable(false);
-		
-		superInstance = c;
-		
-		//Set Size of Dialog to something smaller than 640x480, preferably in multiples of 8 or 16.
-		this.setSize(new Dimension(445, 194));
-		
-		//A Java toolkit that provides us with information about the target system.
+		setResizable(false);	
+		superInstance = c;		
+		this.setSize(new Dimension(445, 194));	
 		Toolkit toolkit = Toolkit.getDefaultToolkit();
-		
-		//Center this dialog on the screen
 		this.setLocation(new Point(toolkit.getScreenSize().width / 2- (256),  toolkit.getScreenSize().height / 2 - (128)));
 		getContentPane().setLayout(new BorderLayout(0, 0));
 		

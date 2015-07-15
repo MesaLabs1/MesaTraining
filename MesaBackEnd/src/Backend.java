@@ -12,31 +12,19 @@ import java.util.Random;
 import javax.swing.DefaultListModel;
 import javax.swing.Timer;
 
-
 public class Backend {
-	//PropertyMaster reference object from INIT
 	Init.PropertyMaster properties;
 	Utils util;
-
-	//Creative shit.
-	enum ThreadNames {
-		Bashful, Doc, Dopey, Grumpy, Happy, Sleepy, Sneezy
-	}
-
-	//Network Master -- all hail
 	NetworkMaster netMaster;
 	Thread netMasterThread;
-
-	//DatabaseRunner -- something witty
 	DatabaseManager dbMan;
-
-	//Payload -- Gold!
 	Payload payload;
-
-	//Timer
 	Timer eventTicker;
 	EventHandler eventHandler;
 
+	enum ThreadNames {
+		Bashful, Doc, Dopey, Grumpy, Happy, Sleepy, Sneezy
+	}
 	
 	public Backend(Init.PropertyMaster prop) {
 		properties = prop;
@@ -603,7 +591,6 @@ public class Backend {
 																			entry.setFlightData(notes);
 																		}
 
-
 																		String resp = dbMan.CreateEntry(username, entry);
 
 																		if (resp.length() == 0) {
@@ -616,7 +603,7 @@ public class Backend {
 																		out.writeUTF("$FAILURE The operation did not complete with the given parameters.");
 																	}
 																}else if (cmd.startsWith("LOG")) {
-
+																	
 																}
 															}else if (request.startsWith("$RECOVER") && rank.equals("superadmin")) {
 																out.writeUTF("$RECOVERY " + dbMan.GetPassword(request.substring("$RECOVER ".length(), request.length())));
