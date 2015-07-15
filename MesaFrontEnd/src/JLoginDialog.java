@@ -28,16 +28,7 @@ import javax.swing.border.EtchedBorder;
 import java.awt.Component;
 import javax.swing.Box;
 
-/**
- * This class outlines the JLoginDialog. This login dialog extends JDialog (meaning it behaves as a popup). It is
- * intended to be called or projected BEFORE AppletMain's UI loads. It must then establish a connection with the 
- * master server, and verify your identity before you will be redirected to the AppletMain UI. The UI must then
- * be modified to match your security clearance. NOTE: This class is a visual event, meaning it retains no 
- * network-related entities, NOR SHOULD IT.
- * 
- * @author hackjunky, jacrin
- *
- */
+
 public class JLoginDialog extends JDialog{
 	private static final long serialVersionUID = 8224336328398525415L;
 	private JTextField usernameField;
@@ -140,9 +131,7 @@ public class JLoginDialog extends JDialog{
 		this.setVisible(true);
 	}
 	
-	/**
-	 * We will call this method from the client layer to indicate a valid login attempt.
-	 */
+	
 	public void AuthSucess() {
 		//We call dispose because it manually adds a callback to windowDeactivated 
 		//and windowClosed. This will notify our applet that we're ready.
@@ -151,17 +140,12 @@ public class JLoginDialog extends JDialog{
 		
 	}
 	
-	/**
-	 * We will call this method from the client layer to indicate an invalid login attempt.
-	 */
+	
 	public void AuthFailure() {
 		ShowHelpText("Invalid Username or Password.");
 	}
 	
-	/**
-	 * Just a little something something for us to be able to indicate to the user information.
-	 * @param text
-	 */
+	
 	public void ShowHelpText(String text) {
 		lblHelptext_1.setText(text);
 	}

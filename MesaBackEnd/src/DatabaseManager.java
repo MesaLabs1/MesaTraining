@@ -26,16 +26,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Attr;
 import org.xml.sax.SAXException;
 
-/**
- * This class outlines the basic get/set methods of the SQL database along with BDO support for the
- * main thread and subsequent networked threads. 
- * 
- * We will need to queue database requests in a master list, and process them/send their callback info
- * as we process them. This system will be embedded in its own class for the purposes of ADO.
- * 
- * @author hackjunky, jacrin
- *
- */
+
 public class DatabaseManager {
 	//The lockfile is created by the system to tell other areas of code to not access/modify this DB.
 	File lockFile = new File ("lock.d");
@@ -156,22 +147,13 @@ public class DatabaseManager {
 		Refresh();
 	}
 
-	/**
-	 * CheckFS checks for a valid database, and that all tables are present. If not, it will
-	 * return false. In this case, you may want to call MakeFS() or FixFS().
-	 * 
-	 * @return True/False if the File System is correct.
-	 */
+	
 	public boolean CheckFS() {
 		util.Log("Checking FS...");
 		return new File("db.xml").exists();
 	}
 
-	/**
-	 * MakeFS creates an XML database based on a template provided to it initially in the FS. If the db is broken or MIA,
-	 * it can repair it automatically.
-	 * @return True/False depending on if the make is successful.
-	 */
+	
 	public boolean MakeFS() {
 		util.Log("Making the filesystem...");
 		File dbtemp = new File("db_template.xml");
@@ -186,10 +168,7 @@ public class DatabaseManager {
 		return true;
 	}
 
-	/**
-	 * FixFS should be called IFF CheckFS is false. Do not call this otherwise. This method
-	 * does not return a boolean for validity.
-	 */
+	
 	public void FixFS() {
 
 	}
@@ -402,7 +381,7 @@ public class DatabaseManager {
 						Payload.Entry entry = payload.CreateBlankEntry(pilot, aircraft, date);
 
 						if (notes.startsWith("m_")) {
-							entry.setMaintinenceData(notes.substring(2, notes.length()));
+							entry.setRepairData(notes.substring(2, notes.length()));
 							entries.add(entry);
 						}else if (notes.startsWith("t_")) {
 							entry.setTrainingData(notes.substring(2, notes.length()));
@@ -481,8 +460,8 @@ public class DatabaseManager {
 
 			if (entry.getFlightData().length() > 0) {
 				element.setAttribute("Notes", "f_" + entry.getFlightData());
-			}else if (entry.getMaintinenceData().length() > 0) {
-				element.setAttribute("Notes", "m_" + entry.getMaintinenceData());
+			}else if (entry.getRepairData().length() > 0) {
+				element.setAttribute("Notes", "m_" + entry.getRepairData());
 			}else if (entry.getTrainingData().length() > 0) {
 				element.setAttribute("Notes", "t_" + entry.getTrainingData());
 			}
@@ -533,6 +512,17 @@ public class DatabaseManager {
 			return e.getMessage();
 		}
 	}
+	
+	synchronized public String AddLog(String caller, Payload.Entry entry) {
+		try {
+			
+			util.Log("The user " + caller + " is creating a synthetic operational log for 'REGEX_" + "'.");
+			
+			return null;
+		}catch (Exception e) {
+			return e.getMessage();
+		}
+	}
 
 	synchronized public String CreateUser(String caller, String username, String password, String permissions) { 
 		try {
@@ -566,7 +556,7 @@ public class DatabaseManager {
 				ui.accessCount++;
 
 				Save();
-				return "";
+				return null;
 			}else {
 				return "A user with this name already exists.";
 			}

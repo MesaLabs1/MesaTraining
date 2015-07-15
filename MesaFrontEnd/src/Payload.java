@@ -14,7 +14,7 @@ public class Payload implements Serializable {
 	private DefaultListModel<String> nameModel;
 
 	private String[] flightLogs;
-	private String[] maintinenceLogs;
+	private String[] RepairLogs;
 	private String[] trainingLogs;
 
 	private DefaultListModel<String> userModel;
@@ -213,12 +213,12 @@ public class Payload implements Serializable {
 		this.flightLogs = flightLogs;
 	}
 
-	public String[] getMaintinenceLogs() {
-		return maintinenceLogs;
+	public String[] getRepairLogs() {
+		return RepairLogs;
 	}
 
-	public void setMaintinenceLogs(String[] maintinenceLogs) {
-		this.maintinenceLogs = maintinenceLogs;
+	public void setRepairLogs(String[] RepairLogs) {
+		this.RepairLogs = RepairLogs;
 	}
 
 	public String[] getTrainingLogs() {
@@ -237,7 +237,7 @@ public class Payload implements Serializable {
 		private String date;
 
 		private String flightData;
-		private String maintinenceData;
+		private String RepairData;
 		private String trainingData;
 
 		public String getPilot() {
@@ -271,15 +271,15 @@ public class Payload implements Serializable {
 			this.flightData = flightData;
 		}
 
-		public String getMaintinenceData() {
-			if (maintinenceData == null) {
+		public String getRepairData() {
+			if (RepairData == null) {
 				return "";
 			}
-			return maintinenceData;
+			return RepairData;
 		}
 
-		public void setMaintinenceData(String maintinenceData) {
-			this.maintinenceData = maintinenceData;
+		public void setRepairData(String RepairData) {
+			this.RepairData = RepairData;
 		}
 
 		public String getTrainingData() {

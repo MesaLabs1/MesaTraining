@@ -85,7 +85,7 @@ public class NewEntry extends JDialog{
 		FullReport, RepairOnly, TrainingOnly, FlightOnly
 	}
 
-	public NewEntry(Client c, ReportType r) {
+	public NewEntry(Client c, ReportType r, Payload.Entry autofill) {
 		network = c;
 		try {
 			UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
@@ -189,7 +189,7 @@ public class NewEntry extends JDialog{
 		panel.setLayout(new MigLayout("", "[grow]", "[179px]"));
 
 		pnl1 = new JPanel();
-		//panel.add(pnl1, "flowx,cell 0 0,grow");
+		panel.add(pnl1, "flowx,cell 0 0,grow");
 		pnl1.setBackground(Color.LIGHT_GRAY);
 		pnl1.setLayout(new MigLayout("", "[][32px:n:32px][2px:n][32px:n:32px][2px:n][48px:n][][25px][32px:n:32px][][::32px][][][][2px][3px][5px][39px][3px][94px][8px][1px][9px][25px][43px][92px]", "[26px][14px][23px][][14px][][]"));
 
@@ -287,7 +287,7 @@ public class NewEntry extends JDialog{
 		pnl1.add(lblAircraftName, "cell 1 6 5 1,alignx center,aligny top");
 
 		pnl2 = new JPanel();
-		panel.add(pnl2, "cell 0 0,grow");
+		//panel.add(pnl2, "cell 0 0,grow");
 		pnl2.setBackground(Color.LIGHT_GRAY);
 		pnl2.setLayout(new MigLayout("", "[8px:n][][][100px:n][][][][grow]", "[20px][3px][17px][19px][84px]"));
 
@@ -374,7 +374,7 @@ public class NewEntry extends JDialog{
 		btnRemove.setBackground(Color.DARK_GRAY);
 		pnlCollab.add(btnRemove, "cell 0 2 2 1,growx,aligny top");
 
-		JLabel lblNoteIfYoure = new JLabel("Note: Even if this is maintenance, fill out the form anyway.");
+		JLabel lblNoteIfYoure = new JLabel("Note: Even if this is Repair, fill out the form anyway.");
 		lblNoteIfYoure.setForeground(Color.BLACK);
 		pnl2.add(lblNoteIfYoure, "cell 5 4 3 1,alignx left,aligny bottom");
 
@@ -453,6 +453,10 @@ public class NewEntry extends JDialog{
 		scrollPane.setViewportView(txtNotes);
 		txtNotes.setBackground(Color.GRAY);
 
+		if (!r.equals(ReportType.FullReport)) {
+			Autofill(autofill);
+		}
+		
 		if (r.equals(ReportType.FlightOnly)) {
 			radioFlight.setSelected(true);
 			radioTraining.setSelected(false);
@@ -478,9 +482,43 @@ public class NewEntry extends JDialog{
 			radioTraining.setEnabled(false);
 			radioRepair.setEnabled(false);
 		}
+
 		this.setVisible(true);
-		this.setModal(true);
+		this.setAlwaysOnTop(true);
 		timer.start();
+	}
+	
+	public void Autofill (Payload.Entry e) {
+		if (e.getDate() != null) {
+			String[] split = e.getRawDate().split("/");
+			String day = split[0];
+			String month = split[1];
+			String year = split[2];
+			
+			txtDay.setText(day);
+			txtMonth.setText(month);
+			txtYear.setText(year);
+		}
+		if (e.getPilot() != null) {
+			if (e.getPilot().contains(";")) {
+				radioCollab.setSelected(true);
+				radioAlone.setSelected(false);
+				
+				String[] split = e.getPilot().split(";");
+				String pilot = split[0];
+				for (int i = 1; i < split.length; i++) {
+					collabModel.addElement(split[i]);
+				}
+				txtPilot.setText(pilot);
+			}else {
+				radioCollab.setSelected(false);
+				radioAlone.setSelected(true);
+				txtPilot.setText(e.getPilot());		
+			}
+		}
+		if (e.getAircraft() != null) {
+			txtAircraft.setText(e.getAircraft());
+		}
 	}
 
 	public boolean TransmitData() {
@@ -504,7 +542,7 @@ public class NewEntry extends JDialog{
 			}
 
 			if (radioRepair.isSelected()) {
-				type = "maintenance";
+				type = "Repair";
 			}else if (radioTraining.isSelected()) {
 				type = "training";
 			}else if (radioFlight.isSelected()) {
@@ -546,7 +584,7 @@ public class NewEntry extends JDialog{
 					btnPrevious.setEnabled(true);
 					btnNext.setEnabled(true);
 					lblProgress.setText("Step 2 of 3");
-					lblHeader.setText("This form can also be used for maintenance entries. Enter your name for 'pilot' if so.");
+					lblHeader.setText("This form can also be used for Repair entries. Enter your name for 'pilot' if so.");
 				}else if (stage == 2) {
 					panel.add(pnl3, "flowx,cell 0 0,grow");
 					panel.remove(pnl2);

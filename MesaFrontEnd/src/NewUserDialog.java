@@ -32,12 +32,7 @@ import javax.swing.JRadioButton;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ChangeEvent;
 
-/**
- * This class simply shows a dialog used for changing a password.
- * 
- * @author hackjunky, jacrin
- *
- */
+
 public class NewUserDialog extends JDialog{
 	private static final long serialVersionUID = 8224336328398525415L;
 	private JTextField usernameField;
@@ -152,15 +147,11 @@ public class NewUserDialog extends JDialog{
 		});
 		panel_1.add(btnAuthenticate, "cell 1 7 2 1");
 		
-		this.setModal(true);
 		this.setAlwaysOnTop(true);
 		this.setVisible(true);
 	}
 	
-	/**
-	 * Just a little something something for us to be able to indicate to the user information.
-	 * @param text
-	 */
+	
 	public void ShowHelpText(String text) {
 		lblHelptext_1.setText(text);
 	}

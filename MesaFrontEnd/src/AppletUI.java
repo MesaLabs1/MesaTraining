@@ -63,12 +63,7 @@ import javax.swing.JScrollPane;
 
 import java.awt.event.KeyEvent;
 
-/**
- * This is the Visual Applet that the web browser will display.
- * 
- * @author hackjunky, jacrin
- *
- */
+
 public class AppletUI extends Applet{
 	//UID Automatically Generated
 	private static final long serialVersionUID = 6373615470012072107L;
@@ -172,7 +167,7 @@ public class AppletUI extends Applet{
 			//Let's allocate all the ImageIcons
 			mesaIcon = Toolkit.getDefaultToolkit().getImage(appletRes.getPath() + "/mesa.png");
 			tab1Icon = new ImageIcon(appletRes.getPath() + "/flight.png");
-			tab2Icon = new ImageIcon(appletRes.getPath() + "/maintinence.png");
+			tab2Icon = new ImageIcon(appletRes.getPath() + "/Repair.png");
 			tab3Icon = new ImageIcon(appletRes.getPath() + "/training2.png");
 			tab4Icon = new ImageIcon(appletRes.getPath() + "/controlpanel.png");
 			notify1Icon = Toolkit.getDefaultToolkit().getImage(appletRes.getPath() + "/notify.png");
@@ -186,10 +181,7 @@ public class AppletUI extends Applet{
 		try {
 			//UIManager.setLookAndFeel("com.sun.java.swing.plaf.gtk.GTKLookAndFeel");
 			UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
-			/**
-			 * A Button Mnemonic is the key a user has to press to activate that button automatically.
-			 * Since we want the program to display them, when the user hits ALT, the mnemonic will display.
-			 */
+			
 			UIManager.getDefaults().put("Button.showMnemonics", Boolean.TRUE);
 		}catch (UnsupportedLookAndFeelException e) {
 			e.printStackTrace();
@@ -420,6 +412,19 @@ public class AppletUI extends Applet{
 		pnlTrainingLogsHolder.add(panel_2, "cell 0 2 5 1,grow");
 
 		JButton btnAdd_2 = new JButton("Add");
+		btnAdd_2.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				Payload.Entry entry = null;
+				if (dataMode.equals(DATA_MODE.MODE_AIRCRAFT)) {
+					entry = client.payload.CreateBlankEntry(null, listData.getSelectedValue(), null);
+				}else if (dataMode.equals(DATA_MODE.MODE_DATE)) {
+					entry = client.payload.CreateBlankEntry(null, null, listData.getSelectedValue());
+				}else if (dataMode.equals(DATA_MODE.MODE_PILOT)) {
+					entry = client.payload.CreateBlankEntry(listData.getSelectedValue(), null, null);
+				}
+				new NewEntry(client, NewEntry.ReportType.TrainingOnly, entry);
+			}
+		});
 		btnAdd_2.setForeground(Color.WHITE);
 		btnAdd_2.setBackground(Color.GRAY);
 
@@ -451,7 +456,7 @@ public class AppletUI extends Applet{
 								.addComponent(btnAdd_2)
 								.addComponent(btnChange_2)
 								.addComponent(btnRemove_2))
-						.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+								.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
 				);
 		panel_2.setLayout(gl_panel_2);
 
@@ -459,7 +464,7 @@ public class AppletUI extends Applet{
 		pnlFlightLogsHolder.setForeground(Color.WHITE);
 		pnlFlightLogsHolder.setBackground(Color.BLACK);
 		tabbedPane.addTab("Flight Logs", tab1Icon, pnlFlightLogsHolder, null);
-		pnlFlightLogsHolder.setLayout(new MigLayout("", "[grow][][][grow][][::18px][]", "[][grow][24px:n:24px]"));
+		pnlFlightLogsHolder.setLayout(new MigLayout("", "[63px,grow][78px][42px][::18px][53px]", "[::14px][grow][::26px]"));
 
 		JLabel lblFlightLogs = new JLabel("Flight Logs");
 		lblFlightLogs.setForeground(Color.WHITE);
@@ -479,6 +484,19 @@ public class AppletUI extends Applet{
 		pnlFlightLogsHolder.add(panel, "cell 0 2 7 1,grow");
 
 		JButton btnAdd = new JButton("Add");
+		btnAdd.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				Payload.Entry entry = null;
+				if (dataMode.equals(DATA_MODE.MODE_AIRCRAFT)) {
+					entry = client.payload.CreateBlankEntry(null, listData.getSelectedValue(), null);
+				}else if (dataMode.equals(DATA_MODE.MODE_DATE)) {
+					entry = client.payload.CreateBlankEntry(null, null, listData.getSelectedValue());
+				}else if (dataMode.equals(DATA_MODE.MODE_PILOT)) {
+					entry = client.payload.CreateBlankEntry(listData.getSelectedValue(), null, null);
+				}
+				new NewEntry(client, NewEntry.ReportType.FlightOnly, entry);
+			}
+		});
 		btnAdd.setForeground(Color.WHITE);
 		btnAdd.setBackground(Color.GRAY);
 
@@ -512,18 +530,18 @@ public class AppletUI extends Applet{
 								.addComponent(btnAdd)
 								.addComponent(btnChange)
 								.addComponent(btnRemove))
-						.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+								.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
 				);
 		panel.setLayout(gl_panel);
 
-		JPanel pnlMaintinenceLogsHolder = new JPanel();
-		pnlMaintinenceLogsHolder.setBackground(Color.BLACK);
-		tabbedPane.addTab("Maintinence Logs", tab2Icon, pnlMaintinenceLogsHolder, null);
-		pnlMaintinenceLogsHolder.setLayout(new MigLayout("", "[grow][][][][][10px:n][]", "[][grow][24px:n:24px,grow]"));
+		JPanel pnlRepairLogsHolder = new JPanel();
+		pnlRepairLogsHolder.setBackground(Color.BLACK);
+		tabbedPane.addTab("Repair Logs", tab2Icon, pnlRepairLogsHolder, null);
+		pnlRepairLogsHolder.setLayout(new MigLayout("", "[63px,grow][78px][42px][::18px][53px]", "[::14px][grow][::26px]"));
 
-		JLabel lblMaintinenceLogs = new JLabel("Maintinence Logs");
-		lblMaintinenceLogs.setForeground(Color.WHITE);
-		pnlMaintinenceLogsHolder.add(lblMaintinenceLogs, "cell 0 0");
+		JLabel lblRepairLogs = new JLabel("Repair Logs");
+		lblRepairLogs.setForeground(Color.WHITE);
+		pnlRepairLogsHolder.add(lblRepairLogs, "cell 0 0");
 
 		mLogsList = new JList<String>();
 		mLogsList.setBackground(Color.DARK_GRAY);
@@ -531,13 +549,26 @@ public class AppletUI extends Applet{
 		mLogsList.setLayoutOrientation(JList.VERTICAL_WRAP);
 		mLogsList.setBorder(new LineBorder(Color.WHITE));
 		mLogsList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		pnlMaintinenceLogsHolder.add(mLogsList, "cell 0 1 7 1,grow");
+		pnlRepairLogsHolder.add(mLogsList, "cell 0 1 7 1,grow");
 
 		JPanel panel_1 = new JPanel();
 		panel_1.setBackground(Color.BLACK);
-		pnlMaintinenceLogsHolder.add(panel_1, "cell 0 2 7 1,grow");
+		pnlRepairLogsHolder.add(panel_1, "cell 0 2 7 1,grow");
 
 		JButton btnAdd_1 = new JButton("Add");
+		btnAdd_1.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				Payload.Entry entry = null;
+				if (dataMode.equals(DATA_MODE.MODE_AIRCRAFT)) {
+					entry = client.payload.CreateBlankEntry(null, listData.getSelectedValue(), null);
+				}else if (dataMode.equals(DATA_MODE.MODE_DATE)) {
+					entry = client.payload.CreateBlankEntry(null, null, listData.getSelectedValue());
+				}else if (dataMode.equals(DATA_MODE.MODE_PILOT)) {
+					entry = client.payload.CreateBlankEntry(listData.getSelectedValue(), null, null);
+				}
+				new NewEntry(client, NewEntry.ReportType.RepairOnly, entry);
+			}
+		});
 		btnAdd_1.setForeground(Color.WHITE);
 		btnAdd_1.setBackground(Color.GRAY);
 
@@ -569,7 +600,7 @@ public class AppletUI extends Applet{
 								.addComponent(btnAdd_1)
 								.addComponent(btnChange_1)
 								.addComponent(btnRemove_1))
-						.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+								.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
 				);
 		panel_1.setLayout(gl_panel_1);
 
@@ -594,7 +625,7 @@ public class AppletUI extends Applet{
 		btnCreateEntry.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				new NewEntry(client, NewEntry.ReportType.FullReport);
+				new NewEntry(client, NewEntry.ReportType.FullReport, null);
 			}
 		});
 		btnCreateEntry.setBackground(Color.GRAY);
@@ -635,8 +666,8 @@ public class AppletUI extends Applet{
 								.addGroup(gl_pnlAdmin.createParallelGroup(Alignment.TRAILING, false)
 										.addComponent(btnFactoryReset, Alignment.LEADING, 0, 0, Short.MAX_VALUE)
 										.addComponent(btnCreateEntry, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 191, Short.MAX_VALUE))
-								.addComponent(lblAdministrativeTasks))
-						.addContainerGap())
+										.addComponent(lblAdministrativeTasks))
+										.addContainerGap())
 				);
 		gl_pnlAdmin.setVerticalGroup(
 				gl_pnlAdmin.createParallelGroup(Alignment.LEADING)
@@ -735,7 +766,7 @@ public class AppletUI extends Applet{
 		btnCreateUser.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				NewUserDialog nud = new NewUserDialog(client);
+				new NewUserDialog(client);
 			}
 		});
 		btnCreateUser.setBackground(Color.GRAY);
@@ -748,7 +779,7 @@ public class AppletUI extends Applet{
 		btnChangePassword.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				PasswordDialog pd = new PasswordDialog(client);
+				new PasswordDialog(client);
 			}
 		});
 		btnChangePassword.setBackground(Color.GRAY);
@@ -913,30 +944,30 @@ public class AppletUI extends Applet{
 																.addComponent(lblUsersOnlineHead)
 																.addComponent(lblLocalSize)
 																.addComponent(lblServerUptimeHead))
-														.addPreferredGap(ComponentPlacement.RELATED, 32, Short.MAX_VALUE)
-														.addGroup(gl_panel_4.createParallelGroup(Alignment.LEADING, false)
-																.addComponent(lblUsers, GroupLayout.DEFAULT_SIZE, 26, Short.MAX_VALUE)
-																.addComponent(lblUsersOnline, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-																.addComponent(lblBufferSize, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-																.addComponent(lblServerUptime)))
-												.addGroup(gl_panel_4.createSequentialGroup()
-														.addGroup(gl_panel_4.createParallelGroup(Alignment.LEADING)
-																.addComponent(lblTechnicalStatistics)
-																.addGroup(gl_panel_4.createSequentialGroup()
-																		.addGap(10)
-																		.addGroup(gl_panel_4.createParallelGroup(Alignment.LEADING)
-																				.addComponent(lblNetworkOverheadHead)
-																				.addComponent(lblMemoryUsageHead)
-																				.addComponent(lblNetworkIpHead))))
-														.addPreferredGap(ComponentPlacement.RELATED, 32, Short.MAX_VALUE)
-														.addGroup(gl_panel_4.createParallelGroup(Alignment.LEADING, false)
-																.addComponent(lblMemoryUsage, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-																.addComponent(lblNetworkOverhead, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-																.addComponent(lblNetworkIP))))
-										.addGap(20))
-								.addGroup(gl_panel_4.createSequentialGroup()
-										.addComponent(lblStatistics)
-										.addContainerGap(128, Short.MAX_VALUE))))
+																.addPreferredGap(ComponentPlacement.RELATED, 32, Short.MAX_VALUE)
+																.addGroup(gl_panel_4.createParallelGroup(Alignment.LEADING, false)
+																		.addComponent(lblUsers, GroupLayout.DEFAULT_SIZE, 26, Short.MAX_VALUE)
+																		.addComponent(lblUsersOnline, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+																		.addComponent(lblBufferSize, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+																		.addComponent(lblServerUptime)))
+																		.addGroup(gl_panel_4.createSequentialGroup()
+																				.addGroup(gl_panel_4.createParallelGroup(Alignment.LEADING)
+																						.addComponent(lblTechnicalStatistics)
+																						.addGroup(gl_panel_4.createSequentialGroup()
+																								.addGap(10)
+																								.addGroup(gl_panel_4.createParallelGroup(Alignment.LEADING)
+																										.addComponent(lblNetworkOverheadHead)
+																										.addComponent(lblMemoryUsageHead)
+																										.addComponent(lblNetworkIpHead))))
+																										.addPreferredGap(ComponentPlacement.RELATED, 32, Short.MAX_VALUE)
+																										.addGroup(gl_panel_4.createParallelGroup(Alignment.LEADING, false)
+																												.addComponent(lblMemoryUsage, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+																												.addComponent(lblNetworkOverhead, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+																												.addComponent(lblNetworkIP))))
+																												.addGap(20))
+																												.addGroup(gl_panel_4.createSequentialGroup()
+																														.addComponent(lblStatistics)
+																														.addContainerGap(128, Short.MAX_VALUE))))
 				);
 		gl_panel_4.setVerticalGroup(
 				gl_panel_4.createParallelGroup(Alignment.LEADING)
@@ -947,33 +978,33 @@ public class AppletUI extends Applet{
 						.addGroup(gl_panel_4.createParallelGroup(Alignment.BASELINE)
 								.addComponent(lblUsersHead)
 								.addComponent(lblUsers))
-						.addPreferredGap(ComponentPlacement.RELATED)
-						.addGroup(gl_panel_4.createParallelGroup(Alignment.BASELINE)
-								.addComponent(lblUsersOnlineHead)
-								.addComponent(lblUsersOnline))
-						.addPreferredGap(ComponentPlacement.RELATED)
-						.addGroup(gl_panel_4.createParallelGroup(Alignment.BASELINE)
-								.addComponent(lblLocalSize)
-								.addComponent(lblBufferSize))
-						.addPreferredGap(ComponentPlacement.RELATED)
-						.addGroup(gl_panel_4.createParallelGroup(Alignment.BASELINE)
-								.addComponent(lblServerUptimeHead)
-								.addComponent(lblServerUptime))
-						.addGap(18)
-						.addComponent(lblTechnicalStatistics)
-						.addPreferredGap(ComponentPlacement.RELATED)
-						.addGroup(gl_panel_4.createParallelGroup(Alignment.BASELINE)
-								.addComponent(lblMemoryUsageHead)
-								.addComponent(lblMemoryUsage))
-						.addPreferredGap(ComponentPlacement.RELATED)
-						.addGroup(gl_panel_4.createParallelGroup(Alignment.BASELINE)
-								.addComponent(lblNetworkOverheadHead)
-								.addComponent(lblNetworkOverhead))
-						.addPreferredGap(ComponentPlacement.RELATED)
-						.addGroup(gl_panel_4.createParallelGroup(Alignment.BASELINE)
-								.addComponent(lblNetworkIpHead)
-								.addComponent(lblNetworkIP))
-						.addContainerGap(46, Short.MAX_VALUE))
+								.addPreferredGap(ComponentPlacement.RELATED)
+								.addGroup(gl_panel_4.createParallelGroup(Alignment.BASELINE)
+										.addComponent(lblUsersOnlineHead)
+										.addComponent(lblUsersOnline))
+										.addPreferredGap(ComponentPlacement.RELATED)
+										.addGroup(gl_panel_4.createParallelGroup(Alignment.BASELINE)
+												.addComponent(lblLocalSize)
+												.addComponent(lblBufferSize))
+												.addPreferredGap(ComponentPlacement.RELATED)
+												.addGroup(gl_panel_4.createParallelGroup(Alignment.BASELINE)
+														.addComponent(lblServerUptimeHead)
+														.addComponent(lblServerUptime))
+														.addGap(18)
+														.addComponent(lblTechnicalStatistics)
+														.addPreferredGap(ComponentPlacement.RELATED)
+														.addGroup(gl_panel_4.createParallelGroup(Alignment.BASELINE)
+																.addComponent(lblMemoryUsageHead)
+																.addComponent(lblMemoryUsage))
+																.addPreferredGap(ComponentPlacement.RELATED)
+																.addGroup(gl_panel_4.createParallelGroup(Alignment.BASELINE)
+																		.addComponent(lblNetworkOverheadHead)
+																		.addComponent(lblNetworkOverhead))
+																		.addPreferredGap(ComponentPlacement.RELATED)
+																		.addGroup(gl_panel_4.createParallelGroup(Alignment.BASELINE)
+																				.addComponent(lblNetworkIpHead)
+																				.addComponent(lblNetworkIP))
+																				.addContainerGap(46, Short.MAX_VALUE))
 				);
 		panel_4.setLayout(gl_panel_4);
 		pnlInternalPane.setLayout(new BorderLayout(0, 0));
@@ -1030,7 +1061,7 @@ public class AppletUI extends Applet{
 		eventHandler = new EventHandler();
 		eventTicker = new Timer(1, eventHandler);
 
-		JLoginDialog dialog = new JLoginDialog(client);
+		new JLoginDialog(client);
 
 		eventTicker.start();
 	}
@@ -1083,11 +1114,11 @@ public class AppletUI extends Applet{
 						client.SilentLog("CREATE \t Creates a 'SEE BELOW'");
 						client.SilentLog("\t USER \t Creates a user. Parameters: USERNAME, PASSWORD, RANK");
 						client.SilentLog("\t ENTRY \t Creates an entry in the database. Parameters: Date, Pilot, Aircraft.");
-						client.SilentLog("\t LOG \t Creates a log file. Paramters: FLIGHT/MAINTENANCE/TRAINING, Date, Pilot, Aircraft, Log Entry");
+						client.SilentLog("\t LOG \t Creates a log file. Paramters: FLIGHT/Repair/TRAINING, Date, Pilot, Aircraft, Log Entry");
 						client.SilentLog("REMOVE \t Removes a 'SEE BELOW'");
 						client.SilentLog("\t USER \t Removes a user. Parameters: USERNAME");
 						client.SilentLog("\t ENTRY \t Removes an entry in the database. Parameters: DATE/PILOT/AIRCRAFT, VALUE.");
-						client.SilentLog("\t LOG \t Removes a log file. Paramters: FLIGHT/MAINTENANCE/TRAINING, Date, Pilot, Aircraft, Log Entry Regex");
+						client.SilentLog("\t LOG \t Removes a log file. Paramters: FLIGHT/Repair/TRAINING, Date, Pilot, Aircraft, Log Entry Regex");
 
 					}else if (helpArea.equalsIgnoreCase("clear")) {
 						client.SilentLog("Executing this command removes all entries on this console screen. It does not affect the system in any way.");
@@ -1212,14 +1243,14 @@ public class AppletUI extends Applet{
 				if (entries != null) {
 					ArrayList<String> training = new ArrayList<String>();
 					ArrayList<String> flight = new ArrayList<String>();
-					ArrayList<String> maintinence = new ArrayList<String>();
+					ArrayList<String> Repair = new ArrayList<String>();
 					int t = 0;
 					int f = 0;
 					int m = 0;
 					for (Payload.Entry entry : entries) {
 						String tData = entry.getTrainingData();
 						String fData = entry.getFlightData();
-						String mData = entry.getMaintinenceData();
+						String mData = entry.getRepairData();
 
 						String append = "";
 
@@ -1243,7 +1274,7 @@ public class AppletUI extends Applet{
 						}
 						if (mData.length() > 0) {
 							m++;
-							maintinence.add(append + mData);
+							Repair.add(append + mData);
 						}
 					}
 					if (training.size() == 0) {
@@ -1252,13 +1283,13 @@ public class AppletUI extends Applet{
 					if (flight.size() == 0) {
 						flight.add("No flights were found for these parameters.");
 					}
-					if (maintinence.size() == 0) {
-						maintinence.add("No repairs were found for these parameters.");
+					if (Repair.size() == 0) {
+						Repair.add("No repairs were found for these parameters.");
 					}
 					tLogsList.setModel(ConvertArrayToModel(training));
 					fLogsList.setModel(ConvertArrayToModel(flight));
-					mLogsList.setModel(ConvertArrayToModel(maintinence));
-					client.Log("Result: " + t + " training entries; " + f + " flight entries; " + m + " maintinence entries.");
+					mLogsList.setModel(ConvertArrayToModel(Repair));
+					client.Log("Result: " + t + " training entries; " + f + " flight entries; " + m + " Repair entries.");
 				}else {
 					client.Log("No results found!");
 				}

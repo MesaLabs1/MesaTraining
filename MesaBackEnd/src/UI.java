@@ -37,12 +37,7 @@ import java.awt.Font;
 
 import javax.swing.border.BevelBorder;
 
-/**
- * This class is a simple GUI for this backend. You can disable it from appearing by adding the tag -nogui to
- * the launch parameters.
- * @author hackjunky, jacrin
- *
- */
+
 public class UI extends JFrame{
 	private static final long serialVersionUID = 3855917297699177329L;
 
@@ -431,9 +426,7 @@ public class UI extends JFrame{
 		util.Log("User Interface successfully initialized. Standby for Network Layer...");
 	}
 
-	/**
-	 * All things that need to get done before the interface is shown, it needs to be added here.
-	 */
+	
 	public void SetUpInterface() {
 		status = ServerStatus.Inactive;
 
@@ -442,10 +435,7 @@ public class UI extends JFrame{
 		eventTicker.start();
 	}
 
-	/**
-	 * Set the UI status.
-	 * @param status The status to set the UI to.
-	 */
+	
 	public void SetStatus(ServerStatus status) {
 		this.status = status;
 	}
@@ -509,10 +499,7 @@ public class UI extends JFrame{
 			consoleList.setSelectedIndex(consoleList.getModel().getSize() - 1);
 		}
 
-		/**
-		 * Converts the memory usage from bytes to a suitable unit, and then puts it in String format.
-		 * @return The String format of the memory usage as XXXXXX KB/MB/GB
-		 */
+		
 		public String getMemoryStatistics() {
 			String memory;
 
@@ -552,10 +539,7 @@ public class UI extends JFrame{
 			return memory;
 		}
 
-		/**
-		 * Converts the uptime, in the format of an integer, to a String of HHH:MM:SS
-		 * @return The String time in HHH:MM:SS
-		 */
+		
 		public String convertUpTime() {
 			String sUptime = "";
 			int hours = 0;
@@ -605,11 +589,7 @@ public class UI extends JFrame{
 		}
 	}
 	
-	/**
-	 * This class converts any JPanel into an activity monitor for this application.
-	 * author hackjunky
-	 *
-	 */
+	
 	public class ActivityMonitor implements ActionListener{
 		JPanel target;
 		

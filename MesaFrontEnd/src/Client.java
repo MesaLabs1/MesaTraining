@@ -10,12 +10,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
-/**
- * This class contains all Network-related things that must run in the background of the UI. 
- * 
- * @author hackjunky, jacrin
- *
- */
+
 public class Client {
 	static final int FRONTEND_VERSION = 1;
 	boolean authenticated = false;
@@ -31,11 +26,7 @@ public class Client {
 		payload = new Payload();
 	}
 
-	/**
-	 * Log is a method that posts the sender name, the time, and the message. 
-	 * @param message The message to display in the system console.
-	 * 
-	 */
+	
 	private static SimpleDateFormat timeFormatter = new SimpleDateFormat("hh:mm:ss a");
 
 	void Log(String message) {
@@ -55,10 +46,7 @@ public class Client {
 		ui.consoleModel.addElement(mesage);
 	}
 
-	/**
-	 * The following block of code allows this class to fetch the calling class' data
-	 * without placing any additional resource load on Thread than is necessary.
-	 */
+	
 	private static final int CLIENT_CODE_STACK_INDEX;
 	static {
 		int i = 0;
@@ -71,12 +59,7 @@ public class Client {
 		CLIENT_CODE_STACK_INDEX = i;
 	}
 
-	/**
-	 * This method should only be called by the LoginDialog. A result of True will init the main user interface.
-	 * @param username The username of the client.
-	 * @param password The password of the client.
-	 * @return Returns true if the username and the password in the database exist.
-	 */
+	
 	public void Authenticate(String username, String password, JLoginDialog callback) {
 		if (networkClient != null) {
 			networkClient.interrupt();
@@ -97,12 +80,7 @@ public class Client {
 		return payload;
 	}
 
-	/**
-	 * This class is the Thread that will run inside the client to establish the connection to the client, and download all relevant
-	 * data. This includes the Strings containing airplane information, and the user's permissions level in the database.
-	 * @author hackjunky, jacrin
-	 *
-	 */
+	
 	public class NetworkLayer implements Runnable {
 		private Socket client;
 		private String username;
@@ -122,11 +100,7 @@ public class Client {
 
 		JLoginDialog callback;
 
-		/**
-		 * Initialize this class with the attempted authentication information.
-		 * @param user The client's username.
-		 * @param pass The client's password.
-		 */
+		
 		public NetworkLayer(String user, String pass, JLoginDialog cback) {
 			username = user.toLowerCase();
 			password = pass;

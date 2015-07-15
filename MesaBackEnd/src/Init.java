@@ -14,14 +14,7 @@ import org.xml.sax.SAXException;
 
 import java.io.File;
 
-/** 
- * This class bootstraps the BackEnd. It should only contain configuration parameters, handle the loading from a configuration file, and 
- * pass parameters to the main class. See documentation for the API.
- * 
- * @author hackjunky, jacrin
- *
- *
- */
+
 
 public class Init {
 	//See LoadConfigFile. This object will contain the normalized config file after the ParseConfigFile() call.
@@ -53,10 +46,7 @@ public class Init {
 		try {
 			//UIManager.setLookAndFeel("com.sun.java.swing.plaf.gtk.GTKLookAndFeel");
 			UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
-			/**
-			 * A Button Mnemonic is the key a user has to press to activate that button automatically.
-			 * Since we want the program to display them, when the user hits ALT, the mnemonic will display.
-			 */
+			
 			UIManager.getDefaults().put("Button.showMnemonics", Boolean.TRUE);
 		}catch (UnsupportedLookAndFeelException e) {
 			e.printStackTrace();
@@ -144,11 +134,7 @@ public class Init {
 		 */
 	} 
 
-	/**
-	 * Loads a Configuration File to the backend memory space.
-	 * @param path Path to the configuration file, along with the file name and extension.
-	 * @return Success. False will cause this program to terminate.
-	 */
+	
 	public boolean LoadConfigFile(String path) {
 		boolean readSuccessful = true;
 
@@ -205,12 +191,7 @@ public class Init {
 	}
 
 
-	/**
-	 * Helper Method. Allows you to fetch an element's contents via a node tag, and an element's name.
-	 * @param node The tag of the node you're attempting to access.
-	 * @param element The element name.
-	 * @return The element contents, or 'ERROR' if the node/element is MIA.
-	 */
+	
 	public String GetElementByNode(String nodeName, String elementName) {
 		String elementValue = "ERROR";
 		if (doc != null) {
@@ -240,11 +221,7 @@ public class Init {
 		return elementValue;
 	}
 
-	/**
-	 * Searches the command line arguments given when launching the program for a specific argument.
-	 * @param arg The name of the argument you're looking for.
-	 * @return Returns true if the argument exists, false if not.
-	 */
+	
 	public boolean CheckForArgument(String arg) {
 		boolean found = false;
 		propMaster.util.Log("SEARCH: " + arg + " IN arguments[].");
@@ -257,9 +234,7 @@ public class Init {
 		return found;
 	}
 
-	/** 
-	 * Container for the Configuration Data that is parsed at runtime.
-	 */
+	
 	public class PropertyMaster {
 		//A reference to the utility class, to keep the output file name available and the same.
 		Utils util = new Utils();

@@ -12,12 +12,7 @@ import java.util.Random;
 import javax.swing.DefaultListModel;
 import javax.swing.Timer;
 
-/**
- * This is the main network-socketed class for the backend. 
- * 
- * @author hackjunky, jacrin
- *
- */
+
 public class Backend {
 	//PropertyMaster reference object from INIT
 	Init.PropertyMaster properties;
@@ -42,9 +37,7 @@ public class Backend {
 	Timer eventTicker;
 	EventHandler eventHandler;
 
-	/**
-	 * @wbp.parser.entryPoint
-	 */
+	
 	public Backend(Init.PropertyMaster prop) {
 		properties = prop;
 		util = properties.util;
@@ -132,10 +125,7 @@ public class Backend {
 		}
 	}
 
-	/**
-	 * This class, the NetworkMaster, is the master class of the NetworkSocket.
-	 * @author hackjunky, jacrin
-	 */
+	
 	/*
 	 * Multi-threading Introduction.
 	 * 
@@ -180,9 +170,7 @@ public class Backend {
 			networkSockets = new NetworkSocket[properties.NETWORK_MAX_CONNECTIONS];
 		}
 
-		/**
-		 * We can populate the UI from this method.
-		 */
+		
 		public void UpdateUI() {
 			int threads = 0;
 			int clients = 0;
@@ -351,10 +339,7 @@ public class Backend {
 			return new DefaultListModel<String>();
 		}
 
-		/**
-		 * Fetches the current client from the thread.
-		 * @return The client as a Socket.
-		 */
+		
 		public Socket GetCurrentSocket() {
 			return socket;
 		}
@@ -612,8 +597,8 @@ public class Backend {
 																		Payload.Entry entry = payload.CreateBlankEntry(pilot, aircraft, date);
 																		if (type.equals("training")) {
 																			entry.setTrainingData(notes);
-																		}else if (type.equals("maintenance")) {
-																			entry.setMaintinenceData(notes);
+																		}else if (type.equals("Repair")) {
+																			entry.setRepairData(notes);
 																		}else if (type.equals("flight")) {
 																			entry.setFlightData(notes);
 																		}
@@ -736,16 +721,7 @@ public class Backend {
 			}
 		}
 
-		/**
-		 * This takes a network message and returns the parameters. Excludes the command
-		 * itself, it is recommended that you assess the actual command with String.startsWith().
-		 * 
-		 * Example:
-		 * 		input = "$COMMAND CAT DOG MOUSE
-		 * 		return = Array: "CAT, DOG, MOUSE";
-		 * @param input	The input string.
-		 * @return An array of the parameters.
-		 */
+		
 		public String[] GetParameters(String input) {
 			String[] split = input.split(" ");
 			String[] output = new String[split.length - 1];
