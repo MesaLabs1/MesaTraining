@@ -91,8 +91,8 @@ public class Init {
 				DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
 				DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
 				Document doc = docBuilder.newDocument();
-				
-				
+
+
 				Element rootElement = doc.createElement("Update");
 				doc.appendChild(rootElement);
 
@@ -102,9 +102,23 @@ public class Init {
 				Transformer transformer = transformerFactory.newTransformer();
 				DOMSource source = new DOMSource(doc);
 				StreamResult result = new StreamResult(new File("update.xml"));
-				
-				transformer.transform(source, result);
 
+				transformer.transform(source, result);
+				
+				if (!new File("bootstrapper.jar").exists()) {
+					propMaster.util.Log("The bootstrapper is missing, returning to main program...");
+					return;
+				}
+
+				ProcessBuilder pb = new ProcessBuilder("java", "-jar", "bootstrapper.jar");
+				try {
+					propMaster.util.Log("Terminating and launching bootstrapper for update!");
+					Process p = pb.start();
+					System.exit(0);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+				
 			} catch (ParserConfigurationException pce) {
 				pce.printStackTrace();
 			} catch (TransformerException tfe) {
@@ -183,8 +197,6 @@ public class Init {
 		LoadConfigFile();
 	}
 
-
-
 	public String GetAttributeByNode(String node, String attribute) {
 		if (doc != null) {
 			try {
@@ -205,7 +217,7 @@ public class Init {
 
 	public boolean CheckForArgument(String arg) {
 		boolean found = false;
-		propMaster.util.Log("Argument! Found " + arg + " in args[].");
+		propMaster.util.Log("Checking for " + arg + " in args[].");
 		for (int i = 0; i < arguments.length; i++) {
 			if (arguments[i].toLowerCase().equals(arg.toLowerCase())) {
 				found = true;
