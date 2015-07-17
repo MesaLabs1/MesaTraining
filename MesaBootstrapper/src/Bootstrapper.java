@@ -32,7 +32,7 @@ public class Bootstrapper {
 	DocumentBuilder dbBuilder;
 	Document doc;
 
-	static String LOG_NAME = "update.log";
+	static String LOG_NAME = "bootstrapper.log";
 	BufferedWriter logWriter;
 
 	public static void main (String[] args) {
