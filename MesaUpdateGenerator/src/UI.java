@@ -42,6 +42,18 @@ import javax.swing.AbstractListModel;
 import java.awt.FlowLayout;
 import javax.swing.JScrollPane;
 import javax.swing.event.ListSelectionListener;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+
 import javax.swing.event.ListSelectionEvent;
 
 public class UI extends JFrame{
@@ -65,6 +77,8 @@ public class UI extends JFrame{
 
 	Sidebar sidebar = null;
 	boolean allowSidebarVisibility = true;
+
+	JLabel lblStatus;
 
 	public static void main(String[] args) {
 		new UI();
@@ -90,9 +104,9 @@ public class UI extends JFrame{
 		Log("Bootstrapped Update Generator initializing...");
 
 		try {
-			fos = new FileOutputStream("update.zip");
+			fos = new FileOutputStream("update.mup");
 			zos = new ZipOutputStream(fos);
-			Log("Preparing 'update.zip' for target environment...");
+			Log("Preparing 'update.mup' for target environment...");
 		} catch (FileNotFoundException e1) {
 			Log("Unable to create an 'update.zip' file to write to. Exiting with error code -1.");
 			e1.printStackTrace();
@@ -102,7 +116,7 @@ public class UI extends JFrame{
 		setBackground(Color.BLACK);
 		setResizable(false);
 		setTitle("Mesa Update Creator");
-		this.setSize(626, 509);
+		this.setSize(626, 521);
 
 		JPanel panel = new JPanel();
 		panel.setBackground(Color.BLACK);
@@ -119,7 +133,7 @@ public class UI extends JFrame{
 		panel_1.setBackground(Color.DARK_GRAY);
 		panel_1.setBorder(null);
 		getContentPane().add(panel_1, BorderLayout.CENTER);
-		panel_1.setLayout(new MigLayout("", "[460px:n:460px,grow][64px:n:64px][grow]", "[][][140px:n:140px][][grow][]"));
+		panel_1.setLayout(new MigLayout("", "[48px:n:48px][412px:n:412px,grow][64px:n:64px][grow]", "[][][140px:n:140px][][grow][][]"));
 
 		JButton btnHideSidebar = new JButton("Close Console");
 		btnHideSidebar.addActionListener(new ActionListener() {
@@ -135,15 +149,15 @@ public class UI extends JFrame{
 		});
 		btnHideSidebar.setForeground(Color.RED);
 		btnHideSidebar.setBackground(Color.BLACK);
-		panel_1.add(btnHideSidebar, "cell 1 0 2 1,alignx right");
+		panel_1.add(btnHideSidebar, "cell 2 0 2 1,alignx right");
 
 		JLabel lblStepLoad = new JLabel("Step 1: Load files into the program.");
 		lblStepLoad.setForeground(Color.GREEN);
-		panel_1.add(lblStepLoad, "cell 0 1 3 1,alignx center");
+		panel_1.add(lblStepLoad, "cell 0 1 4 1,alignx center");
 
 		JPanel panel_2 = new JPanel();
 		panel_2.setBackground(Color.DARK_GRAY);
-		panel_1.add(panel_2, "cell 1 2 2 1,grow");
+		panel_1.add(panel_2, "cell 2 2 2 1,grow");
 
 		JButton btnAdd = new JButton("Add File(s)...");
 		btnAdd.setBackground(Color.GRAY);
@@ -156,9 +170,20 @@ public class UI extends JFrame{
 				chooser.setMultiSelectionEnabled(true);
 				chooser.showOpenDialog(UI.this);
 				File[] files = chooser.getSelectedFiles();
+				
+				boolean errorFlag = false;
+				
 				for (File f : files) {
-					Log("Adding " + f.getName() + " to the package queue.");
-					stepOne.addElement(f.getPath());
+					if (!f.getName().matches(".*\\d.*")) {
+						Log("Adding " + f.getName() + " to the package queue.");
+						stepOne.addElement(f.getPath());
+					}else {
+						errorFlag = true;
+					}
+				}
+				
+				if (errorFlag) {
+					JOptionPane.showMessageDialog(UI.this, "Some of the files you've selected contain numerics. This is not supported by this program.", "Unsupported File Convention", JOptionPane.ERROR_MESSAGE);
 				}
 			}
 		});
@@ -169,8 +194,23 @@ public class UI extends JFrame{
 		btnRemove.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				Log("Removing " + stepOne.getElementAt(UI.this.fileList.getSelectedIndex()) + " from the package queue.");
-				stepOne.remove(UI.this.fileList.getSelectedIndex());
+				try {
+					Log("Removing " + stepOne.getElementAt(UI.this.fileList.getSelectedIndex()) + " from the package queue.");
+					stepOne.remove(UI.this.fileList.getSelectedIndex());
+				}catch (Exception ex2) {
+					int rand = new Random().nextInt(5);
+					if (rand == 0) {
+						Log("There's nothing there, silly!");
+					}else if (rand == 1) {
+						Log("Oh you sure got me! Try picking something next time.");
+					}else if (rand == 2) {
+						Log("Pick something! Oh man, I have too much free time on my hands.");
+					}else if (rand == 3) {
+						Log("HA! YOU THOUGHT. Pick something next time.");
+					}else if (rand == 4) {
+						Log("Not all heroes wear capes. Give Jad a high five for good error handling next time you see him.");
+					}
+				}
 			}
 		});
 
@@ -180,13 +220,17 @@ public class UI extends JFrame{
 		btnSend.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				try {
-				String element = stepOne.getElementAt(UI.this.fileList.getSelectedIndex());
+					String element = stepOne.getElementAt(UI.this.fileList.getSelectedIndex());
 					try {
-						addToZipFile(element, zos);
+						addToZipFile(element);
 
 						stepTwoA.addElement(element);
 						stepOne.remove(UI.this.fileList.getSelectedIndex());
 						stepTwoB.addElement("Create");	
+
+						if (stepOne.size() > 0) {
+							fileList.setSelectedIndex(0);
+						}
 					}catch (Exception ex) {
 						Log("Unable to package this file. Skipping.");
 						ex.printStackTrace();
@@ -234,10 +278,10 @@ public class UI extends JFrame{
 
 		JLabel lblStepDesignate = new JLabel("Step 2: Designate update protocol for each file.");
 		lblStepDesignate.setForeground(Color.GREEN);
-		panel_1.add(lblStepDesignate, "cell 0 3 3 1,alignx center");
+		panel_1.add(lblStepDesignate, "cell 0 3 4 1,alignx center");
 
 		JSplitPane splitPane = new JSplitPane();
-		panel_1.add(splitPane, "cell 0 4,grow");
+		panel_1.add(splitPane, "cell 0 4 2 1,grow");
 		splitPane.setBackground(Color.LIGHT_GRAY);
 
 		JPanel panel_3 = new JPanel();
@@ -275,7 +319,7 @@ public class UI extends JFrame{
 
 		JPanel panel_4 = new JPanel();
 		panel_4.setBackground(Color.DARK_GRAY);
-		panel_1.add(panel_4, "cell 1 4 2 1,grow");
+		panel_1.add(panel_4, "cell 2 4 2 1,grow");
 
 		JButton btnUpdate = new JButton("Update");
 		btnUpdate.setBackground(Color.GRAY);
@@ -380,34 +424,67 @@ public class UI extends JFrame{
 		JLabel lblProgress = new JLabel("Progress:");
 		lblProgress.setForeground(Color.GREEN);
 		lblProgress.setBackground(Color.GREEN);
-		panel_1.add(lblProgress, "flowx,cell 0 5");
+		panel_1.add(lblProgress, "cell 0 5");
 
 		progressBar = new JProgressBar();
-		panel_1.add(progressBar, "cell 0 5,growx");
+		panel_1.add(progressBar, "cell 1 5,growx");
 
 		JButton btnAbort = new JButton("Abort");
 		btnAbort.setEnabled(false);
-		panel_1.add(btnAbort, "cell 1 5,growx");
+		panel_1.add(btnAbort, "cell 2 5,growx");
 
 		JButton btnFinish = new JButton("Start");
 		btnFinish.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				try {
+					btnFinish.setEnabled(false);
+					btnAbort.setEnabled(true);
 					Log("Finalizing update package with manifest...");
 					progressBar.setValue(20);
 
+					DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
+					DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
+					Document doc = docBuilder.newDocument();
 
-					fos.close();
+
+					Element rootElement = doc.createElement("Manifest");
+					doc.appendChild(rootElement);
+
+					int step = 50 / stepTwoA.getSize();
+
+					for (int i = 0; i < stepTwoA.getSize(); i++) {
+						SetStatus("Creating manifest for '" + new File(stepTwoA.get(i)).getName() + "'...");
+						rootElement.setAttribute(new File(stepTwoA.get(i)).getName(), stepTwoB.get(i));
+						progressBar.setValue(progressBar.getValue() + step);
+					}
+
+					TransformerFactory transformerFactory = TransformerFactory.newInstance();
+					Transformer transformer = transformerFactory.newTransformer();
+					DOMSource source = new DOMSource(doc);
+					StreamResult result = new StreamResult(new File("mup_manifest.xml"));
+
+					transformer.transform(source, result);
+
+					progressBar.setValue(70);
+
+					UI.this.addToZipFile("mup_manifest.xml");
+
 					zos.close();
-				} catch (IOException e) {
+					fos.close();
+
+					progressBar.setValue(100);
+
+					Log("Done!");
+					btnAbort.setEnabled(false);
+				} catch (IOException | TransformerException | ParserConfigurationException e) {
 					e.printStackTrace();
 				}
 			}
 		});
-		panel_1.add(btnFinish, "cell 2 5,growx");
+		panel_1.add(btnFinish, "cell 3 5,growx");
 
 		JPanel panel_6 = new JPanel();
-		panel_1.add(panel_6, "flowx,cell 0 2,grow");
+		panel_1.add(panel_6, "flowx,cell 0 2 2 1,grow");
 		panel_6.setLayout(new BorderLayout(0, 0));
 
 		Component horizontalStrut_1 = Box.createHorizontalStrut(250);
@@ -424,12 +501,23 @@ public class UI extends JFrame{
 
 		fileList.setModel(stepOne);
 
+		lblStatus = new JLabel("Waiting...");
+		lblStatus.setForeground(Color.ORANGE);
+		lblStatus.setBackground(Color.ORANGE);
+		panel_1.add(lblStatus, "cell 1 6,alignx center,growy");
+
 		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
 		this.setVisible(true);
 	}
 
-	public void addToZipFile(String fileName, ZipOutputStream zos) throws FileNotFoundException, IOException {
-		Log("Writing '" + fileName + "' to zip file");
+	public void SetStatus(String status) {
+		if (lblStatus != null) {
+			lblStatus.setText(status);
+		}
+	}
+
+	public void addToZipFile(String fileName) throws FileNotFoundException, IOException {
+		Log("Writing '" + fileName + "' to package file.");
 
 		File file = new File(fileName);
 		FileInputStream fis = new FileInputStream(file);
@@ -478,6 +566,8 @@ public class UI extends JFrame{
 		System.out.println(log);
 
 		sidebar.console.addElement(log);
+
+		SetStatus(message);
 
 		sidebar.list.setSelectedIndex(sidebar.console.size() - 1);
 
