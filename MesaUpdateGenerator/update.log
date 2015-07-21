@@ -1,275 +1,45 @@
-[<init>@09:51:29 PM]: Bootstrapped Update Generator initializing...
-[<init>@09:51:29 PM]: Preparing 'update.mup' for target environment...
-[actionPerformed@09:51:32 PM]: Pick something! Oh man, I have too much free time on my hands.
-[actionPerformed@09:51:35 PM]: Showing the File Chooser.
-[<init>@09:52:16 PM]: Bootstrapped Update Generator initializing...
-[<init>@09:52:16 PM]: Preparing 'update.mup' for target environment...
-[actionPerformed@09:52:18 PM]: Oh you sure got me! Try picking something next time.
-[actionPerformed@09:52:19 PM]: HA! YOU THOUGHT. Pick something next time.
-[actionPerformed@09:52:21 PM]: Showing the File Chooser.
-[actionPerformed@09:52:27 PM]: Adding .eclipseproduct to the package queue.
-[actionPerformed@09:52:27 PM]: Adding artifacts.xml to the package queue.
-[actionPerformed@09:52:27 PM]: Adding eclipse.exe to the package queue.
-[actionPerformed@09:52:27 PM]: Adding eclipse.ini to the package queue.
-[actionPerformed@09:52:27 PM]: Adding eclipsec.exe to the package queue.
-[addToZipFile@09:52:28 PM]: Writing 'C:\Users\Hack\Documents\eclipse\.eclipseproduct' to package file.
-[addToZipFile@09:52:29 PM]: Writing 'C:\Users\Hack\Documents\eclipse\artifacts.xml' to package file.
-[addToZipFile@09:52:29 PM]: Writing 'C:\Users\Hack\Documents\eclipse\eclipse.exe' to package file.
-[addToZipFile@09:52:29 PM]: Writing 'C:\Users\Hack\Documents\eclipse\eclipse.ini' to package file.
-[addToZipFile@09:52:29 PM]: Writing 'C:\Users\Hack\Documents\eclipse\eclipsec.exe' to package file.
-[actionPerformed@09:52:33 PM]: Finalizing update package with manifest...
-[addToZipFile@09:52:33 PM]: Writing 'mup_manifest.xml' to package file.
-[<init>@09:52:55 PM]: Bootstrapped Update Generator initializing...
-[<init>@09:52:55 PM]: Preparing 'update.mup' for target environment...
-[actionPerformed@09:52:58 PM]: Showing the File Chooser.
-[actionPerformed@09:53:02 PM]: Adding .eclipseproduct to the package queue.
-[actionPerformed@09:53:02 PM]: Adding artifacts.xml to the package queue.
-[actionPerformed@09:53:02 PM]: Adding eclipse.exe to the package queue.
-[actionPerformed@09:53:02 PM]: Adding eclipse.ini to the package queue.
-[actionPerformed@09:53:02 PM]: Adding eclipsec.exe to the package queue.
-[addToZipFile@09:53:10 PM]: Writing 'C:\Users\Hack\Documents\eclipse\.eclipseproduct' to package file.
-[addToZipFile@09:53:11 PM]: Writing 'C:\Users\Hack\Documents\eclipse\artifacts.xml' to package file.
-[addToZipFile@09:53:11 PM]: Writing 'C:\Users\Hack\Documents\eclipse\eclipse.exe' to package file.
-[addToZipFile@09:53:11 PM]: Writing 'C:\Users\Hack\Documents\eclipse\eclipse.ini' to package file.
-[addToZipFile@09:53:11 PM]: Writing 'C:\Users\Hack\Documents\eclipse\eclipsec.exe' to package file.
-[actionPerformed@09:53:12 PM]: Finalizing update package with manifest...
-[addToZipFile@09:53:12 PM]: Writing 'mup_manifest.xml' to package file.
-[actionPerformed@09:53:12 PM]: Done!
-[actionPerformed@09:54:24 PM]: Finalizing update package with manifest...
-[addToZipFile@09:54:24 PM]: Writing 'mup_manifest.xml' to package file.
-[<init>@09:56:25 PM]: Bootstrapped Update Generator initializing...
-[<init>@09:56:25 PM]: Preparing 'update.mup' for target environment...
-[actionPerformed@09:56:27 PM]: Showing the File Chooser.
-[actionPerformed@09:56:35 PM]: Adding 1.png to the package queue.
-[actionPerformed@09:56:35 PM]: Adding 2.png to the package queue.
-[actionPerformed@09:56:35 PM]: Adding 3.png to the package queue.
-[actionPerformed@09:56:35 PM]: Adding 4.png to the package queue.
-[actionPerformed@09:56:35 PM]: Adding 5.png to the package queue.
-[actionPerformed@09:56:35 PM]: Adding 6.png to the package queue.
-[actionPerformed@09:56:35 PM]: Adding 7.png to the package queue.
-[actionPerformed@09:56:35 PM]: Adding 8.png to the package queue.
-[actionPerformed@09:56:35 PM]: Adding 9.png to the package queue.
-[actionPerformed@09:56:35 PM]: Adding Assembly-CSharp-Editor-vs.csproj to the package queue.
-[actionPerformed@09:56:35 PM]: Adding Assembly-CSharp-Editor.csproj to the package queue.
-[actionPerformed@09:56:35 PM]: Adding Assembly-CSharp-firstpass-vs.csproj to the package queue.
-[actionPerformed@09:56:35 PM]: Adding Assembly-CSharp-firstpass.csproj to the package queue.
-[actionPerformed@09:56:35 PM]: Adding Assembly-CSharp-vs.csproj to the package queue.
-[actionPerformed@09:56:35 PM]: Adding Assembly-CSharp.csproj to the package queue.
-[actionPerformed@09:56:35 PM]: Adding Assembly-UnityScript-Editor-vs.unityproj to the package queue.
-[actionPerformed@09:56:35 PM]: Adding Assembly-UnityScript-Editor.unityproj to the package queue.
-[actionPerformed@09:56:35 PM]: Adding Assembly-UnityScript-firstpass-vs.unityproj to the package queue.
-[actionPerformed@09:56:35 PM]: Adding Assembly-UnityScript-firstpass.unityproj to the package queue.
-[actionPerformed@09:56:35 PM]: Adding Assembly-UnityScript-vs.unityproj to the package queue.
-[actionPerformed@09:56:35 PM]: Adding Assembly-UnityScript.unityproj to the package queue.
-[actionPerformed@09:56:35 PM]: Adding Project Charlie-csharp.sln to the package queue.
-[actionPerformed@09:56:35 PM]: Adding Project Charlie.sln to the package queue.
-[actionPerformed@09:56:35 PM]: Adding Project Charlie.userprefs to the package queue.
-[actionPerformed@09:56:35 PM]: Adding mmo-ui-core.psd to the package queue.
-[addToZipFile@09:56:38 PM]: Writing 'C:\Users\Hack\Documents\Project Charlie\1.png' to package file.
-[addToZipFile@09:56:38 PM]: Writing 'C:\Users\Hack\Documents\Project Charlie\2.png' to package file.
-[addToZipFile@09:56:39 PM]: Writing 'C:\Users\Hack\Documents\Project Charlie\3.png' to package file.
-[addToZipFile@09:56:39 PM]: Writing 'C:\Users\Hack\Documents\Project Charlie\4.png' to package file.
-[addToZipFile@09:56:39 PM]: Writing 'C:\Users\Hack\Documents\Project Charlie\5.png' to package file.
-[addToZipFile@09:56:39 PM]: Writing 'C:\Users\Hack\Documents\Project Charlie\6.png' to package file.
-[addToZipFile@09:56:39 PM]: Writing 'C:\Users\Hack\Documents\Project Charlie\7.png' to package file.
-[addToZipFile@09:56:39 PM]: Writing 'C:\Users\Hack\Documents\Project Charlie\8.png' to package file.
-[addToZipFile@09:56:39 PM]: Writing 'C:\Users\Hack\Documents\Project Charlie\9.png' to package file.
-[addToZipFile@09:56:40 PM]: Writing 'C:\Users\Hack\Documents\Project Charlie\Assembly-CSharp-Editor-vs.csproj' to package file.
-[addToZipFile@09:56:40 PM]: Writing 'C:\Users\Hack\Documents\Project Charlie\Assembly-CSharp-Editor.csproj' to package file.
-[addToZipFile@09:56:40 PM]: Writing 'C:\Users\Hack\Documents\Project Charlie\Assembly-CSharp-firstpass-vs.csproj' to package file.
-[addToZipFile@09:56:40 PM]: Writing 'C:\Users\Hack\Documents\Project Charlie\Assembly-CSharp-firstpass.csproj' to package file.
-[addToZipFile@09:56:40 PM]: Writing 'C:\Users\Hack\Documents\Project Charlie\Assembly-CSharp-vs.csproj' to package file.
-[addToZipFile@09:56:40 PM]: Writing 'C:\Users\Hack\Documents\Project Charlie\Assembly-CSharp.csproj' to package file.
-[addToZipFile@09:56:40 PM]: Writing 'C:\Users\Hack\Documents\Project Charlie\Assembly-UnityScript-Editor-vs.unityproj' to package file.
-[addToZipFile@09:56:40 PM]: Writing 'C:\Users\Hack\Documents\Project Charlie\Assembly-UnityScript-Editor.unityproj' to package file.
-[addToZipFile@09:56:41 PM]: Writing 'C:\Users\Hack\Documents\Project Charlie\Assembly-UnityScript-firstpass-vs.unityproj' to package file.
-[addToZipFile@09:56:41 PM]: Writing 'C:\Users\Hack\Documents\Project Charlie\Assembly-UnityScript-firstpass.unityproj' to package file.
-[addToZipFile@09:56:41 PM]: Writing 'C:\Users\Hack\Documents\Project Charlie\Assembly-UnityScript-vs.unityproj' to package file.
-[addToZipFile@09:56:41 PM]: Writing 'C:\Users\Hack\Documents\Project Charlie\Assembly-UnityScript.unityproj' to package file.
-[addToZipFile@09:56:41 PM]: Writing 'C:\Users\Hack\Documents\Project Charlie\Project Charlie-csharp.sln' to package file.
-[addToZipFile@09:56:41 PM]: Writing 'C:\Users\Hack\Documents\Project Charlie\Project Charlie.sln' to package file.
-[addToZipFile@09:56:42 PM]: Writing 'C:\Users\Hack\Documents\Project Charlie\Project Charlie.userprefs' to package file.
-[addToZipFile@09:56:42 PM]: Writing 'C:\Users\Hack\Documents\Project Charlie\mmo-ui-core.psd' to package file.
-[actionPerformed@09:56:43 PM]: Oh you sure got me! Try picking something next time.
-[actionPerformed@09:56:43 PM]: Not all heroes wear capes. Give Jad a high five for good error handling next time you see him.
-[actionPerformed@09:56:47 PM]: Finalizing update package with manifest...
-[addToZipFile@09:56:47 PM]: Writing 'mup_manifest.xml' to package file.
-[actionPerformed@09:56:47 PM]: Done!
-[<init>@09:31:44 AM]: Bootstrapped Update Generator initializing...
-[<init>@09:31:44 AM]: Preparing 'update.mup' for target environment...
-[<init>@09:34:17 AM]: Bootstrapped Update Generator initializing...
-[<init>@09:34:17 AM]: Preparing 'update.mup' for target environment...
-[actionPerformed@09:34:18 AM]: Showing the File Chooser.
-[actionPerformed@09:34:26 AM]: Adding 1.png to the package queue.
-[actionPerformed@09:34:26 AM]: Adding 2.png to the package queue.
-[actionPerformed@09:34:26 AM]: Adding 3.png to the package queue.
-[actionPerformed@09:34:26 AM]: Adding 4.png to the package queue.
-[actionPerformed@09:34:26 AM]: Adding 5.png to the package queue.
-[actionPerformed@09:34:26 AM]: Adding 6.png to the package queue.
-[actionPerformed@09:34:26 AM]: Adding 7.png to the package queue.
-[actionPerformed@09:34:26 AM]: Adding 8.png to the package queue.
-[actionPerformed@09:34:26 AM]: Adding 9.png to the package queue.
-[actionPerformed@09:34:26 AM]: Adding Assembly-CSharp-Editor-vs.csproj to the package queue.
-[actionPerformed@09:34:26 AM]: Adding Assembly-CSharp-Editor.csproj to the package queue.
-[actionPerformed@09:34:26 AM]: Adding Assembly-CSharp-firstpass-vs.csproj to the package queue.
-[actionPerformed@09:34:26 AM]: Adding Assembly-CSharp-firstpass.csproj to the package queue.
-[actionPerformed@09:34:26 AM]: Adding Assembly-CSharp-vs.csproj to the package queue.
-[actionPerformed@09:34:26 AM]: Adding Assembly-CSharp.csproj to the package queue.
-[actionPerformed@09:34:26 AM]: Adding Assembly-UnityScript-Editor-vs.unityproj to the package queue.
-[actionPerformed@09:34:26 AM]: Adding Assembly-UnityScript-Editor.unityproj to the package queue.
-[actionPerformed@09:34:26 AM]: Adding Assembly-UnityScript-firstpass-vs.unityproj to the package queue.
-[actionPerformed@09:34:26 AM]: Adding Assembly-UnityScript-firstpass.unityproj to the package queue.
-[actionPerformed@09:34:26 AM]: Adding Assembly-UnityScript-vs.unityproj to the package queue.
-[actionPerformed@09:34:26 AM]: Adding Assembly-UnityScript.unityproj to the package queue.
-[actionPerformed@09:34:26 AM]: Adding Project Charlie-csharp.sln to the package queue.
-[actionPerformed@09:34:26 AM]: Adding Project Charlie.sln to the package queue.
-[actionPerformed@09:34:26 AM]: Adding Project Charlie.userprefs to the package queue.
-[actionPerformed@09:34:26 AM]: Adding mmo-ui-core.psd to the package queue.
-[addToZipFile@09:34:28 AM]: Writing 'C:\Users\Hack\Documents\Project Charlie\1.png' to package file.
-[addToZipFile@09:34:28 AM]: Writing 'C:\Users\Hack\Documents\Project Charlie\2.png' to package file.
-[addToZipFile@09:34:28 AM]: Writing 'C:\Users\Hack\Documents\Project Charlie\3.png' to package file.
-[addToZipFile@09:34:28 AM]: Writing 'C:\Users\Hack\Documents\Project Charlie\4.png' to package file.
-[addToZipFile@09:34:28 AM]: Writing 'C:\Users\Hack\Documents\Project Charlie\5.png' to package file.
-[addToZipFile@09:34:29 AM]: Writing 'C:\Users\Hack\Documents\Project Charlie\6.png' to package file.
-[addToZipFile@09:34:29 AM]: Writing 'C:\Users\Hack\Documents\Project Charlie\7.png' to package file.
-[addToZipFile@09:34:29 AM]: Writing 'C:\Users\Hack\Documents\Project Charlie\8.png' to package file.
-[addToZipFile@09:34:29 AM]: Writing 'C:\Users\Hack\Documents\Project Charlie\9.png' to package file.
-[addToZipFile@09:34:29 AM]: Writing 'C:\Users\Hack\Documents\Project Charlie\Assembly-CSharp-Editor-vs.csproj' to package file.
-[addToZipFile@09:34:29 AM]: Writing 'C:\Users\Hack\Documents\Project Charlie\Assembly-CSharp-Editor.csproj' to package file.
-[addToZipFile@09:34:29 AM]: Writing 'C:\Users\Hack\Documents\Project Charlie\Assembly-CSharp-firstpass-vs.csproj' to package file.
-[addToZipFile@09:34:30 AM]: Writing 'C:\Users\Hack\Documents\Project Charlie\Assembly-CSharp-firstpass.csproj' to package file.
-[addToZipFile@09:34:30 AM]: Writing 'C:\Users\Hack\Documents\Project Charlie\Assembly-CSharp-vs.csproj' to package file.
-[addToZipFile@09:34:30 AM]: Writing 'C:\Users\Hack\Documents\Project Charlie\Assembly-CSharp.csproj' to package file.
-[addToZipFile@09:34:30 AM]: Writing 'C:\Users\Hack\Documents\Project Charlie\Assembly-UnityScript-Editor-vs.unityproj' to package file.
-[addToZipFile@09:34:31 AM]: Writing 'C:\Users\Hack\Documents\Project Charlie\Assembly-UnityScript-Editor.unityproj' to package file.
-[addToZipFile@09:34:31 AM]: Writing 'C:\Users\Hack\Documents\Project Charlie\Assembly-UnityScript-firstpass-vs.unityproj' to package file.
-[addToZipFile@09:34:31 AM]: Writing 'C:\Users\Hack\Documents\Project Charlie\Assembly-UnityScript-firstpass.unityproj' to package file.
-[addToZipFile@09:34:31 AM]: Writing 'C:\Users\Hack\Documents\Project Charlie\Assembly-UnityScript-vs.unityproj' to package file.
-[addToZipFile@09:34:31 AM]: Writing 'C:\Users\Hack\Documents\Project Charlie\Assembly-UnityScript.unityproj' to package file.
-[addToZipFile@09:34:32 AM]: Writing 'C:\Users\Hack\Documents\Project Charlie\Project Charlie-csharp.sln' to package file.
-[addToZipFile@09:34:32 AM]: Writing 'C:\Users\Hack\Documents\Project Charlie\Project Charlie.sln' to package file.
-[addToZipFile@09:34:32 AM]: Writing 'C:\Users\Hack\Documents\Project Charlie\Project Charlie.userprefs' to package file.
-[addToZipFile@09:34:32 AM]: Writing 'C:\Users\Hack\Documents\Project Charlie\mmo-ui-core.psd' to package file.
-[actionPerformed@09:34:36 AM]: Finalizing update package with manifest...
-[<init>@09:43:05 AM]: Bootstrapped Update Generator initializing...
-[<init>@09:43:05 AM]: Preparing 'update.mup' for target environment...
-[<init>@09:43:37 AM]: Bootstrapped Update Generator initializing...
-[<init>@09:43:37 AM]: Preparing 'update.mup' for target environment...
-[<init>@09:43:52 AM]: Bootstrapped Update Generator initializing...
-[<init>@09:43:52 AM]: Preparing 'update.mup' for target environment...
-[<init>@09:45:58 AM]: Bootstrapped Update Generator initializing...
-[<init>@09:45:58 AM]: Preparing 'update.mup' for target environment...
-[actionPerformed@09:46:10 AM]: Pick something! Oh man, I have too much free time on my hands.
-[<init>@09:46:33 AM]: Bootstrapped Update Generator initializing...
-[<init>@09:46:33 AM]: Preparing 'update.mup' for target environment...
-[actionPerformed@09:46:34 AM]: Not all heroes wear capes. Give Jad a high five for good error handling next time you see him.
-[actionPerformed@09:46:38 AM]: Not all heroes wear capes. Give Jad a high five for good error handling next time you see him.
-[actionPerformed@09:46:41 AM]: Showing the File Chooser.
-[actionPerformed@09:46:46 AM]: Adding 1.png to the package queue.
-[actionPerformed@09:46:46 AM]: Adding 2.png to the package queue.
-[actionPerformed@09:46:46 AM]: Adding 3.png to the package queue.
-[actionPerformed@09:46:46 AM]: Adding 4.png to the package queue.
-[actionPerformed@09:46:46 AM]: Adding 5.png to the package queue.
-[actionPerformed@09:46:46 AM]: Adding 6.png to the package queue.
-[actionPerformed@09:46:46 AM]: Adding 7.png to the package queue.
-[actionPerformed@09:46:46 AM]: Adding 8.png to the package queue.
-[actionPerformed@09:46:46 AM]: Adding 9.png to the package queue.
-[actionPerformed@09:46:46 AM]: Adding Assembly-CSharp-Editor-vs.csproj to the package queue.
-[actionPerformed@09:46:46 AM]: Adding Assembly-CSharp-Editor.csproj to the package queue.
-[actionPerformed@09:46:46 AM]: Adding Assembly-CSharp-firstpass-vs.csproj to the package queue.
-[actionPerformed@09:46:46 AM]: Adding Assembly-CSharp-firstpass.csproj to the package queue.
-[actionPerformed@09:46:46 AM]: Adding Assembly-CSharp-vs.csproj to the package queue.
-[actionPerformed@09:46:46 AM]: Adding Assembly-CSharp.csproj to the package queue.
-[actionPerformed@09:46:46 AM]: Adding Assembly-UnityScript-Editor-vs.unityproj to the package queue.
-[actionPerformed@09:46:46 AM]: Adding Assembly-UnityScript-Editor.unityproj to the package queue.
-[actionPerformed@09:46:46 AM]: Adding Assembly-UnityScript-firstpass-vs.unityproj to the package queue.
-[actionPerformed@09:46:46 AM]: Adding Assembly-UnityScript-firstpass.unityproj to the package queue.
-[actionPerformed@09:46:46 AM]: Adding Assembly-UnityScript-vs.unityproj to the package queue.
-[actionPerformed@09:46:46 AM]: Adding Assembly-UnityScript.unityproj to the package queue.
-[actionPerformed@09:46:46 AM]: Adding Project Charlie-csharp.sln to the package queue.
-[actionPerformed@09:46:46 AM]: Adding Project Charlie.sln to the package queue.
-[actionPerformed@09:46:46 AM]: Adding Project Charlie.userprefs to the package queue.
-[actionPerformed@09:46:46 AM]: Adding mmo-ui-core.psd to the package queue.
-[addToZipFile@09:46:49 AM]: Writing 'C:\Users\Hack\Documents\Project Charlie\1.png' to package file.
-[addToZipFile@09:46:49 AM]: Writing 'C:\Users\Hack\Documents\Project Charlie\2.png' to package file.
-[addToZipFile@09:46:49 AM]: Writing 'C:\Users\Hack\Documents\Project Charlie\3.png' to package file.
-[addToZipFile@09:46:49 AM]: Writing 'C:\Users\Hack\Documents\Project Charlie\4.png' to package file.
-[addToZipFile@09:46:50 AM]: Writing 'C:\Users\Hack\Documents\Project Charlie\5.png' to package file.
-[addToZipFile@09:46:50 AM]: Writing 'C:\Users\Hack\Documents\Project Charlie\6.png' to package file.
-[addToZipFile@09:46:50 AM]: Writing 'C:\Users\Hack\Documents\Project Charlie\7.png' to package file.
-[addToZipFile@09:46:50 AM]: Writing 'C:\Users\Hack\Documents\Project Charlie\8.png' to package file.
-[addToZipFile@09:46:50 AM]: Writing 'C:\Users\Hack\Documents\Project Charlie\9.png' to package file.
-[addToZipFile@09:46:51 AM]: Writing 'C:\Users\Hack\Documents\Project Charlie\Assembly-CSharp-Editor-vs.csproj' to package file.
-[addToZipFile@09:46:51 AM]: Writing 'C:\Users\Hack\Documents\Project Charlie\Assembly-CSharp-Editor.csproj' to package file.
-[addToZipFile@09:46:51 AM]: Writing 'C:\Users\Hack\Documents\Project Charlie\Assembly-CSharp-firstpass-vs.csproj' to package file.
-[addToZipFile@09:46:51 AM]: Writing 'C:\Users\Hack\Documents\Project Charlie\Assembly-CSharp-firstpass.csproj' to package file.
-[addToZipFile@09:46:51 AM]: Writing 'C:\Users\Hack\Documents\Project Charlie\Assembly-CSharp-vs.csproj' to package file.
-[addToZipFile@09:46:52 AM]: Writing 'C:\Users\Hack\Documents\Project Charlie\Assembly-CSharp.csproj' to package file.
-[addToZipFile@09:46:52 AM]: Writing 'C:\Users\Hack\Documents\Project Charlie\Assembly-UnityScript-Editor-vs.unityproj' to package file.
-[addToZipFile@09:46:52 AM]: Writing 'C:\Users\Hack\Documents\Project Charlie\Assembly-UnityScript-Editor.unityproj' to package file.
-[addToZipFile@09:46:52 AM]: Writing 'C:\Users\Hack\Documents\Project Charlie\Assembly-UnityScript-firstpass-vs.unityproj' to package file.
-[addToZipFile@09:46:52 AM]: Writing 'C:\Users\Hack\Documents\Project Charlie\Assembly-UnityScript-firstpass.unityproj' to package file.
-[addToZipFile@09:46:53 AM]: Writing 'C:\Users\Hack\Documents\Project Charlie\Assembly-UnityScript-vs.unityproj' to package file.
-[addToZipFile@09:46:53 AM]: Writing 'C:\Users\Hack\Documents\Project Charlie\Assembly-UnityScript.unityproj' to package file.
-[addToZipFile@09:46:53 AM]: Writing 'C:\Users\Hack\Documents\Project Charlie\Project Charlie-csharp.sln' to package file.
-[addToZipFile@09:46:53 AM]: Writing 'C:\Users\Hack\Documents\Project Charlie\Project Charlie.sln' to package file.
-[addToZipFile@09:46:53 AM]: Writing 'C:\Users\Hack\Documents\Project Charlie\Project Charlie.userprefs' to package file.
-[addToZipFile@09:46:53 AM]: Writing 'C:\Users\Hack\Documents\Project Charlie\mmo-ui-core.psd' to package file.
-[actionPerformed@09:46:54 AM]: Oh you sure got me! Try picking something next time.
-[actionPerformed@09:46:54 AM]: HA! YOU THOUGHT. Pick something next time.
-[actionPerformed@09:46:58 AM]: Finalizing update package with manifest...
-[<init>@09:51:21 AM]: Bootstrapped Update Generator initializing...
-[<init>@09:51:21 AM]: Preparing 'update.mup' for target environment...
-[actionPerformed@09:51:23 AM]: Showing the File Chooser.
-[<init>@09:51:47 AM]: Bootstrapped Update Generator initializing...
-[<init>@09:51:47 AM]: Preparing 'update.mup' for target environment...
-[<init>@09:52:56 AM]: Bootstrapped Update Generator initializing...
-[<init>@09:52:56 AM]: Preparing 'update.mup' for target environment...
-[actionPerformed@09:52:59 AM]: HA! YOU THOUGHT. Pick something next time.
-[actionPerformed@09:53:01 AM]: Showing the File Chooser.
-[actionPerformed@09:53:06 AM]: Adding 1.png to the package queue.
-[actionPerformed@09:53:06 AM]: Adding 2.png to the package queue.
-[actionPerformed@09:53:06 AM]: Adding 3.png to the package queue.
-[actionPerformed@09:53:06 AM]: Adding 4.png to the package queue.
-[actionPerformed@09:53:06 AM]: Adding 5.png to the package queue.
-[actionPerformed@09:53:06 AM]: Adding 6.png to the package queue.
-[actionPerformed@09:53:06 AM]: Adding 7.png to the package queue.
-[actionPerformed@09:53:06 AM]: Adding 8.png to the package queue.
-[actionPerformed@09:53:06 AM]: Adding 9.png to the package queue.
-[<init>@09:53:18 AM]: Bootstrapped Update Generator initializing...
-[<init>@09:53:18 AM]: Preparing 'update.mup' for target environment...
-[actionPerformed@09:53:20 AM]: Showing the File Chooser.
-[actionPerformed@09:53:25 AM]: Adding Assembly-CSharp-Editor-vs.csproj to the package queue.
-[actionPerformed@09:53:25 AM]: Adding Assembly-CSharp-Editor.csproj to the package queue.
-[actionPerformed@09:53:25 AM]: Adding Assembly-CSharp-firstpass-vs.csproj to the package queue.
-[actionPerformed@09:53:25 AM]: Adding Assembly-CSharp-firstpass.csproj to the package queue.
-[actionPerformed@09:53:25 AM]: Adding Assembly-CSharp-vs.csproj to the package queue.
-[actionPerformed@09:53:25 AM]: Adding Assembly-CSharp.csproj to the package queue.
-[actionPerformed@09:53:25 AM]: Adding Assembly-UnityScript-Editor-vs.unityproj to the package queue.
-[actionPerformed@09:53:25 AM]: Adding Assembly-UnityScript-Editor.unityproj to the package queue.
-[actionPerformed@09:53:25 AM]: Adding Assembly-UnityScript-firstpass-vs.unityproj to the package queue.
-[actionPerformed@09:53:25 AM]: Adding Assembly-UnityScript-firstpass.unityproj to the package queue.
-[actionPerformed@09:53:25 AM]: Adding Assembly-UnityScript-vs.unityproj to the package queue.
-[actionPerformed@09:53:25 AM]: Adding Assembly-UnityScript.unityproj to the package queue.
-[actionPerformed@09:53:25 AM]: Adding Project Charlie-csharp.sln to the package queue.
-[actionPerformed@09:53:25 AM]: Adding Project Charlie.sln to the package queue.
-[actionPerformed@09:53:25 AM]: Adding Project Charlie.userprefs to the package queue.
-[actionPerformed@09:53:25 AM]: Adding mmo-ui-core.psd to the package queue.
-[addToZipFile@09:53:28 AM]: Writing 'C:\Users\Hack\Documents\Project Charlie\Assembly-CSharp-Editor-vs.csproj' to package file.
-[addToZipFile@09:53:28 AM]: Writing 'C:\Users\Hack\Documents\Project Charlie\Assembly-CSharp-Editor.csproj' to package file.
-[addToZipFile@09:53:29 AM]: Writing 'C:\Users\Hack\Documents\Project Charlie\Assembly-CSharp-firstpass-vs.csproj' to package file.
-[addToZipFile@09:53:29 AM]: Writing 'C:\Users\Hack\Documents\Project Charlie\Assembly-CSharp-firstpass.csproj' to package file.
-[addToZipFile@09:53:29 AM]: Writing 'C:\Users\Hack\Documents\Project Charlie\Assembly-CSharp-vs.csproj' to package file.
-[addToZipFile@09:53:29 AM]: Writing 'C:\Users\Hack\Documents\Project Charlie\Assembly-CSharp.csproj' to package file.
-[addToZipFile@09:53:29 AM]: Writing 'C:\Users\Hack\Documents\Project Charlie\Assembly-UnityScript-Editor-vs.unityproj' to package file.
-[addToZipFile@09:53:29 AM]: Writing 'C:\Users\Hack\Documents\Project Charlie\Assembly-UnityScript-Editor.unityproj' to package file.
-[addToZipFile@09:53:30 AM]: Writing 'C:\Users\Hack\Documents\Project Charlie\Assembly-UnityScript-firstpass-vs.unityproj' to package file.
-[addToZipFile@09:53:30 AM]: Writing 'C:\Users\Hack\Documents\Project Charlie\Assembly-UnityScript-firstpass.unityproj' to package file.
-[addToZipFile@09:53:30 AM]: Writing 'C:\Users\Hack\Documents\Project Charlie\Assembly-UnityScript-vs.unityproj' to package file.
-[addToZipFile@09:53:30 AM]: Writing 'C:\Users\Hack\Documents\Project Charlie\Assembly-UnityScript.unityproj' to package file.
-[addToZipFile@09:53:30 AM]: Writing 'C:\Users\Hack\Documents\Project Charlie\Project Charlie-csharp.sln' to package file.
-[addToZipFile@09:53:30 AM]: Writing 'C:\Users\Hack\Documents\Project Charlie\Project Charlie.sln' to package file.
-[addToZipFile@09:53:30 AM]: Writing 'C:\Users\Hack\Documents\Project Charlie\Project Charlie.userprefs' to package file.
-[addToZipFile@09:53:31 AM]: Writing 'C:\Users\Hack\Documents\Project Charlie\mmo-ui-core.psd' to package file.
-[actionPerformed@09:53:32 AM]: There's nothing there, silly!
-[actionPerformed@09:53:35 AM]: Finalizing update package with manifest...
+[<init>@02:39:40 AM]: Bootstrapped Update Generator initializing...
+[<init>@02:39:40 AM]: Preparing 'update.mup' for target environment...
+[actionPerformed@02:39:41 AM]: Showing the File Chooser.
+[actionPerformed@02:39:45 AM]: Adding Assembly-CSharp-Editor-vs.csproj to the package queue.
+[actionPerformed@02:39:45 AM]: Adding Assembly-CSharp-Editor.csproj to the package queue.
+[actionPerformed@02:39:45 AM]: Adding Assembly-CSharp-firstpass-vs.csproj to the package queue.
+[actionPerformed@02:39:45 AM]: Adding Assembly-CSharp-firstpass.csproj to the package queue.
+[actionPerformed@02:39:45 AM]: Adding Assembly-CSharp-vs.csproj to the package queue.
+[actionPerformed@02:39:45 AM]: Adding Assembly-CSharp.csproj to the package queue.
+[actionPerformed@02:39:45 AM]: Adding Assembly-UnityScript-Editor-vs.unityproj to the package queue.
+[actionPerformed@02:39:45 AM]: Adding Assembly-UnityScript-Editor.unityproj to the package queue.
+[actionPerformed@02:39:45 AM]: Adding Assembly-UnityScript-firstpass-vs.unityproj to the package queue.
+[actionPerformed@02:39:45 AM]: Adding Assembly-UnityScript-firstpass.unityproj to the package queue.
+[actionPerformed@02:39:45 AM]: Adding Assembly-UnityScript-vs.unityproj to the package queue.
+[actionPerformed@02:39:45 AM]: Adding Assembly-UnityScript.unityproj to the package queue.
+[actionPerformed@02:39:45 AM]: Adding mmo-ui-core.psd to the package queue.
+[actionPerformed@02:39:47 AM]: Adding 'C:\Users\Hack\Documents\Project Charlie\Assembly-CSharp-Editor-vs.csproj' to package compression queue.
+[actionPerformed@02:39:48 AM]: Adding 'C:\Users\Hack\Documents\Project Charlie\Assembly-CSharp-Editor.csproj' to package compression queue.
+[actionPerformed@02:39:48 AM]: Adding 'C:\Users\Hack\Documents\Project Charlie\Assembly-CSharp-firstpass-vs.csproj' to package compression queue.
+[actionPerformed@02:39:48 AM]: Adding 'C:\Users\Hack\Documents\Project Charlie\Assembly-CSharp-firstpass.csproj' to package compression queue.
+[actionPerformed@02:39:48 AM]: Adding 'C:\Users\Hack\Documents\Project Charlie\Assembly-CSharp-vs.csproj' to package compression queue.
+[actionPerformed@02:39:48 AM]: Adding 'C:\Users\Hack\Documents\Project Charlie\Assembly-CSharp.csproj' to package compression queue.
+[actionPerformed@02:39:48 AM]: Adding 'C:\Users\Hack\Documents\Project Charlie\Assembly-UnityScript-Editor-vs.unityproj' to package compression queue.
+[actionPerformed@02:39:48 AM]: Adding 'C:\Users\Hack\Documents\Project Charlie\Assembly-UnityScript-Editor.unityproj' to package compression queue.
+[actionPerformed@02:39:49 AM]: Adding 'C:\Users\Hack\Documents\Project Charlie\Assembly-UnityScript-firstpass-vs.unityproj' to package compression queue.
+[actionPerformed@02:39:49 AM]: Adding 'C:\Users\Hack\Documents\Project Charlie\Assembly-UnityScript-firstpass.unityproj' to package compression queue.
+[actionPerformed@02:39:49 AM]: Adding 'C:\Users\Hack\Documents\Project Charlie\Assembly-UnityScript-vs.unityproj' to package compression queue.
+[actionPerformed@02:39:49 AM]: Adding 'C:\Users\Hack\Documents\Project Charlie\Assembly-UnityScript.unityproj' to package compression queue.
+[actionPerformed@02:39:49 AM]: Adding 'C:\Users\Hack\Documents\Project Charlie\mmo-ui-core.psd' to package compression queue.
+[run@02:39:50 AM]: Finalizing update package with manifest...
+[addToZipFile@02:39:50 AM]: Writing 'temp/Assembly-CSharp-Editor-vs.csproj' to package file.
+[addToZipFile@02:39:50 AM]: Writing 'temp/Assembly-CSharp-Editor.csproj' to package file.
+[addToZipFile@02:39:50 AM]: Writing 'temp/Assembly-CSharp-firstpass-vs.csproj' to package file.
+[addToZipFile@02:39:50 AM]: Writing 'temp/Assembly-CSharp-firstpass.csproj' to package file.
+[addToZipFile@02:39:50 AM]: Writing 'temp/Assembly-CSharp-vs.csproj' to package file.
+[addToZipFile@02:39:50 AM]: Writing 'temp/Assembly-CSharp.csproj' to package file.
+[addToZipFile@02:39:50 AM]: Writing 'temp/Assembly-UnityScript-Editor-vs.unityproj' to package file.
+[addToZipFile@02:39:50 AM]: Writing 'temp/Assembly-UnityScript-Editor.unityproj' to package file.
+[addToZipFile@02:39:50 AM]: Writing 'temp/Assembly-UnityScript-firstpass-vs.unityproj' to package file.
+[addToZipFile@02:39:50 AM]: Writing 'temp/Assembly-UnityScript-firstpass.unityproj' to package file.
+[addToZipFile@02:39:50 AM]: Writing 'temp/Assembly-UnityScript-vs.unityproj' to package file.
+[addToZipFile@02:39:50 AM]: Writing 'temp/Assembly-UnityScript.unityproj' to package file.
+[addToZipFile@02:39:50 AM]: Writing 'temp/mmo-ui-core.psd' to package file.
+[addToZipFile@02:39:51 AM]: Writing 'temp/mup_manifest.xml' to package file.
+[run@02:39:51 AM]: Done!

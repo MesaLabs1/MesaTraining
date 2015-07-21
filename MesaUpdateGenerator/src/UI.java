@@ -30,6 +30,8 @@ import javax.swing.Box;
 import javax.swing.JProgressBar;
 
 import java.io.*;
+import java.nio.file.CopyOption;
+import java.nio.file.Files;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Random;
@@ -54,7 +56,15 @@ import javax.xml.transform.stream.StreamResult;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import com.sun.org.apache.xerces.internal.util.XMLChar;
+
 import javax.swing.event.ListSelectionEvent;
+import java.awt.Font;
+import javax.swing.ScrollPaneConstants;
+
+import static java.nio.file.StandardCopyOption.*;
+
+import java.nio.file.*;
 
 public class UI extends JFrame{
 	private static final long serialVersionUID = -6340304491773037483L;
@@ -79,6 +89,8 @@ public class UI extends JFrame{
 	boolean allowSidebarVisibility = true;
 
 	JLabel lblStatus;
+	JButton btnFinish;
+	JButton btnAbort;
 
 	public static void main(String[] args) {
 		new UI();
@@ -170,20 +182,36 @@ public class UI extends JFrame{
 				chooser.setMultiSelectionEnabled(true);
 				chooser.showOpenDialog(UI.this);
 				File[] files = chooser.getSelectedFiles();
-				
+
 				boolean errorFlag = false;
+
+				File temp = new File("temp");
+				if (!temp.exists()) {
+					temp.mkdir();
+				}
 				
 				for (File f : files) {
-					if (!f.getName().matches(".*\\d.*")) {
+					if (!f.getName().matches(".*\\d.*") && !f.getName().contains(" ")) {
 						Log("Adding " + f.getName() + " to the package queue.");
-						stepOne.addElement(f.getPath());
+						
+						Path end = FileSystems.getDefault().getPath("temp", f.getName());
+						
+						try {
+							Files.copy(f.toPath(), end, REPLACE_EXISTING);
+							
+							stepOne.addElement(f.getPath());
+						} catch (IOException e1) {
+							e1.printStackTrace();
+						}
 					}else {
 						errorFlag = true;
 					}
 				}
-				
+
+				fileList.setSelectedIndex(0);
+
 				if (errorFlag) {
-					JOptionPane.showMessageDialog(UI.this, "Some of the files you've selected contain numerics. This is not supported by this program.", "Unsupported File Convention", JOptionPane.ERROR_MESSAGE);
+					JOptionPane.showMessageDialog(UI.this, "Some of the files you've selected contain numerics or spaces. This is not supported by this program.", "Unsupported File Convention", JOptionPane.ERROR_MESSAGE);
 				}
 			}
 		});
@@ -198,18 +226,7 @@ public class UI extends JFrame{
 					Log("Removing " + stepOne.getElementAt(UI.this.fileList.getSelectedIndex()) + " from the package queue.");
 					stepOne.remove(UI.this.fileList.getSelectedIndex());
 				}catch (Exception ex2) {
-					int rand = new Random().nextInt(5);
-					if (rand == 0) {
-						Log("There's nothing there, silly!");
-					}else if (rand == 1) {
-						Log("Oh you sure got me! Try picking something next time.");
-					}else if (rand == 2) {
-						Log("Pick something! Oh man, I have too much free time on my hands.");
-					}else if (rand == 3) {
-						Log("HA! YOU THOUGHT. Pick something next time.");
-					}else if (rand == 4) {
-						Log("Not all heroes wear capes. Give Jad a high five for good error handling next time you see him.");
-					}
+
 				}
 			}
 		});
@@ -222,11 +239,31 @@ public class UI extends JFrame{
 				try {
 					String element = stepOne.getElementAt(UI.this.fileList.getSelectedIndex());
 					try {
-						addToZipFile(element);
+						String invalids = "";
+
+						File name = new File(element);
+
+						for (int i = 0; i < name.getName().length(); i++) {
+							char c = name.getName().charAt(i);
+							if (!XMLChar.isValid(c)) {
+								invalids += c + " ";
+							}
+						}
+
+						if (invalids.length() > 0) {
+							JOptionPane.showMessageDialog(UI.this, "This file contains illegal characters not allowed in a package! \n Characters: " + invalids, "Invalid Characters", JOptionPane.OK_OPTION);
+							stepOne.remove(UI.this.fileList.getSelectedIndex());
+
+							Log("Invalid characters!");
+
+							return;
+						}
+
+						Log("Adding '" + element + "' to package compression queue.");
 
 						stepTwoA.addElement(element);
 						stepOne.remove(UI.this.fileList.getSelectedIndex());
-						stepTwoB.addElement("Create");	
+						stepTwoB.addElement("Create");
 
 						if (stepOne.size() > 0) {
 							fileList.setSelectedIndex(0);
@@ -236,18 +273,7 @@ public class UI extends JFrame{
 						ex.printStackTrace();
 					}
 				}catch (Exception ex2) {
-					int rand = new Random().nextInt(5);
-					if (rand == 0) {
-						Log("There's nothing there, silly!");
-					}else if (rand == 1) {
-						Log("Oh you sure got me! Try picking something next time.");
-					}else if (rand == 2) {
-						Log("Pick something! Oh man, I have too much free time on my hands.");
-					}else if (rand == 3) {
-						Log("HA! YOU THOUGHT. Pick something next time.");
-					}else if (rand == 4) {
-						Log("Not all heroes wear capes. Give Jad a high five for good error handling next time you see him.");
-					}
+
 				}
 			}
 		});
@@ -292,6 +318,8 @@ public class UI extends JFrame{
 		panel_3.add(horizontalStrut, BorderLayout.SOUTH);
 
 		JScrollPane scrollPane_1 = new JScrollPane();
+		scrollPane_1.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+		scrollPane_1.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
 		panel_3.add(scrollPane_1, BorderLayout.CENTER);
 
 		fileList2 = new JList<String>();
@@ -308,9 +336,16 @@ public class UI extends JFrame{
 		fileList2.setModel(stepTwoA);
 
 		JScrollPane scrollPane_2 = new JScrollPane();
+		scrollPane_2.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+		scrollPane_2.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
 		splitPane.setRightComponent(scrollPane_2);
 
 		protocolList2 = new JList<String>();
+		protocolList2.addListSelectionListener(new ListSelectionListener() {
+			public void valueChanged(ListSelectionEvent arg0) {
+				fileList2.setSelectedIndex(protocolList2.getSelectedIndex());
+			}
+		});
 		scrollPane_2.setViewportView(protocolList2);
 		protocolList2.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		protocolList2.setForeground(Color.ORANGE);
@@ -429,55 +464,15 @@ public class UI extends JFrame{
 		progressBar = new JProgressBar();
 		panel_1.add(progressBar, "cell 1 5,growx");
 
-		JButton btnAbort = new JButton("Abort");
+		btnAbort = new JButton("Abort");
 		btnAbort.setEnabled(false);
 		panel_1.add(btnAbort, "cell 2 5,growx");
 
-		JButton btnFinish = new JButton("Start");
+		btnFinish = new JButton("Start");
 		btnFinish.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				try {
-					btnFinish.setEnabled(false);
-					btnAbort.setEnabled(true);
-					Log("Finalizing update package with manifest...");
-					progressBar.setValue(20);
-
-					DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
-					DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
-					Document doc = docBuilder.newDocument();
-
-
-					Element rootElement = doc.createElement("Manifest");
-					doc.appendChild(rootElement);
-
-					int step = 50 / stepTwoA.getSize();
-
-					for (int i = 0; i < stepTwoA.getSize(); i++) {
-						SetStatus("Creating manifest for '" + new File(stepTwoA.get(i)).getName() + "'...");
-						rootElement.setAttribute(new File(stepTwoA.get(i)).getName(), stepTwoB.get(i));
-						progressBar.setValue(progressBar.getValue() + step);
-					}
-
-					TransformerFactory transformerFactory = TransformerFactory.newInstance();
-					Transformer transformer = transformerFactory.newTransformer();
-					DOMSource source = new DOMSource(doc);
-					StreamResult result = new StreamResult(new File("mup_manifest.xml"));
-
-					transformer.transform(source, result);
-
-					progressBar.setValue(70);
-
-					UI.this.addToZipFile("mup_manifest.xml");
-
-					zos.close();
-					fos.close();
-
-					progressBar.setValue(100);
-
-					Log("Done!");
-					btnAbort.setEnabled(false);
-				} catch (IOException | TransformerException | ParserConfigurationException e) {
-					e.printStackTrace();
+				if (stepTwoA.getSize() > 0) {
+					new Thread(new AsyncPackager()).start();
 				}
 			}
 		});
@@ -502,6 +497,7 @@ public class UI extends JFrame{
 		fileList.setModel(stepOne);
 
 		lblStatus = new JLabel("Waiting...");
+		lblStatus.setFont(new Font("Tahoma", Font.PLAIN, 8));
 		lblStatus.setForeground(Color.ORANGE);
 		lblStatus.setBackground(Color.ORANGE);
 		panel_1.add(lblStatus, "cell 1 6,alignx center,growy");
@@ -578,5 +574,77 @@ public class UI extends JFrame{
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+
+	public class AsyncPackager implements Runnable {
+		long startMillis;
+		long endMillis;
+		
+		@Override
+		public void run() {
+			try {
+				startMillis = System.currentTimeMillis();
+				
+				btnFinish.setEnabled(false);
+				btnAbort.setEnabled(true);
+				Log("Finalizing update package with manifest...");
+				progressBar.setValue(20);
+
+				DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
+				DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
+				Document doc = docBuilder.newDocument();
+
+
+				Element rootElement = doc.createElement("Manifest");
+				doc.appendChild(rootElement);
+
+				int step = 50 / stepTwoA.getSize();
+
+				for (int i = 0; i < stepTwoA.getSize(); i++) {
+					SetStatus("Creating manifest for '" + new File(stepTwoA.get(i)).getName() + "'...");
+
+					addToZipFile("temp/" + new File(stepTwoA.get(i)).getName());
+
+					rootElement.setAttribute(new File(stepTwoA.get(i)).getName(), stepTwoB.get(i));
+
+					progressBar.setValue(progressBar.getValue() + step);
+				}
+
+				stepTwoA.clear();
+				stepTwoB.clear();
+
+				TransformerFactory transformerFactory = TransformerFactory.newInstance();
+				Transformer transformer = transformerFactory.newTransformer();
+				DOMSource source = new DOMSource(doc);
+				StreamResult result = new StreamResult(new File("temp/mup_manifest.xml"));
+
+				transformer.transform(source, result);
+
+				progressBar.setValue(70);
+
+				UI.this.addToZipFile("temp/mup_manifest.xml");
+
+				zos.close();
+				fos.close();
+
+				progressBar.setValue(100);
+
+				Log("Done!");
+				
+				new File("temp").delete();
+				
+				btnAbort.setEnabled(false);
+				
+				endMillis = System.currentTimeMillis();
+				
+				int timeSeconds = (int) ((endMillis - startMillis) / 1000);
+				File pkg = new File("update.mup");
+				
+				JOptionPane.showMessageDialog(UI.this, "The package has been successfully built! \n Package: " + pkg.getAbsolutePath() + "\n Size: " + pkg.length() + " bytes \n Time: " + timeSeconds + " s \n \n \n The application will now exit.", "Operation Successful!", JOptionPane.OK_OPTION);
+			} catch (IOException | TransformerException | ParserConfigurationException e) {
+				e.printStackTrace();
+			}
+		}
+
 	}
 }
