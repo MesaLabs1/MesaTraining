@@ -43,3 +43,48 @@
 [addToZipFile@02:39:50 AM]: Writing 'temp/mmo-ui-core.psd' to package file.
 [addToZipFile@02:39:51 AM]: Writing 'temp/mup_manifest.xml' to package file.
 [run@02:39:51 AM]: Done!
+[<init>@09:47:57 AM]: Bootstrapped Update Generator initializing...
+[<init>@09:47:57 AM]: Preparing 'update.mup' for target environment...
+[actionPerformed@09:48:01 AM]: Showing the File Chooser.
+[actionPerformed@09:48:07 AM]: Adding Assembly-CSharp-Editor-vs.csproj to the package queue.
+[actionPerformed@09:48:07 AM]: Adding Assembly-CSharp-Editor.csproj to the package queue.
+[actionPerformed@09:48:07 AM]: Adding Assembly-CSharp-firstpass-vs.csproj to the package queue.
+[actionPerformed@09:48:07 AM]: Adding Assembly-CSharp-firstpass.csproj to the package queue.
+[actionPerformed@09:48:07 AM]: Adding Assembly-CSharp-vs.csproj to the package queue.
+[actionPerformed@09:48:07 AM]: Adding Assembly-CSharp.csproj to the package queue.
+[actionPerformed@09:48:07 AM]: Adding Assembly-UnityScript-Editor-vs.unityproj to the package queue.
+[actionPerformed@09:48:07 AM]: Adding Assembly-UnityScript-Editor.unityproj to the package queue.
+[actionPerformed@09:48:07 AM]: Adding Assembly-UnityScript-firstpass-vs.unityproj to the package queue.
+[actionPerformed@09:48:07 AM]: Adding Assembly-UnityScript-firstpass.unityproj to the package queue.
+[actionPerformed@09:48:07 AM]: Adding Assembly-UnityScript-vs.unityproj to the package queue.
+[actionPerformed@09:48:07 AM]: Adding Assembly-UnityScript.unityproj to the package queue.
+[actionPerformed@09:48:07 AM]: Adding mmo-ui-core.psd to the package queue.
+[actionPerformed@09:48:09 AM]: Adding 'C:\Users\Hack\Documents\Project Charlie\Assembly-CSharp-Editor-vs.csproj' to package compression queue.
+[actionPerformed@09:48:09 AM]: Adding 'C:\Users\Hack\Documents\Project Charlie\Assembly-CSharp-Editor.csproj' to package compression queue.
+[actionPerformed@09:48:09 AM]: Adding 'C:\Users\Hack\Documents\Project Charlie\Assembly-CSharp-firstpass-vs.csproj' to package compression queue.
+[actionPerformed@09:48:09 AM]: Adding 'C:\Users\Hack\Documents\Project Charlie\Assembly-CSharp-firstpass.csproj' to package compression queue.
+[actionPerformed@09:48:09 AM]: Adding 'C:\Users\Hack\Documents\Project Charlie\Assembly-CSharp-vs.csproj' to package compression queue.
+[actionPerformed@09:48:10 AM]: Adding 'C:\Users\Hack\Documents\Project Charlie\Assembly-CSharp.csproj' to package compression queue.
+[actionPerformed@09:48:10 AM]: Adding 'C:\Users\Hack\Documents\Project Charlie\Assembly-UnityScript-Editor-vs.unityproj' to package compression queue.
+[actionPerformed@09:48:10 AM]: Adding 'C:\Users\Hack\Documents\Project Charlie\Assembly-UnityScript-Editor.unityproj' to package compression queue.
+[actionPerformed@09:48:10 AM]: Adding 'C:\Users\Hack\Documents\Project Charlie\Assembly-UnityScript-firstpass-vs.unityproj' to package compression queue.
+[actionPerformed@09:48:11 AM]: Adding 'C:\Users\Hack\Documents\Project Charlie\Assembly-UnityScript-firstpass.unityproj' to package compression queue.
+[actionPerformed@09:48:11 AM]: Adding 'C:\Users\Hack\Documents\Project Charlie\Assembly-UnityScript-vs.unityproj' to package compression queue.
+[actionPerformed@09:48:11 AM]: Adding 'C:\Users\Hack\Documents\Project Charlie\Assembly-UnityScript.unityproj' to package compression queue.
+[actionPerformed@09:48:11 AM]: Adding 'C:\Users\Hack\Documents\Project Charlie\mmo-ui-core.psd' to package compression queue.
+[run@09:48:13 AM]: Finalizing update package with manifest...
+[addToZipFile@09:48:13 AM]: Writing 'temp/Assembly-CSharp-Editor-vs.csproj' to package file.
+[addToZipFile@09:48:13 AM]: Writing 'temp/Assembly-CSharp-Editor.csproj' to package file.
+[addToZipFile@09:48:13 AM]: Writing 'temp/Assembly-CSharp-firstpass-vs.csproj' to package file.
+[addToZipFile@09:48:13 AM]: Writing 'temp/Assembly-CSharp-firstpass.csproj' to package file.
+[addToZipFile@09:48:13 AM]: Writing 'temp/Assembly-CSharp-vs.csproj' to package file.
+[addToZipFile@09:48:13 AM]: Writing 'temp/Assembly-CSharp.csproj' to package file.
+[addToZipFile@09:48:13 AM]: Writing 'temp/Assembly-UnityScript-Editor-vs.unityproj' to package file.
+[addToZipFile@09:48:13 AM]: Writing 'temp/Assembly-UnityScript-Editor.unityproj' to package file.
+[addToZipFile@09:48:13 AM]: Writing 'temp/Assembly-UnityScript-firstpass-vs.unityproj' to package file.
+[addToZipFile@09:48:13 AM]: Writing 'temp/Assembly-UnityScript-firstpass.unityproj' to package file.
+[addToZipFile@09:48:13 AM]: Writing 'temp/Assembly-UnityScript-vs.unityproj' to package file.
+[addToZipFile@09:48:13 AM]: Writing 'temp/Assembly-UnityScript.unityproj' to package file.
+[addToZipFile@09:48:13 AM]: Writing 'temp/mmo-ui-core.psd' to package file.
+[addToZipFile@09:48:14 AM]: Writing 'temp/mup_manifest.xml' to package file.
+[run@09:48:14 AM]: Done!
