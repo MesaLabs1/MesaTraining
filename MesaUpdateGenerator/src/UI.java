@@ -91,6 +91,7 @@ public class UI extends JFrame{
 	JLabel lblStatus;
 	JButton btnFinish;
 	JButton btnAbort;
+	JButton btnHideSidebar;
 
 	public static void main(String[] args) {
 		new UI();
@@ -147,7 +148,7 @@ public class UI extends JFrame{
 		getContentPane().add(panel_1, BorderLayout.CENTER);
 		panel_1.setLayout(new MigLayout("", "[48px:n:48px][412px:n:412px,grow][64px:n:64px][grow]", "[][][140px:n:140px][][grow][][]"));
 
-		JButton btnHideSidebar = new JButton("Close Console");
+		btnHideSidebar = new JButton("Close Console");
 		btnHideSidebar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				sidebar.setVisible(!sidebar.isVisible());
