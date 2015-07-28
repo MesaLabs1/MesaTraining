@@ -25,6 +25,7 @@ import javax.swing.JButton;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import java.awt.event.ActionEvent;
 import javax.swing.plaf.ColorUIResource;
 import javax.swing.border.EtchedBorder;
@@ -307,18 +308,142 @@ public class QuizUI extends Applet {
 		
 		this.setSize(640, 480);
 		
-		SwitchToQuizMode();
+		switchToQuizMode();
 	}
 	
-	public void SwitchToQuizMode() {
+	public void switchToQuizMode() {
 		pnlHolder.add(pnlQuiz, BorderLayout.CENTER);
 		pnlHolder.remove(pnlInstruction);
 	}
 	
-	public void SwitchToReadingMode() {
+	public void switchToReadingMode() {
 		pnlHolder.add(pnlInstruction, BorderLayout.CENTER);
 		pnlHolder.remove(pnlQuiz);
 	}
 	
+	public void nenerateQuiz() {
+		
+	}
+	
+	public void nextQuestion() {
+	
+	}
+	
 	private static final long serialVersionUID = -3138705569063633507L;
+	
+	public class Quiz {
+		ArrayList<QuizQuestion> questions;
+		ArrayList<String> responses;
+		int progress = 0;
+		int total = -1;
+		
+		String quizTitle;
+		
+		public Quiz(String title, ArrayList<QuizQuestion> questions) {
+			this.questions = questions;
+			if (questions == null) {
+				questions = new ArrayList<QuizQuestion>();
+			}
+			total = questions.size();
+			
+			quizTitle = title;
+		}
+		
+		public String getTitle() {
+			return quizTitle;
+		}
+		
+		public void addQuestion(QuizQuestion q) {
+			questions.add(q);
+			total = questions.size();
+		}
+		
+		public void removeQuestion(String question) {
+			for (QuizQuestion q : questions) {
+				if (q.question.equals(question)) {
+					questions.remove(q);
+				}
+			}
+			total = questions.size();
+		}
+		
+		public void respondToCurrentQuestion(String response) {
+			responses.add(progress, response);
+		}
+		
+		public QuizQuestion getNextQuestion() {
+			progress++;
+			if (progress <= questions.size()) {
+				return questions.get(progress);
+			}
+			progress = -1;
+			return null;
+		}
+		
+		public QuizQuestion generateQuestion(String question, String[] options, int correctIndex) {
+			return new QuizQuestion(question, options, correctIndex);
+		}
+		
+		public float gradeQuiz() {
+			float percentage = 0.0f;
+			int correct = 0;
+			ArrayList<Integer> incorrectIndicies = new ArrayList<Integer>();
+			
+			for (int i = 0; i < questions.size(); i++) {
+				QuizQuestion q = questions.get(i);
+				String response = responses.get(i);
+				if (q.isValid(response)) {
+					correct++;
+				}else {
+					incorrectIndicies.add(i);
+				}
+			}
+			
+			percentage = correct / total;
+			
+			return percentage;
+		}
+		
+		public class QuizQuestion {
+			String question;
+			
+			String[] options;
+			int correctIndex;
+			
+			public QuizQuestion(String question, String[] options, int correctIndex) {
+				this.question = question;
+				this.options = options;
+				this.correctIndex = correctIndex;
+			}
+			
+			public boolean isValid (int index) {
+				if (index == correctIndex) {
+					return true;
+				}
+				return false;
+			}
+			
+			public boolean isValid (String response) {
+				if (response.equals(options[correctIndex])) {
+					return true;
+				}
+				return false;
+			}
+			
+			public String getQuestion() {
+				return question;
+			}
+			
+			public String[] getOptions() {
+				return options;
+			}
+		}
+	}
+	
+	public class Instruction {
+		
+		public Instruction() {
+			
+		}
+	}
 }
