@@ -25,12 +25,25 @@ import javax.swing.JButton;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import java.awt.event.ActionListener;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.awt.event.ActionEvent;
 import javax.swing.plaf.ColorUIResource;
 import javax.swing.border.EtchedBorder;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultTreeModel;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.w3c.dom.Document;
+import org.xml.sax.SAXException;
+
 import javax.swing.tree.DefaultMutableTreeNode;
 
 public class QuizUI extends Applet {
@@ -39,6 +52,11 @@ public class QuizUI extends Applet {
 	JPanel pnlHolder;
 	JPanel pnlInstruction;
 	JPanel pnlQuiz;
+	
+	DocumentBuilderFactory dbFactory;
+	File dbFile;
+	DocumentBuilder dbBuilder;
+	Document doc;
 	
 	public QuizUI() {
 		try {
@@ -308,7 +326,7 @@ public class QuizUI extends Applet {
 		
 		this.setSize(640, 480);
 		
-		switchToQuizMode();
+		switchToReadingMode();
 	}
 	
 	public void switchToQuizMode() {
@@ -321,13 +339,30 @@ public class QuizUI extends Applet {
 		pnlHolder.remove(pnlQuiz);
 	}
 	
-	public void generateQuiz() {
+	public void readManifest() {
 		
 	}
 	
-	public void nextQuestion() {
-	
+	public void LoadConfigFile(String target) {		
+		dbFile = new File(target);
+		dbFactory = DocumentBuilderFactory.newInstance();
+		dbBuilder = null;
+		try {
+			dbBuilder = dbFactory.newDocumentBuilder();
+		} catch (ParserConfigurationException e) {
+			e.printStackTrace();
+		}
+		doc = null;
+		try {
+			doc = dbBuilder.parse(dbFile);
+		} catch (SAXException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		doc.getDocumentElement().normalize();
 	}
+
 	
 	private static final long serialVersionUID = -3138705569063633507L;
 	
@@ -505,5 +540,30 @@ public class QuizUI extends Applet {
 				return index;
 			}
 		}
+	}
+	
+	private static final int CLIENT_CODE_STACK_INDEX;
+	
+	static {
+		int i = 0;
+		for (StackTraceElement ste : Thread.currentThread().getStackTrace()) {
+			i++;
+			if (ste.getClassName().equals(QuizUI.class.getName())) {
+				break;
+			}
+		}
+		CLIENT_CODE_STACK_INDEX = i;
+	}
+
+	private static SimpleDateFormat timeFormatter= new SimpleDateFormat("hh:mm:ss a");
+
+	void Log(String message) {
+		Date date = new Date();
+		String sender = Thread.currentThread().getStackTrace()[CLIENT_CODE_STACK_INDEX].getMethodName();
+		String time = timeFormatter.format(date);
+
+		String log = "[" + sender + "@" + time +"]: " + message;
+		
+		System.out.println(log);
 	}
 }
