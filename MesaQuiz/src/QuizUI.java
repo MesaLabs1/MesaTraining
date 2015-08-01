@@ -321,7 +321,7 @@ public class QuizUI extends Applet {
 		pnlHolder.remove(pnlQuiz);
 	}
 	
-	public void nenerateQuiz() {
+	public void generateQuiz() {
 		
 	}
 	
@@ -441,9 +441,69 @@ public class QuizUI extends Applet {
 	}
 	
 	public class Instruction {
+		ArrayList<InstructionPage> pages;
+		String instructionTitle;
 		
-		public Instruction() {
+		int progress;
+		
+		public Instruction(String instructionTitle) {
+			pages = new ArrayList<InstructionPage>();
+			this.instructionTitle = instructionTitle;
+			progress = 0;
+		}
+		
+		public InstructionPage nextPage() {
+			progress++;
+			if (progress > 0 && progress < pages.size()) {
+				return pages.get(progress);
+			}else {
+				return new InstructionPage("You have completed this lesson!", -1);
+			}
+		}
+		
+		public InstructionPage prevPage() {
+			progress--;
+			if (progress > 0 && progress < pages.size()) {
+				return pages.get(progress);
+			}else {
+				return new InstructionPage("Click next to begin the lesson!", -1);
+			}
+		}
+		
+		public InstructionPage getPageAt(int i) {
+			if (i > 0 && i < pages.size()) {
+				return pages.get(i);
+			}else {
+				return null;
+			}
+		}
+		
+		public void addPage(String text) {
+			pages.add(new InstructionPage(text, pages.size()));
+		}
+		
+		public void insertPage(String text, int index) {
+			if (index > 0 && index < pages.size()) {
+				pages.add(new InstructionPage(text, index));
+			}
+		}
+		
+		public class InstructionPage {
+			String pageText = "";
+			int index;
 			
+			public InstructionPage(String text, int index) {
+				pageText = text;
+				this.index = index;
+			}
+			
+			public String getText() {
+				return pageText;
+			}
+			
+			public int getIndex() {
+				return index;
+			}
 		}
 	}
 }
