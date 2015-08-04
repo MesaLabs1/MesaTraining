@@ -1,1 +1,14 @@
-<Curriculum></Curriculum>
+<Curriculum>
+	
+	
+	
+	<Archive><Lesson_1 Name="Introduction to Lesson Making" Manifest="Page_1;Page_2;Quiz_1;Page_3;Page_4;Quiz_2">
+		<Pages Page_1="This is some text that would go on page one." Page_2="This is some text that goes on page two."></Pages>
+		<Quizzes>
+			<Quiz_1>
+				<Question_1 Question="This is the text that will appear as the query. How was your day today?" Value="1">
+					<Answers a00000000="This is a potential answer. My value is 0." a00000001="This is the correct answer. My value is 1." a00000002="This is another answer. I am incorrect. My value is 2."></Answers></Question_1>
+				<Question_2 Question="Do you love Mesa Labs?" Value="0">
+					<Answers a00000000="Yes." a00000001="No."></Answers></Question_2></Quiz_1></Quizzes></Lesson_1><Lesson_2></Lesson_2><Lesson_3></Lesson_3></Archive>
+	<Store>
+		<jaboulhosn Progress="lesson_1;quiz_1"></jaboulhosn></Store></Curriculum>

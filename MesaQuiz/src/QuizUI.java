@@ -326,7 +326,7 @@ public class QuizUI extends Applet {
 		
 		this.setSize(640, 480);
 		
-		switchToReadingMode();
+		switchToQuizMode();
 	}
 	
 	public void switchToQuizMode() {
