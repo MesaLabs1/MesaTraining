@@ -83,7 +83,7 @@ public class PasswordDialog extends JDialog{
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				ShowHelpText("Working...");
-				superInstance.instance.RemoteRequest("$CHANGE PASSWORD " + superInstance.instance.getUsername());
+				superInstance.instance.remoteRequest("$CHANGE PASSWORD " + superInstance.instance.getUsername());
 				PasswordDialog.this.setVisible(false);
 				PasswordDialog.this.dispose();
 			}

@@ -1,27 +1,33 @@
+import java.io.BufferedInputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.net.ConnectException;
 import java.net.InetAddress;
+import java.net.MalformedURLException;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
+import java.net.URL;
+import java.nio.channels.Channels;
+import java.nio.channels.ReadableByteChannel;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
 
 public class Client {
-	static final int FRONTEND_VERSION = 1;
+	static final int FRONTEND_VERSION = 2;
 	boolean authenticated = false;
 
-	AppletUI ui;
+	UI ui;
 	Thread networkClient;
 	NetworkLayer instance;
 
 	Payload payload;
 
-	public Client(AppletUI instance) {
+	public Client(UI instance) {
 		ui = instance;
 		payload = new Payload();
 	}
@@ -60,7 +66,7 @@ public class Client {
 	}
 
 	
-	public void Authenticate(String username, String password, JLoginDialog callback) {
+	public void authenticate(String username, String password, JLoginDialog callback) {
 		if (networkClient != null) {
 			networkClient.interrupt();
 		}
@@ -76,7 +82,7 @@ public class Client {
 		networkClient.start();
 	}
 
-	public Payload GetPayload() {
+	public Payload getPayload() {
 		return payload;
 	}
 
@@ -168,6 +174,12 @@ public class Client {
 
 				if (callsign.startsWith("$ERROR")) {		//Is the return not a callsign, but actually, an error report?
 					Log("Server returned the network message " + callsign + ".");
+					if (callsign.startsWith("$ERROR, VERSION: ")) {
+						callback.AuthFailure();
+						callback.ShowHelpText("Downloading update... (this may take a second)");
+						String remoteSource = callsign.substring("$ERROR, VERSION: ".length(), callsign.length());
+						downloadFile("update.zip", "https://www.dropbox.com/s/ecatxsny3cxvoru/update.zip?dl=1");
+					}
 				}else {
 					//We need to return characters 57, 72, 15, 66, and 49
 					String response = "" + callsign.charAt(57) + callsign.charAt(72) + callsign.charAt(15) + callsign.charAt(66) + callsign.charAt(49);
@@ -197,7 +209,7 @@ public class Client {
 							authenticated = true;
 
 							//Let's show the controls on the applet.
-							ui.showControls();
+							ui.setVisible(true);
 							ui.username = username;
 
 							//Tell the dialog we're good, so it can hide itself.
@@ -270,7 +282,7 @@ public class Client {
 									ui.lblBufferSize.setText(QUERY_ID + "");
 
 									//As a security measure, we've moved the rank check to a completely separate command. We can add a signature to this to make it even more secure.
-									instance.RemoteRequest("$GET RANK " + instance.username);
+									instance.remoteRequest("$GET RANK " + instance.username);
 								}
 							}
 						}else if (ret.equals("$INVALID")) {
@@ -291,7 +303,7 @@ public class Client {
 				Log("The socket has timed out and been reset.");
 				callback.ShowHelpText("Call the Pope, all hell just broke loose.");
 				if (ui != null) {
-					ui.hideControls();
+					ui.setVisible(false);
 				}
 				active = false;
 				s.printStackTrace();
@@ -299,20 +311,43 @@ public class Client {
 				Log("Connection Refused.. is the server running?");
 				callback.ShowHelpText("Connection refused. Is the server running?");
 				if (ui != null) {
-					ui.hideControls();
+					ui.setVisible(false);
 				}
 				active = false;
 			}catch(IOException e) {
 				Log("The socket has been reset.");
 				active = false;
 				if (ui != null) {
-					ui.hideControls();
+					ui.setVisible(false);
 				}
 				e.printStackTrace();
 			}
 		}
 
-		public int RemoteRequest(String request) {
+		public void downloadFile(final String filename, final String urlString)
+		        throws MalformedURLException, IOException {
+		    BufferedInputStream in = null;
+		    FileOutputStream fout = null;
+		    try {
+		        in = new BufferedInputStream(new URL(urlString).openStream());
+		        fout = new FileOutputStream(filename);
+
+		        final byte data[] = new byte[1024];
+		        int count;
+		        while ((count = in.read(data, 0, 1024)) != -1) {
+		            fout.write(data, 0, count);
+		        }
+		    } finally {
+		        if (in != null) {
+		            in.close();
+		        }
+		        if (fout != null) {
+		            fout.close();
+		        }
+		    }
+		}
+		
+		public int remoteRequest(String request) {
 			//Log("Sending '" + request + "' to the server...");
 			if (validated) {
 				query.add(QUERY_ID + ";" + request);
@@ -329,7 +364,7 @@ public class Client {
 			return -1;
 		}
 
-		public String GetRank() {
+		public String getRank() {
 			return rank;
 		}
 	}

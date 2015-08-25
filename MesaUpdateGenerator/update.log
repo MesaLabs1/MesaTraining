@@ -88,3 +88,24 @@
 [addToZipFile@09:48:13 AM]: Writing 'temp/mmo-ui-core.psd' to package file.
 [addToZipFile@09:48:14 AM]: Writing 'temp/mup_manifest.xml' to package file.
 [run@09:48:14 AM]: Done!
+[<init>@07:22:36 AM]: Bootstrapped Update Generator initializing...
+[<init>@07:22:36 AM]: Preparing 'update.mup' for target environment...
+[actionPerformed@07:22:38 AM]: Showing the File Chooser.
+[actionPerformed@07:26:03 AM]: Adding mesaconnect.jar to the package queue.
+[actionPerformed@07:26:05 AM]: Adding 'C:\Users\Hack\git\MesaTraining\MesaFrontEnd\mesaconnect.jar' to package compression queue.
+[actionPerformed@07:26:07 AM]: Setting 'C:\Users\Hack\git\MesaTraining\MesaFrontEnd\mesaconnect.jar' to an Update file.
+[run@07:26:09 AM]: Finalizing update package with manifest...
+[addToZipFile@07:26:09 AM]: Writing 'temp/mesaconnect.jar' to package file.
+[addToZipFile@07:26:10 AM]: Writing 'temp/mup_manifest.xml' to package file.
+[run@07:26:10 AM]: Done!
+[<init>@07:29:51 AM]: Bootstrapped Update Generator initializing...
+[<init>@07:29:51 AM]: Preparing 'update.mup' for target environment...
+[actionPerformed@07:29:52 AM]: Showing the File Chooser.
+[actionPerformed@07:30:27 AM]: Adding mesaconnect.jar to the package queue.
+[actionPerformed@07:30:29 AM]: Showing the File Chooser.
+[actionPerformed@07:30:36 AM]: Adding 'C:\Users\Hack\git\MesaTraining\MesaFrontEnd\mesaconnect.jar' to package compression queue.
+[actionPerformed@07:30:37 AM]: Setting 'C:\Users\Hack\git\MesaTraining\MesaFrontEnd\mesaconnect.jar' to an Update file.
+[run@07:31:31 AM]: Finalizing update package with manifest...
+[addToZipFile@07:31:31 AM]: Writing 'temp/mesaconnect.jar' to package file.
+[addToZipFile@07:31:31 AM]: Writing 'temp/mup_manifest.xml' to package file.
+[run@07:31:31 AM]: Done!

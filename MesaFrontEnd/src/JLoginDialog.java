@@ -110,7 +110,7 @@ public class JLoginDialog extends JDialog{
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				ShowHelpText("Authenticating...");
-				superInstance.Authenticate(usernameField.getText(), new String(passwordField.getPassword()), JLoginDialog.this);
+				superInstance.authenticate(usernameField.getText(), new String(passwordField.getPassword()), JLoginDialog.this);
 			}
 		});
 		panel_1.add(btnAuthenticate, "cell 1 6");
@@ -148,5 +148,9 @@ public class JLoginDialog extends JDialog{
 	
 	public void ShowHelpText(String text) {
 		lblHelptext_1.setText(text);
+	}
+	
+	public void DoUpdate (String remotePackage) {
+		
 	}
 }

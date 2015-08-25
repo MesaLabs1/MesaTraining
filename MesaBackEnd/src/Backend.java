@@ -682,7 +682,7 @@ public class Backend {
 							util.Log("MISMATCH! Client says their IP is " + remoteIP + " but we see " + server.getRemoteSocketAddress() + "! Closing the Server!");
 						}
 					}else {
-						out.writeUTF("$ERROR, VERSION");
+						out.writeUTF("$ERROR, VERSION: " + propMaster.BACKEND_UPDATE_TARGET);
 						util.Log("MISMATCH! Client is version " + remoteVersion + " but we are version " + propMaster.BACKEND_VERSION + "! Closing the Server!");
 					}
 				}catch(SocketTimeoutException s) {

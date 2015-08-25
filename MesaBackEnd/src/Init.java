@@ -154,6 +154,7 @@ public class Init {
 		propMaster.NETWORK_MAX_CONNECTIONS = Integer.parseInt(GetAttributeByNode("Network", "MaxConnections"));
 		propMaster.NETWORK_MAX_OVERHEAD = Integer.parseInt(GetAttributeByNode("Network", "MaxOverhead"));
 		propMaster.NETWORK_PORT = Integer.parseInt(GetAttributeByNode("Network", "Port"));
+		propMaster.BACKEND_UPDATE_TARGET = GetAttributeByNode("Network", "Update");
 
 		propMaster.BACKEND_VERSION = Integer.parseInt(GetAttributeByNode("INIT", "Version"));
 	}
@@ -232,6 +233,7 @@ public class Init {
 		Utils util = new Utils();
 		UI ui;
 		int BACKEND_VERSION = 1;
+		String BACKEND_UPDATE_TARGET = "";
 
 		final String newline = System.getProperty("line.separator");
 

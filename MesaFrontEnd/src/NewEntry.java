@@ -552,7 +552,7 @@ public class NewEntry extends JDialog{
 			String date =  month + day + year + ";" + hour + minute + "00";
 
 			String req = "$CREATE ENTRY " + pilots + " " + date + " " + txtAircraft.getText() + " " + type + " " + notes;
-			network.instance.RemoteRequest(req);
+			network.instance.remoteRequest(req);
 			return true;
 		}catch (Exception e) {
 			e.printStackTrace();

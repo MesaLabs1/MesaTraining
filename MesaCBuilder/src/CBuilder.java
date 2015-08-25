@@ -14,9 +14,11 @@ import javax.swing.Box;
 import javax.swing.JTextArea;
 import javax.swing.JRadioButton;
 import javax.swing.JCheckBox;
+import javax.swing.JFrame;
 import javax.swing.JProgressBar;
 
-public class CBuilder extends Applet{
+public class CBuilder extends JFrame{
+	
 	public CBuilder() {
 		setLayout(new BorderLayout(0, 0));
 		
@@ -53,7 +55,11 @@ public class CBuilder extends Applet{
 		JPanel pnlMain = new JPanel();
 		pnlMain.setBackground(Color.GRAY);
 		
-		add(pnlMain, BorderLayout.CENTER);
+		JPanel pnlHolder = new JPanel();
+		pnlHolder.setLayout(new BorderLayout());
+		
+		add(pnlHolder, BorderLayout.CENTER);
+		
 		pnlMain.setLayout(new MigLayout("", "[][][grow]", "[][][grow][grow]"));
 		
 		JLabel lblNewLabel = new JLabel("You can either select an existing entry, or create another one. Simply navigate the tree to begin.");
@@ -191,6 +197,8 @@ public class CBuilder extends Applet{
 		lblVersion.setForeground(Color.WHITE);
 		lblVersion.setBackground(Color.WHITE);
 		pnlStart.add(lblVersion, "cell 0 5 3 1,alignx right,aligny bottom");
+		
+		pnlHolder.add(pnlMain, BorderLayout.CENTER);
 		
 		this.setSize(640, 480);
 	}

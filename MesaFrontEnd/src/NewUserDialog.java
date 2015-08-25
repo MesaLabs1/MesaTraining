@@ -140,7 +140,7 @@ public class NewUserDialog extends JDialog{
 				}else if (radioUser.isSelected()) {
 					selectedRank = "user";
 				}
-				superInstance.instance.RemoteRequest("$CREATE USER " + usernameField.getText() + " " + new String(passwordField.getPassword()) + " " + selectedRank);
+				superInstance.instance.remoteRequest("$CREATE USER " + usernameField.getText() + " " + new String(passwordField.getPassword()) + " " + selectedRank);
 				NewUserDialog.this.setVisible(false);
 				NewUserDialog.this.dispose();
 			}
