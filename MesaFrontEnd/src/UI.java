@@ -98,7 +98,13 @@ public class UI extends JFrame{
 	Client client;
 
 	//UI Stuffs
+	QuizUI quizUI;
+	JPanel pnlInternalPane;
+	boolean quizVisible = false;
+	
 	JScrollPane scrollPane;
+	
+	JButton btnLogout;
 
 	JLabel lblUsername;
 	JLabel lblTime;
@@ -178,6 +184,7 @@ public class UI extends JFrame{
 	}
 
 	public UI() {
+		quizUI = new QuizUI();
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		getContentPane().setBackground(Color.BLACK);
 		try {
@@ -205,15 +212,12 @@ public class UI extends JFrame{
 		//Allocate all Resources, make sure they're there, etc etc
 		AllocateResources();
 
-		//Set the size of the Application to half the screen's Width, and half the height.
-		//this.setSize(new Dimension(SCREEN_SIZE_X / 2, SCREEN_SIZE_Y / 2));
-
 		/*
 		 * Since we used MIGLayout, which resizes controls automatically with screen size changes, we can design this interface as
 		 * large as possible, as assume it can shrink it for us if necessary. In this case, I have chosen the size of my desktop's
 		 * monitor in Eclipse (to avoid scrolling around). In the future, another developer could set it to something even larger if they wanted to.
 		 */
-		this.setMinimumSize(new Dimension(896, 606));
+		this.setMinimumSize(new Dimension(1024, 606));
 		this.setSize(896, 606);
 		getContentPane().setLayout(new BorderLayout(0, 0));
 
@@ -256,6 +260,7 @@ public class UI extends JFrame{
 			@Override
 			public void mousePressed(MouseEvent e) {
 				pnlNotification1.setBorder(BorderFactory.createLoweredBevelBorder());
+				UI.this.buttonOne();
 			}
 			@Override
 			public void mouseReleased(MouseEvent e) {
@@ -320,6 +325,7 @@ public class UI extends JFrame{
 			@Override
 			public void mousePressed(MouseEvent e) {
 				pnlNotification2.setBorder(BorderFactory.createLoweredBevelBorder());
+				buttonTwo();
 			}
 			@Override
 			public void mouseReleased(MouseEvent e) {
@@ -344,6 +350,7 @@ public class UI extends JFrame{
 			@Override
 			public void mousePressed(MouseEvent e) {
 				pnlNotification3.setBorder(BorderFactory.createLoweredBevelBorder());
+				buttonThree();
 			}
 			@Override
 			public void mouseReleased(MouseEvent e) {
@@ -353,7 +360,14 @@ public class UI extends JFrame{
 		pnlNotification3.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
 		pnlHeader.add(pnlNotification3, "cell 21 0,grow");
 
-		JButton btnLogout = new JButton("Logout");
+		btnLogout = new JButton("Logout");
+		btnLogout.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if (btnLogout.isEnabled()) {
+					System.exit(0);
+				}
+			}
+		});
 		btnLogout.setForeground(Color.WHITE);
 		btnLogout.setBackground(Color.GRAY);
 		pnlHeader.add(btnLogout, "cell 23 0,aligny baseline");
@@ -382,7 +396,7 @@ public class UI extends JFrame{
 		lblUserPermissions.setForeground(Color.WHITE);
 		pnlFooter.add(lblUserPermissions, "cell 16 0");
 
-		JPanel pnlInternalPane = new JPanel();
+		pnlInternalPane = new JPanel();
 		getContentPane().add(pnlInternalPane, BorderLayout.CENTER);
 		pnlInternalPane.setBorder(new EtchedBorder(EtchedBorder.RAISED, null, null));
 		pnlInternalPane.setBackground(Color.BLACK);
@@ -1076,6 +1090,27 @@ public class UI extends JFrame{
 		return out;
 	}
 	
+	public void buttonOne() {
+		quizVisible = !quizVisible;
+		if (quizVisible) {
+			this.getContentPane().remove(pnlInternalPane);
+			this.getContentPane().add(quizUI, BorderLayout.CENTER);
+		}else {
+			this.getContentPane().remove(quizUI);
+			this.getContentPane().add(pnlInternalPane, BorderLayout.CENTER);
+		}
+		this.getContentPane().validate();
+		this.getContentPane().repaint();
+	}
+	
+	public void buttonTwo() {
+		
+	}
+	
+	public void buttonThree() {
+		
+	}
+	
 	public void ShowUIDialog(String title, String message) {
 		JOptionPane.showMessageDialog(SwingUtilities.windowForComponent(this), message, title, JOptionPane.INFORMATION_MESSAGE);
 	}
@@ -1127,7 +1162,7 @@ public class UI extends JFrame{
 		public EventHandler() {
 			superInstance = UI.this;
 		}
-
+		
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
 			lblUsername.setText(username + "!");

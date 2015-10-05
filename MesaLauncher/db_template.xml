@@ -1,0 +1,15 @@
+<Database Header="com.mesalabs1.xml.database">
+	<!--Database contains all USER and AIRCRAFT information.--><Data>
+		<!--Contains Date, Pilot, Aircraft, and Logs for Repair, Training, Flight, and Administration--><Date></Date>
+		<Pilot>
+		</Pilot><Aircraft>
+</Aircraft><Logs><Repair></Repair><Training></Training>
+	<Flight></Flight>
+	<Administration></Administration></Logs>
+		
+		
+	</Data>
+	
+	<Users>
+		<admin Password="root" Rank="superadmin" LastLogin="18082015;072941"><!--Pre-loaded admin user profile. Delete or change password before going live!--></admin></Users>
+</Database>

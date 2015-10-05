@@ -1,5 +1,3 @@
-import java.applet.Applet;
-
 import java.awt.BorderLayout;
 import java.awt.Color;
 
@@ -46,7 +44,7 @@ import org.xml.sax.SAXException;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 
-public class QuizUI extends Applet {
+public class QuizUI extends JPanel {
 	JPanel pnlSideMenu;
 	JPanel pnlMain;
 	JPanel pnlHolder;
@@ -59,28 +57,106 @@ public class QuizUI extends Applet {
 	Document doc;
 	
 	public QuizUI() {
-		try {
-			UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
-			UIManager.getLookAndFeelDefaults().put("Tree.background", new ColorUIResource(Color.darkGray));
-			UIManager.getDefaults().put("Button.showMnemonics", Boolean.TRUE);
-		}catch (UnsupportedLookAndFeelException e) {
-			e.printStackTrace();
-		}catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		}catch (InstantiationException e) {
-			e.printStackTrace();
-		}catch (IllegalAccessException e) {
-			e.printStackTrace();
-		}
-
-		
 		setBackground(Color.BLACK);
 		setLayout(new BorderLayout(0, 0));
 		
+		pnlInstruction = new JPanel();
+		pnlInstruction.setBackground(Color.GRAY);
+		pnlInstruction.setLayout(new MigLayout("", "[grow][]", "[][grow][]"));
+		
+		JLabel lblTitle = new JLabel("Learning Material Title");
+		pnlInstruction.add(lblTitle, "flowx,cell 0 0,alignx left,aligny top");
+		lblTitle.setFont(new Font("Copperplate", Font.PLAIN, 24));
+		
+		JLabel lblPages = new JLabel("Total Pages: XX");
+		pnlInstruction.add(lblPages, "cell 1 0,alignx right,aligny center");
+		
+		JTextArea txtInformation = new JTextArea();
+		txtInformation.setEditable(false);
+		txtInformation.setEnabled(false);
+		txtInformation.setDisabledTextColor(Color.BLACK);
+		txtInformation.setLineWrap(true);
+		txtInformation.setWrapStyleWord(true);
+		txtInformation.setFont(new Font("Monospaced", Font.ITALIC, 13));
+		txtInformation.setText("This is instructional material. It can take up many lines, and therefore can be used to teach quite a large quantity of information.\r\n\r\nThis is another line.");
+		txtInformation.setForeground(Color.BLACK);
+		txtInformation.setBackground(Color.GRAY);
+		pnlInstruction.add(txtInformation, "cell 0 1 2 1,grow");
+		
+		JPanel pnlBar = new JPanel();
+		pnlBar.setBackground(Color.GRAY);
+		pnlInstruction.add(pnlBar, "cell 0 2 2 1,growx,aligny bottom");
+		
+		JButton btnBack = new JButton("<");
+		btnBack.setForeground(Color.LIGHT_GRAY);
+		btnBack.setBackground(Color.DARK_GRAY);
+		pnlBar.add(btnBack);
+		
+		JLabel lblPage = new JLabel("Page ##");
+		lblPage.setFont(new Font("Trajan Pro", Font.PLAIN, 14));
+		pnlBar.add(lblPage);
+		
+		JButton btnForward = new JButton(">");
+		btnForward.setForeground(Color.LIGHT_GRAY);
+		btnForward.setBackground(Color.DARK_GRAY);
+		pnlBar.add(btnForward);
+		//pnlHolder.add(pnlInstruction, BorderLayout.CENTER);
+		
+		Component horizontalStrut_2 = Box.createHorizontalStrut(128);
+		pnlInstruction.add(horizontalStrut_2, "cell 0 0,grow");
+		
+		this.setSize(640, 480);
+		
+		JPanel outer = new JPanel();
+		outer.setBackground(Color.BLACK);
+		add(outer, BorderLayout.CENTER);
+		outer.setLayout(new BorderLayout(0, 0));
+		
+		JPanel inner = new JPanel();
+		outer.add(inner);
+		inner.setLayout(new BorderLayout(0, 0));
+		
+		JPanel pnlHeader = new JPanel();
+		inner.add(pnlHeader, BorderLayout.NORTH);
+		pnlHeader.setBackground(Color.GRAY);
+		pnlHeader.setBorder(new BevelBorder(BevelBorder.RAISED, null, null, null, null));
+		pnlHeader.setLayout(new MigLayout("", "[][][][][][grow][]", "[][]"));
+		
+		JLabel lblNewLabel = new JLabel("Lesson XX, Section XX - STATUS");
+		lblNewLabel.setFont(new Font("Lucida Grande", Font.BOLD, 18));
+		pnlHeader.add(lblNewLabel, "cell 0 0 7 1,growx,aligny center");
+		
+		JLabel lblProgress = new JLabel("Progress:");
+		pnlHeader.add(lblProgress, "flowx,cell 1 1");
+		
+		JLabel lblProgressText = new JLabel("XXX/XXX Questions");
+		pnlHeader.add(lblProgressText, "cell 4 1,alignx center");
+		
+		JButton btnViewPlan = new JButton("View Lesson Plan");
+		btnViewPlan.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				if (pnlSideMenu.isVisible()) {
+					pnlSideMenu.setVisible(false);
+					((MigLayout)pnlMain.getLayout()).setColumnConstraints("[0px:n:0px,grow][grow][][grow]");
+					QuizUI.this.validate();
+				}else {
+					pnlSideMenu.setVisible(true);
+					((MigLayout)pnlMain.getLayout()).setColumnConstraints("[grow][grow][][grow]");
+					QuizUI.this.validate();
+				}
+			}
+		});
+		pnlHeader.add(btnViewPlan, "cell 6 1");
+		btnViewPlan.setForeground(Color.WHITE);
+		btnViewPlan.setBackground(Color.DARK_GRAY);
+		
+		JProgressBar progressBar = new JProgressBar();
+		pnlHeader.add(progressBar, "cell 1 1 3 1,growx");
+		
 		pnlMain = new JPanel();
+		inner.add(pnlMain, BorderLayout.CENTER);
 		pnlMain.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
 		pnlMain.setBackground(Color.DARK_GRAY);
-		add(pnlMain, BorderLayout.CENTER);
 		pnlMain.setLayout(new MigLayout("", "[0px:n:0px][grow][grow][grow]", "[][grow][grow][grow][]"));
 		
 		JLabel lblTime = new JLabel("XX:XX Remaining");
@@ -154,53 +230,8 @@ public class QuizUI extends Applet {
 		
 		pnlHolder.setLayout(new BorderLayout(0, 0));
 		
-		pnlInstruction = new JPanel();
-		pnlInstruction.setBackground(Color.GRAY);
-		pnlInstruction.setLayout(new MigLayout("", "[grow][]", "[][grow][]"));
-		
-		JLabel lblTitle = new JLabel("Learning Material Title");
-		pnlInstruction.add(lblTitle, "flowx,cell 0 0,alignx left,aligny top");
-		lblTitle.setFont(new Font("Copperplate", Font.PLAIN, 24));
-		
-		JLabel lblPages = new JLabel("Total Pages: XX");
-		pnlInstruction.add(lblPages, "cell 1 0,alignx right,aligny center");
-		
-		JTextArea txtInformation = new JTextArea();
-		txtInformation.setEditable(false);
-		txtInformation.setEnabled(false);
-		txtInformation.setDisabledTextColor(Color.BLACK);
-		txtInformation.setLineWrap(true);
-		txtInformation.setWrapStyleWord(true);
-		txtInformation.setFont(new Font("Monospaced", Font.ITALIC, 13));
-		txtInformation.setText("This is instructional material. It can take up many lines, and therefore can be used to teach quite a large quantity of information.\r\n\r\nThis is another line.");
-		txtInformation.setForeground(Color.BLACK);
-		txtInformation.setBackground(Color.GRAY);
-		pnlInstruction.add(txtInformation, "cell 0 1 2 1,grow");
-		
-		JPanel pnlBar = new JPanel();
-		pnlBar.setBackground(Color.GRAY);
-		pnlInstruction.add(pnlBar, "cell 0 2 2 1,growx,aligny bottom");
-		
-		JButton btnBack = new JButton("<");
-		btnBack.setForeground(Color.LIGHT_GRAY);
-		btnBack.setBackground(Color.DARK_GRAY);
-		pnlBar.add(btnBack);
-		
-		JLabel lblPage = new JLabel("Page ##");
-		lblPage.setFont(new Font("Trajan Pro", Font.PLAIN, 14));
-		pnlBar.add(lblPage);
-		
-		JButton btnForward = new JButton(">");
-		btnForward.setForeground(Color.LIGHT_GRAY);
-		btnForward.setBackground(Color.DARK_GRAY);
-		pnlBar.add(btnForward);
-		
 		
 		pnlHolder.add(pnlQuiz, BorderLayout.CENTER);
-		//pnlHolder.add(pnlInstruction, BorderLayout.CENTER);
-		
-		Component horizontalStrut_2 = Box.createHorizontalStrut(128);
-		pnlInstruction.add(horizontalStrut_2, "cell 0 0,grow");
 		pnlMain.add(pnlSideMenu, "flowy,cell 0 1 1 3,grow");
 		
 		pnlQuiz.setLayout(new MigLayout("", "[grow][grow]", "[][grow][][grow]"));
@@ -252,7 +283,7 @@ public class QuizUI extends Applet {
 		pnlMultipleChoice.add(rdbtnResponse_2, "cell 0 4");
 		
 		JButton btnPlayMedia = new JButton("Play Media");
-		btnPlayMedia.setIcon(new ImageIcon(QuizUI.class.getResource("/res/media_icn.png")));
+		btnPlayMedia.setIcon(new ImageIcon(QuizUI.class.getResource("/resources/res/media_icn.png")));
 		btnPlayMedia.setForeground(Color.WHITE);
 		btnPlayMedia.setBackground(Color.DARK_GRAY);
 		pnlQuiz.add(btnPlayMedia, "cell 1 0,alignx right,aligny center");
@@ -287,44 +318,17 @@ public class QuizUI extends Applet {
 		lblNewLabel_1.setForeground(Color.WHITE);
 		pnlMain.add(lblNewLabel_1, "cell 2 4 2 1,alignx right");
 		
-		JPanel pnlHeader = new JPanel();
-		pnlHeader.setBackground(Color.GRAY);
-		pnlHeader.setBorder(new BevelBorder(BevelBorder.RAISED, null, null, null, null));
-		add(pnlHeader, BorderLayout.NORTH);
-		pnlHeader.setLayout(new MigLayout("", "[][][][][][grow][]", "[][]"));
+		Component horizontalStrut_4 = Box.createHorizontalStrut(20);
+		outer.add(horizontalStrut_4, BorderLayout.EAST);
 		
-		JLabel lblNewLabel = new JLabel("Lesson XX, Section XX - STATUS");
-		lblNewLabel.setFont(new Font("Lucida Grande", Font.BOLD, 18));
-		pnlHeader.add(lblNewLabel, "cell 0 0 7 1,growx,aligny center");
+		Component horizontalStrut = Box.createHorizontalStrut(20);
+		outer.add(horizontalStrut, BorderLayout.WEST);
 		
-		JLabel lblProgress = new JLabel("Progress:");
-		pnlHeader.add(lblProgress, "flowx,cell 1 1");
+		Component verticalStrut_1 = Box.createVerticalStrut(20);
+		outer.add(verticalStrut_1, BorderLayout.SOUTH);
 		
-		JLabel lblProgressText = new JLabel("XXX/XXX Questions");
-		pnlHeader.add(lblProgressText, "cell 4 1,alignx center");
-		
-		JButton btnViewPlan = new JButton("View Lesson Plan");
-		btnViewPlan.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				if (pnlSideMenu.isVisible()) {
-					pnlSideMenu.setVisible(false);
-					((MigLayout)pnlMain.getLayout()).setColumnConstraints("[0px:n:0px,grow][grow][][grow]");
-					QuizUI.this.validate();
-				}else {
-					pnlSideMenu.setVisible(true);
-					((MigLayout)pnlMain.getLayout()).setColumnConstraints("[grow][grow][][grow]");
-					QuizUI.this.validate();
-				}
-			}
-		});
-		pnlHeader.add(btnViewPlan, "cell 6 1");
-		btnViewPlan.setForeground(Color.WHITE);
-		btnViewPlan.setBackground(Color.DARK_GRAY);
-		
-		JProgressBar progressBar = new JProgressBar();
-		pnlHeader.add(progressBar, "cell 1 1 3 1,growx");
-		
-		this.setSize(640, 480);
+		Component verticalStrut = Box.createVerticalStrut(20);
+		outer.add(verticalStrut, BorderLayout.NORTH);
 		
 		switchToQuizMode();
 	}

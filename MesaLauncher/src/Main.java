@@ -204,7 +204,7 @@ public class Main extends JFrame {
 		lblUpdate.setText("Updates may be required! Check for updates.");
 		
 				JLabel lblNewLabel_1 = new JLabel("Created by Jad Aboulhosn for Mesa Labs");
-				panel_1.add(lblNewLabel_1, "cell 0 3 2 2,alignx left,aligny bottom");
+				panel_1.add(lblNewLabel_1, "cell 0 3 3 2,alignx left,aligny bottom");
 		
 		btnExit = new JButton("Exit");
 		btnExit.addActionListener(new ActionListener() {

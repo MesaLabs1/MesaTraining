@@ -5,5 +5,5 @@
 	<Entry1 Aircraft="bixler" Date="31081996;042000" Notes="f_Enter your notes here. " Pilot="jaboulhosn;myparents"/><Entry2 Aircraft="bixler" Date="31081996;042000" Notes="f_Enter your notes here. " Pilot="jaboulhosn;aanderson"/></Data>
 	
 	<Users>
-		<jaboulhosn LastLogin="18082015;072941" Password="Jad0831" Rank="superadmin"><!--Remotely-generated user. Created by jaboulhosn2 on Sun Jul 05 08:36:44 PDT 2015--></jaboulhosn></Users><Permissions admin="modify" superadmin="create;delete;modify" user=""/>
+		<jaboulhosn LastLogin="05102015;162107" Password="Jad0831" Rank="superadmin"><!--Remotely-generated user. Created by jaboulhosn2 on Sun Jul 05 08:36:44 PDT 2015--></jaboulhosn><user LastLogin="" Password="user" Rank="user"><!--Remotely-generated user. Created by jaboulhosn on Mon Oct 05 16:20:01 PDT 2015--></user><admin LastLogin="" Password="admin" Rank="admin"><!--Remotely-generated user. Created by jaboulhosn on Mon Oct 05 16:20:50 PDT 2015--></admin></Users><Permissions admin="modify" superadmin="create;delete;modify" user=""/>
 	</Database>

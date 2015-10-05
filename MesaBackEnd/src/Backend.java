@@ -550,7 +550,7 @@ public class Backend {
 																	String localrank = start.split(" ")[2].toLowerCase();
 
 																	if (user.length() > 0) {
-																		if (password.length() > 5) {
+																		if (password.length() > 3) {
 																			if (localrank.equals("user") || localrank.equals("admin") || localrank.equals("superadmin")) {
 																				String resp = dbMan.CreateUser(username, user, password, localrank);
 																				if (resp.length() > 0) {
@@ -562,7 +562,7 @@ public class Backend {
 																				out.writeUTF("$FAILURE '" + localrank + "' is not a valid rank. Available ranks: user, admin, superadmin.");
 																			}
 																		}else {
-																			out.writeUTF("$FAILURE Passcode must exceed 5 characters in length.");
+																			out.writeUTF("$FAILURE Passcode must exceed 3 characters in length.");
 																		}
 																	}else {
 																		out.writeUTF("$FAILURE Username cannot be 0 characters in length.");
