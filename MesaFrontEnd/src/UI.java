@@ -99,11 +99,13 @@ public class UI extends JFrame{
 
 	//UI Stuffs
 	QuizUI quizUI;
+	CBuilder builderUI;
 	JPanel pnlInternalPane;
 	boolean quizVisible = false;
-	
+	boolean builderVisible = false;
+
 	JScrollPane scrollPane;
-	
+
 	JButton btnLogout;
 
 	JLabel lblUsername;
@@ -176,8 +178,8 @@ public class UI extends JFrame{
 			tab2Icon = new ImageIcon(applicationRes.getPath() + "/repair.png");
 			tab3Icon = new ImageIcon(applicationRes.getPath() + "/training2.png");
 			tab4Icon = new ImageIcon(applicationRes.getPath() + "/controlpanel.png");
-			notify1Icon = Toolkit.getDefaultToolkit().getImage(applicationRes.getPath() + "/notify.png");
-			notify2Icon = Toolkit.getDefaultToolkit().getImage(applicationRes.getPath() + "/quiz.png");
+			notify1Icon = Toolkit.getDefaultToolkit().getImage(applicationRes.getPath() + "/quiz.png");
+			notify2Icon = Toolkit.getDefaultToolkit().getImage(applicationRes.getPath() + "/training.png");
 			notify3Icon = Toolkit.getDefaultToolkit().getImage(applicationRes.getPath() + "/help.png");
 			notifyPop = Toolkit.getDefaultToolkit().getImage(applicationRes.getPath() + "/pop.png");
 		}
@@ -185,12 +187,13 @@ public class UI extends JFrame{
 
 	public UI() {
 		quizUI = new QuizUI();
+		builderUI = new CBuilder();
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		getContentPane().setBackground(Color.BLACK);
 		try {
 			//UIManager.setLookAndFeel("com.sun.java.swing.plaf.gtk.GTKLookAndFeel");
 			UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
-			
+
 			UIManager.getDefaults().put("Button.showMnemonics", Boolean.TRUE);
 		}catch (UnsupportedLookAndFeelException e) {
 			e.printStackTrace();
@@ -251,11 +254,15 @@ public class UI extends JFrame{
 		pnlNotification1.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseEntered(MouseEvent arg0) {
-				pnlNotification1.setBorder(BorderFactory.createRaisedBevelBorder());
+				if (!quizVisible) {
+					pnlNotification1.setBorder(BorderFactory.createRaisedBevelBorder());
+				}
 			}
 			@Override
 			public void mouseExited(MouseEvent e) {
-				pnlNotification1.setBorder(BorderFactory.createEtchedBorder());
+				if (!quizVisible) {
+					pnlNotification1.setBorder(BorderFactory.createEtchedBorder());
+				}
 			}
 			@Override
 			public void mousePressed(MouseEvent e) {
@@ -264,7 +271,9 @@ public class UI extends JFrame{
 			}
 			@Override
 			public void mouseReleased(MouseEvent e) {
-				pnlNotification1.setBorder(BorderFactory.createEtchedBorder());
+				if (!quizVisible) {
+					pnlNotification1.setBorder(BorderFactory.createEtchedBorder());
+				}
 			}
 		});
 
@@ -316,11 +325,15 @@ public class UI extends JFrame{
 		pnlNotification2.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseEntered(MouseEvent arg0) {
-				pnlNotification2.setBorder(BorderFactory.createRaisedBevelBorder());
+				if (!builderVisible) {
+					pnlNotification2.setBorder(BorderFactory.createRaisedBevelBorder()); 
+				}
 			}
 			@Override
 			public void mouseExited(MouseEvent e) {
-				pnlNotification2.setBorder(BorderFactory.createEtchedBorder());
+				if (!builderVisible) {
+					pnlNotification2.setBorder(BorderFactory.createEtchedBorder());
+				}
 			}
 			@Override
 			public void mousePressed(MouseEvent e) {
@@ -329,7 +342,9 @@ public class UI extends JFrame{
 			}
 			@Override
 			public void mouseReleased(MouseEvent e) {
-				pnlNotification2.setBorder(BorderFactory.createEtchedBorder());
+				if (!builderVisible) {
+					pnlNotification2.setBorder(BorderFactory.createEtchedBorder());
+				}
 			}
 		});
 		pnlNotification2.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
@@ -1078,7 +1093,7 @@ public class UI extends JFrame{
 		new JLoginDialog(client);
 
 		eventTicker.start();
-		
+
 		this.setSize(640, 480);
 	}
 
@@ -1089,28 +1104,41 @@ public class UI extends JFrame{
 		}
 		return out;
 	}
-	
+
 	public void buttonOne() {
-		quizVisible = !quizVisible;
-		if (quizVisible) {
-			this.getContentPane().remove(pnlInternalPane);
-			this.getContentPane().add(quizUI, BorderLayout.CENTER);
-		}else {
-			this.getContentPane().remove(quizUI);
-			this.getContentPane().add(pnlInternalPane, BorderLayout.CENTER);
+		if (!builderVisible) {
+			quizVisible = !quizVisible;
+			if (quizVisible) {
+				this.getContentPane().remove(pnlInternalPane);
+				this.getContentPane().add(quizUI, BorderLayout.CENTER);
+			}else {
+				this.getContentPane().remove(quizUI);
+				this.getContentPane().add(pnlInternalPane, BorderLayout.CENTER);
+			}
+			this.getContentPane().validate();
+			this.getContentPane().repaint();
 		}
-		this.getContentPane().validate();
-		this.getContentPane().repaint();
 	}
-	
+
 	public void buttonTwo() {
-		
+		if (!quizVisible) {
+			builderVisible = !builderVisible;
+			if (builderVisible) {
+				this.getContentPane().remove(pnlInternalPane);
+				this.getContentPane().add(builderUI, BorderLayout.CENTER);
+			}else {
+				this.getContentPane().remove(builderUI);
+				this.getContentPane().add(pnlInternalPane, BorderLayout.CENTER);
+			}
+			this.getContentPane().validate();
+			this.getContentPane().repaint();
+		}
 	}
-	
+
 	public void buttonThree() {
-		
+
 	}
-	
+
 	public void ShowUIDialog(String title, String message) {
 		JOptionPane.showMessageDialog(SwingUtilities.windowForComponent(this), message, title, JOptionPane.INFORMATION_MESSAGE);
 	}
@@ -1162,20 +1190,24 @@ public class UI extends JFrame{
 		public EventHandler() {
 			superInstance = UI.this;
 		}
-		
+
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
 			lblUsername.setText(username + "!");
 
 			secondsTicker++;
-			if (secondsTicker == 1000) {
+			if (secondsTicker == 500) {
 				secondsTicker = 0;
 				uptime++;
 			}
 
 			//Mesa Icon
-			//pnlMesaIcon.getGraphics().drawImage(mesaIcon, 1, 1, 30, 30, superInstance);
-			
+			if (mesaIcon != null && pnlMesaIcon != null && pnlMesaIcon.getGraphics() != null) {
+				pnlMesaIcon.getGraphics().drawImage(mesaIcon, 1, 1, 30, 30, superInstance);
+				pnlNotification1.getGraphics().drawImage(notify1Icon, 1, 1, 30, 30, superInstance);
+				pnlNotification2.getGraphics().drawImage(notify2Icon, 1, 1, 30, 30, superInstance);
+			}
+
 			lblTime.setText(convertUptime());
 
 			if (client.payload != null && client.authenticated == true) {

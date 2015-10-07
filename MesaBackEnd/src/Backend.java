@@ -12,22 +12,47 @@ import java.util.Random;
 import javax.swing.DefaultListModel;
 import javax.swing.Timer;
 
+/**
+ * The Backend provides multi-threaded networking with support for complex object serialization. The UI runs on a separate
+ * thread, and will occasionally access flags in this class to check it's status for visual reporting.
+ * @author hackjunky
+ *
+ */
 public class Backend {
+	//We can pass all user configuration parameters around in a PropertyMaster, which is a nested class in Init.
 	Init.PropertyMaster properties;
+	
+	//Utility class is passed around by pointer to the entire program, for the purpose of central logging.
 	Utils util;
+	
+	//The NetworkMaster is a storage system for the active network connections. SEE CLASS.
 	NetworkMaster netMaster;
+	//The master thread runs the network master, and keeps it asynchronous from the main execution.
 	Thread netMasterThread;
+	
+	//DatabaseManager reference, we will use this class to interpret and render serializable data. SEE CLASS.
 	DatabaseManager dbMan;
+	//Same as above, but for the curriculum.
+	CurriculumDatabase cMan;
+	
+	//The serialized object, passed between the server and all clients. SEE CLASS.
 	Payload payload;
+	
+	//Main timer keeps track of the server's hearbeat, memory usage, and updates the user interface via flags.
 	Timer eventTicker;
+	//SEE CLASS.
 	EventHandler eventHandler;
 
+	//We assign a thread an arbitrary name. I got clever here.
 	enum ThreadNames {
 		Bashful, Doc, Dopey, Grumpy, Happy, Sleepy, Sneezy
 	}
 	
+	//Constructor
 	public Backend(Init.PropertyMaster prop) {
+		//Read in properties pointer from Init.
 		properties = prop;
+		//Read in utilities pointer from Init.
 		util = properties.util;
 
 		util.Log("Backend main program is initializing...");
@@ -40,6 +65,9 @@ public class Backend {
 
 		//Initialize the DBManager and point it to the shared resources
 		dbMan = new DatabaseManager(util, netMaster.ui, payload);
+		
+		//Initialize the Curriculum Database, and point it to the shared resources
+		cMan = new CurriculumDatabase(util, netMaster.ui, payload);
 
 		//Create a wrapper thread
 		netMasterThread = new Thread(netMaster);
@@ -55,26 +83,39 @@ public class Backend {
 		eventTicker.start();
 	}
 
-
+	/**
+	 * EventHandler simple controls the UI <-> Async Thread situation. Since, in ADO, we cannot reference other-thread items, 
+	 * we can overcome this hurdle by simply setting and reading integer flags in this thread, and having a separate timer on the 
+	 * UI side to superimpose the flags onto labels, etc.
+	 * @author hackjunky
+	 *
+	 */
 	public class EventHandler implements ActionListener{
+		//Let's pass these in, for good measure.
 		Backend backend;
 		UI ui;
 		NetworkMaster netMaster;
 
+		//Timer runs at interval of 100, so we want 1000/100 = 10 tick intervals to maintain per-second operation.
 		int second = 10;
 
+		//Constructor
 		public EventHandler() {
 			backend = Backend.this;
 			netMaster = backend.netMaster;
 			ui = netMaster.ui;
 		}
 
+		//ActionPerformed is called by the Swing Timer class.
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			backend = Backend.this;
 			netMaster = backend.netMaster;
 			ui = netMaster.ui;
 
+			/*The UI sets a boolean flag, which we read here, and set back to false. This keeps ADO seamless, and avoids
+			 * per-thread erroring and error-passing errors. You will see this in many other methods throughout the program.
+			 */
 			if (ui.activate) {
 				util.Log("Activating the Network Listener...");
 				ui.activate = false;
@@ -88,6 +129,10 @@ public class Backend {
 				netMasterThread.interrupt();
 			}
 
+			/*Here, we check to see if a thread has died, and recycle it's address in the array, to keep the garbage collection
+			 * seamless. If we don't do this, we can have up to MAX_USERS threads, all containing junk/useless data, held onto
+			 * by a null network class.
+			 */	
 			for (int i = 0; i < netMaster.networkThreads.length; i++) {
 				if (netMaster.networkThreads[i] != null) {
 					if (!netMaster.networkThreads[i].isAlive()) {
@@ -97,11 +142,13 @@ public class Backend {
 				}
 			}
 
+			//We've done all our UI flagging, tell the UI it's time to update.
 			netMaster.UpdateUI();
 
 			//We call this to reload the payload class data for its sync.
 			netMaster.UpdatePayload();
 
+			//Remember, we onlu want to tick every second, so since we're at 100 ticks, then 1000/100 = 10 ops/tick.
 			if (second == 0) {
 				second = 10;
 
@@ -154,12 +201,17 @@ public class Backend {
 		Socket socket;
 
 		public NetworkMaster() {
+			//We can use this variable read in directly by INIT from the XML configuration file.
 			networkThreads = new Thread[properties.NETWORK_MAX_CONNECTIONS];
 			networkSockets = new NetworkSocket[properties.NETWORK_MAX_CONNECTIONS];
 		}
 
 		
 		public void UpdateUI() {
+			/*Update the UI. Let's read the thread count, client count, and handle count. Remember that since the other 
+			 * ADO thread is continuously accessing this data at approx. 100 times/second, we cannot clear the variable 
+			 * until we're ready to write to it. Therefore, we write to these temporary integers, and then update the UI.
+			 */
 			int threads = 0;
 			int clients = 0;
 			int handles = 0;
@@ -186,6 +238,9 @@ public class Backend {
 					serverSocket = new ServerSocket(instance.properties.NETWORK_PORT);
 				}catch (Exception e) {
 					util.Log("Server failed to bind to port... is it already running?");
+					/*BUG: Sometimes if we re-activate the listener and the port is already in use by the program, the system
+					 * will reject the assignment. I've added this message because I'm too lazy to fix it.
+					 */
 					util.Log("Ignore this message if you've just reactivated the listener.");
 				}
 
@@ -193,6 +248,7 @@ public class Backend {
 
 				//This will execute eternally until the program terminates. It's in a separate thread for this reason.
 				while (true) {
+					//We will repeatedly update the UI while this loop is running indefinitely.
 					UpdateUI(); 
 					ui.SetStatus(UI.ServerStatus.Active);
 					ui.progressBar.setValue(100);
@@ -224,6 +280,8 @@ public class Backend {
 								 * Garbage Collection involves Java searching memory spaces for defunct/unused data and destroying it
 								 * so as to minimize our memory footprint. While we can call GC via System.gc(), Java also does it 
 								 * when it believes a large amount of data is unused.  
+								 * 
+								 * Expected behavior: The program will start at 1MB and gradually climb to ~25MB before returning to 0MB.
 								 */
 
 								util.Log("Clearing a previous thread (this might cause us to GC in a bit)...");
@@ -259,6 +317,7 @@ public class Backend {
 					}
 					if (!success) {
 						util.Log("CRITICAL ERROR. I DON'T HAVE ANYWHERE TO PUT MY NEXT CLIENT.");
+						//We should never ever see this message on the UI.
 					}
 					UpdateUI();
 				}
@@ -273,11 +332,19 @@ public class Backend {
 			}
 		}
 
+		/**
+		 * Updating the payload involves converting the database XML output into a usable serializable class called
+		 * the Payload. It is not uncommon to reference to the networked class as a Payload.
+		 */
 		public void UpdatePayload() {
+			/*
+			 * First, set the models in the payload using the DBMan GetAllOfType request.
+			 */
 			payload.setDateModel(ConvertArrayToModel(dbMan.GetAllOfType(DatabaseManager.FieldType.DATES)));
 			payload.setPilotModel(ConvertArrayToModel(dbMan.GetAllOfType(DatabaseManager.FieldType.PILOTS)));
 			payload.setNameModel(ConvertArrayToModel(dbMan.GetAllOfType(DatabaseManager.FieldType.AIRCRAFTS)));
 
+			//Next, populate the ranklist.
 			String[] ranklist = dbMan.RequestRankList();
 			DefaultListModel<String> userModel = new DefaultListModel<String>();
 			DefaultListModel<String> rankModel = new DefaultListModel<String>();
@@ -292,11 +359,13 @@ public class Backend {
 				payload.setRankModel(rankModel);
 			}
 
+			//User count.
 			int count = dbMan.GetUserCount();
 			if (count > 0) {
 				payload.setNumUsers(count);
 			}
 
+			//Arbitrary statistics we serialize because we can.
 			payload.setNumOnline(ui.numClients);
 			if (netMaster != null && netMaster.socket != null) {
 				payload.setNetIP(netMaster.socket.getInetAddress().toString());
@@ -305,9 +374,15 @@ public class Backend {
 			payload.setUptime(ui.lblUptime.getText());
 			payload.setMemUsage(ui.lblMemUsage.getText());
 
+			//We inform DBMan that the payload is ready to be sent.
 			dbMan.SendPayloadStacks();
 		}
 
+		/**
+		 * Converts an Array into a DefaultListModel (the format used by JLists)
+		 * @param in The array to convert.
+		 * @return A DefaultListModel with in[] in it.
+		 */
 		public DefaultListModel<String> ConvertArrayToModel(String[] in) {
 			if (in != null) {
 				DefaultListModel<String> model = new DefaultListModel<String>();
@@ -327,12 +402,25 @@ public class Backend {
 			return new DefaultListModel<String>();
 		}
 
-		
+		/**
+		 * Returns the socket that the server wants to use next, so we can assign to it.
+		 * @return A socket that wants a user and is next in line.
+		 */
 		public Socket GetCurrentSocket() {
 			return socket;
 		}
 	}
 
+	/**
+	 * NetworkSocket provides socket support for each individual client. In example, creating 12 of these creates 12 possible 
+	 * client sockets to write to. The clients will connect to each one individually, but launching them all together would 
+	 * cause a port binding error. That's why we store them in the master class, and keep one open, just in case someone connects.
+	 * 
+	 * When someone disconnects, the loop in this class terminates, and the class marks itself as waiting for Garbage Collection.
+	 * The system should collect it soon.
+	 * @author hackjunky
+	 *
+	 */
 	public class NetworkSocket implements Runnable {
 		//Reference to Superclass for ease-of-access
 		Backend instance = Backend.this;
@@ -340,20 +428,24 @@ public class Backend {
 		Init.PropertyMaster propMaster = instance.properties;
 		UI ui;
 
-		//Data
+		//Server Data
 		private String name;
 		private Socket server;
-
 		private boolean active;
-
 		private String remoteName;
 
 		//Client
 		private String username;
 		private String password;
 
+		//Rank
 		private String rank = "user";
 
+		/**
+		 * Constructor for NetworkSocket.
+		 * @param socket Socket to bind to.
+		 * @param threadName Name for the thread, so we can represent it literally.
+		 */
 		public NetworkSocket(Socket socket, String threadName) {
 			ui = instance.properties.ui;
 			active = true;
@@ -362,17 +454,32 @@ public class Backend {
 			server = socket;
 		}
 
+		/**
+		 * Are we still alive and connected to a user?
+		 * @return True if we are connected, and false if we're ready for GC.
+		 */
 		public boolean GetActive() {
 			return active;
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * @see java.lang.Runnable#run()
+		 */
 		@Override
 		public void run() {
+			/**
+			 * This method executes eternally via the Thread that controls it. It is called only once, however, you will notice
+			 * I've added a while(true), which would normally hang a program. However, since we have our own thread, and this is
+			 * normal practice for network threading, everything is okay. Don't freak out :)
+			 */
 			DataInputStream in;
 			DataOutputStream out;
 			ObjectOutputStream  oos;
 			while(active) {
+				//Start here
 				try {
+					//Show that we're starting our handshake.
 					ui.accessCount++;
 					ui.progressBar.setValue(10);
 
@@ -381,9 +488,7 @@ public class Backend {
 
 					in = new DataInputStream(server.getInputStream());
 
-
-
-
+					//Let the user know we're doing it.
 					util.Log("You've awoken " + name + " on port " + server.getLocalPort() + ".");
 					util.Log("[" + name + "] Authorizing " + server.getRemoteSocketAddress() + "...");
 
@@ -420,8 +525,10 @@ public class Backend {
 
 					ui.progressBar.setValue(20);
 
+					//Check to see if the versions match.
 					if (remoteVersion.equals(String.valueOf(propMaster.BACKEND_VERSION))) {
 						ui.progressBar.setValue(25);
+						//Check to see if the user's IP matches what they registered for the socket. 
 						if (remoteIP.equals(server.getRemoteSocketAddress().toString())) {
 							ui.progressBar.setValue(30);
 							this.remoteName = remoteName;
@@ -439,6 +546,7 @@ public class Backend {
 
 							Random rand = new Random();
 
+							//Designate a callsign to each message, so we don't lose them in the network trace.
 							String message = "CALLSIGN ";
 							for (int i = 0; i < 128; i++) {
 								message += rand.nextInt(10);
@@ -497,6 +605,9 @@ public class Backend {
 								if (verified) {			//Given that the loop above terminated, and the user info was valid, we are now in the main loop.
 									boolean done = false;
 
+									/*
+									 * Main loop, the user is authenticated at this point.
+									 */
 									while (!done) {
 										try {
 											ui.numOverhead++;
@@ -703,12 +814,17 @@ public class Backend {
 					e.printStackTrace();
 				}
 
+				//We've died, which means the client is disconnected,closed,whatever. Mark us ready for GC, because we want to clean this mess up.
 				ui.numOverhead--;
 				active = false;
 			}
 		}
 
-		
+		/**
+		 * Helper method that takes a input string, separated by spaces, and returns an array of commands.
+		 * @param input COMMAND PARAM PARAM PARAM
+		 * @return [PARAM][PARAM][PARAM]
+		 */
 		public String[] GetParameters(String input) {
 			String[] split = input.split(" ");
 			String[] output = new String[split.length - 1];

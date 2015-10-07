@@ -9,12 +9,14 @@ import java.awt.Component;
 
 import javax.swing.Box;
 import javax.swing.border.BevelBorder;
+
 import net.miginfocom.swing.MigLayout;
 
 import javax.swing.border.LineBorder;
 
 import java.awt.Font;
 
+import javax.swing.JComponent;
 import javax.swing.JRadioButton;
 import javax.swing.SwingConstants;
 import javax.swing.JTextArea;
@@ -22,6 +24,7 @@ import javax.swing.JProgressBar;
 import javax.swing.JButton;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
+
 import java.awt.event.ActionListener;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -31,9 +34,11 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.awt.event.ActionEvent;
+
 import javax.swing.plaf.ColorUIResource;
 import javax.swing.border.EtchedBorder;
 import javax.swing.JTree;
+import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -51,12 +56,19 @@ public class QuizUI extends JPanel {
 	JPanel pnlInstruction;
 	JPanel pnlQuiz;
 	
+	JButton btnEdit;
+	
+	CBuilder builder;
+	JPanel inner;
+	
 	DocumentBuilderFactory dbFactory;
 	File dbFile;
 	DocumentBuilder dbBuilder;
 	Document doc;
 	
 	public QuizUI() {
+		builder = new CBuilder();
+		
 		setBackground(Color.BLACK);
 		setLayout(new BorderLayout(0, 0));
 		
@@ -112,7 +124,7 @@ public class QuizUI extends JPanel {
 		add(outer, BorderLayout.CENTER);
 		outer.setLayout(new BorderLayout(0, 0));
 		
-		JPanel inner = new JPanel();
+		inner = new JPanel();
 		outer.add(inner);
 		inner.setLayout(new BorderLayout(0, 0));
 		
@@ -124,7 +136,7 @@ public class QuizUI extends JPanel {
 		
 		JLabel lblNewLabel = new JLabel("Lesson XX, Section XX - STATUS");
 		lblNewLabel.setFont(new Font("Lucida Grande", Font.BOLD, 18));
-		pnlHeader.add(lblNewLabel, "cell 0 0 7 1,growx,aligny center");
+		pnlHeader.add(lblNewLabel, "flowx,cell 0 0 6 1,growx,aligny center");
 		
 		JLabel lblProgress = new JLabel("Progress:");
 		pnlHeader.add(lblProgress, "flowx,cell 1 1");
@@ -137,7 +149,7 @@ public class QuizUI extends JPanel {
 			public void actionPerformed(ActionEvent arg0) {
 				if (pnlSideMenu.isVisible()) {
 					pnlSideMenu.setVisible(false);
-					((MigLayout)pnlMain.getLayout()).setColumnConstraints("[0px:n:0px,grow][grow][][grow]");
+					((MigLayout)pnlMain.getLayout()).setColumnConstraints("[0px:n:0px][grow][][grow]");
 					QuizUI.this.validate();
 				}else {
 					pnlSideMenu.setVisible(true);
@@ -146,12 +158,34 @@ public class QuizUI extends JPanel {
 				}
 			}
 		});
-		pnlHeader.add(btnViewPlan, "cell 6 1");
+		pnlHeader.add(btnViewPlan, "cell 6 1,alignx right");
 		btnViewPlan.setForeground(Color.WHITE);
 		btnViewPlan.setBackground(Color.DARK_GRAY);
 		
 		JProgressBar progressBar = new JProgressBar();
-		pnlHeader.add(progressBar, "cell 1 1 3 1,growx");
+		pnlHeader.add(progressBar, "cell 1 1,growx");
+		
+		btnEdit = new JButton("Edit Curriculum");
+		btnEdit.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if (btnEdit.isEnabled()) {
+					if (btnEdit.getText().equals("Edit Curriculum")) {
+						inner.remove(pnlMain);
+						inner.add(builder, BorderLayout.CENTER);
+						btnEdit.setText("Return to Curriculum");
+					}else {
+						inner.remove(builder);
+						inner.add(pnlMain, BorderLayout.CENTER);
+						btnEdit.setText("Edit Curriculum");
+					}
+					QuizUI.this.validate();
+					QuizUI.this.repaint();
+				}
+			}
+		});
+		btnEdit.setForeground(Color.WHITE);
+		btnEdit.setBackground(Color.DARK_GRAY);
+		pnlHeader.add(btnEdit, "cell 6 0,alignx right");
 		
 		pnlMain = new JPanel();
 		inner.add(pnlMain, BorderLayout.CENTER);
@@ -174,6 +208,7 @@ public class QuizUI extends JPanel {
 		JTree tree = new JTree();
 		tree.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
 		tree.setBackground(Color.DARK_GRAY);
+		tree.setCellRenderer(new CustomCellRenderer());
 		tree.setModel(new DefaultTreeModel(
 			new DefaultMutableTreeNode("Name's Lesson Plan") {
 				private static final long serialVersionUID = -5189884384669868456L;
@@ -543,6 +578,22 @@ public class QuizUI extends JPanel {
 			public int getIndex() {
 				return index;
 			}
+		}
+	}
+	
+	public class CustomCellRenderer extends DefaultTreeCellRenderer{
+		private static final long serialVersionUID = -2748612083655962073L;
+
+		@Override
+		public Component getTreeCellRendererComponent(JTree tree, Object value,
+				boolean isSelected, boolean expanded, boolean leaf, int row,
+				boolean hasFocus) {
+
+			JComponent c = (JComponent) super.getTreeCellRendererComponent(tree, value, isSelected, expanded, leaf, row, hasFocus);
+			c.setBackground(Color.DARK_GRAY); 
+			c.setOpaque(true);
+			c.setForeground(Color.black);
+			return c; 
 		}
 	}
 	

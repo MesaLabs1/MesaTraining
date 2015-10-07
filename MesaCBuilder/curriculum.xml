@@ -1,0 +1,9 @@
+<Curriculum>
+	
+	
+	
+	<Lessons><Lesson1 Title="Lesson 1" Users="">
+		<Data1 Title="Introduction">
+			<Page1 Content="This is some information for Lesson 1."></Page1>
+			<Page2 Content="This is also some information for Lesson 1."></Page2></Data1>
+		</Lesson1><Quiz1 Users="" Title=""><Question1 Question="This is a default quiz question, stored in XML" Options="option1;option2;option3;option4;option5" Answer="2"></Question1></Quiz1></Lessons></Curriculum>

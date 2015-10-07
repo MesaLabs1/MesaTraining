@@ -163,6 +163,7 @@ public class DatabaseManager {
 			} catch (IOException e) {
 				System.out.println("Failed to create proper FS. Unexpected behavior could occur.");
 				e.printStackTrace();
+				return false;
 			}
 		}
 		return true;
@@ -515,7 +516,6 @@ public class DatabaseManager {
 	
 	synchronized public String AddLog(String caller, Payload.Entry entry) {
 		try {
-			
 			util.Log("The user " + caller + " is creating a synthetic operational log for 'REGEX_" + "'.");
 			
 			return null;

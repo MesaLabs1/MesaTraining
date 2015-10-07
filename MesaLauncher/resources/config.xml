@@ -1,0 +1,6 @@
+<config>
+	<INIT Version="2" Update="">
+	
+	</INIT>
+	
+	<Network Port="1337" MaxConnections="12" MaxOverhead="0" Update="https://www.dropbox.com/s/ecatxsny3cxvoru/update.zip"></Network></config>

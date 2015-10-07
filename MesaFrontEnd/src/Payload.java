@@ -22,6 +22,8 @@ public class Payload implements Serializable {
 
 	private ArrayList<Entry> entries;
 
+	private Curriculum curriculum;
+
 	private int numUsers;
 	private int numOnline;
 	private int bufferSize;
@@ -38,6 +40,8 @@ public class Payload implements Serializable {
 		rankModel = new DefaultListModel<String>();
 
 		entries = new ArrayList<Entry>();
+		
+		curriculum = new Curriculum();
 	}
 
 	public DefaultListModel<String> getDateModel() {
@@ -170,6 +174,10 @@ public class Payload implements Serializable {
 	public void AddEntry(Entry e) {
 		entries.add(e);
 	}
+	
+	public Curriculum getCurriculum() {
+		return curriculum;
+	}
 
 	public Entry CreateBlankEntry(String p, String a, String d) {
 		return new Entry(p, a, d);
@@ -301,5 +309,174 @@ public class Payload implements Serializable {
 
 	}
 
+	public class Curriculum implements Serializable {
+		private static final long serialVersionUID = 6647307836727889362L;
+		ArrayList<CBase> lessonPlan;
+		
+		public Curriculum() {
+			lessonPlan = new ArrayList<CBase>();
+		}
+		
+		public Lesson CreateLesson() {
+			return new Lesson();
+		}
+		
+		public Quiz CreateQuiz() {
+			return new Quiz();
+		}
+		
+		public void AddLesson(Lesson l) {
+			lessonPlan.add(l);
+		}
+		
+		public void AddQuiz(Quiz q) {
+			lessonPlan.add(q);
+		}
+		
+		public abstract class CBase implements Serializable {
+			private static final long serialVersionUID = -375548600471048655L;
+			
+			private ArrayList<String> usersCompleted;
+			
+			public ArrayList<String> getUsersCompleted() {
+				return usersCompleted;
+			}
 
+			private String title;
+			
+			public String getTitle() {
+				return title;
+			}
+
+			public void setTitle(String title) {
+				this.title = title;
+			}
+
+			public CBase() {
+				usersCompleted = new ArrayList<String>();
+			}
+			
+			public boolean HasCompleted(String user) {
+				for (String s : usersCompleted) {
+					if (user.equals(s)) {
+						return true;
+					}
+				}
+				return false;
+			}
+			
+			public void AddUser(String user) {
+				usersCompleted.add(user);
+			}
+		}
+		
+		public class Lesson extends CBase implements Serializable {
+			private static final long serialVersionUID = 5872060605131951672L;
+			ArrayList<Section> sections;
+		
+			public Lesson() {
+				sections = new ArrayList<Section>();
+			}
+			
+			public void AddSection(ArrayList<String> pages, String title) {
+				Section s = new Section(pages);
+				s.setTitle(title);
+				sections.add(s);
+			}
+			
+			public ArrayList<Section> getSections() {
+				return sections;
+			}
+
+			
+			public class Section implements Serializable {
+				private static final long serialVersionUID = -1776884185653143123L;
+				ArrayList<String> pages;
+				String title;
+				
+				public String getTitle() {
+					return title;
+				}
+
+				public void setTitle(String title) {
+					this.title = title;
+				}
+
+				public Section(ArrayList<String> p) {
+					pages = p;
+				}
+				
+				public void addPage(String p) {
+					pages.add(p);
+				}
+				
+				public void addPages(String[] p) {
+					for (int i = 0; i < p.length; i++) {
+						pages.add(p[i]);
+					}
+				}
+				
+				public void removePage(int a) {
+					pages.remove(a);
+				}
+			}
+		}
+		
+		public class Quiz extends CBase implements Serializable {
+			private static final long serialVersionUID = -5334137890876651888L;
+			ArrayList<QuizQuestion> questions;
+			
+			public Quiz() {
+				questions = new ArrayList<QuizQuestion>();
+			}
+			
+			public QuizQuestion GetQuestion(int i) {
+				return questions.get(i);
+			}
+			
+			public void AddQuestion(QuizQuestion q) {
+				questions.add(q);
+			}
+			
+			public void AddQuestion(QuizQuestion q, int i) {
+				questions.add(i, q);
+			}
+			
+			public QuizQuestion CreateQuestion() {
+				return new QuizQuestion();
+			}
+			
+			public class QuizQuestion implements Serializable {
+				private static final long serialVersionUID = -1131913365991982401L;
+				
+				String question;
+				int answer;
+				String[] responses;
+				
+				public QuizQuestion() {
+					responses = new String[5];
+				}
+				
+				public void SetQuestion(String s) {
+					question = s;
+				}
+				
+				public void SetResponse(int resp) {
+					answer = resp;
+				}
+				
+				public void SetAnswers(String[] r) {
+					for (int i = 0; i < 5; i++) {
+						 responses[i] = r[i];
+					}
+				}
+				
+				public void SetAnswer(int i, String c) {
+					if (i < responses.length) {
+						responses[i] = c;
+					}
+				}
+			}
+		}
+	}
 }
